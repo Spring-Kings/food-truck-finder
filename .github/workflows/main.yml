@@ -1,0 +1,41 @@
+name: Main workflow
+on:
+  push
+  pull_request
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+          java-version: 14.0.0
+          java-package: jdk
+          architecture: x64
+
+      - name: yarn install
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: install
+
+      - name: Move into API directory
+          run: cd food-truck-api
+
+      - name: Test API
+        uses: eskatos/gradle-command-action@v1
+        with:
+          arguments: test
+
+      - name: Move into frontend directory
+        run: |
+          cd -
+          cd food-truck-frontend
+
+      - name: Test Frontend
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: test --passWithNoTests
