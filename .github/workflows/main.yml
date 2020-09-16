@@ -16,6 +16,11 @@ jobs:
           java-package: jdk
           architecture: x64
 
+      - name: Get Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+
       # Cache build files
       - name: Cache
         uses: actions/cache@v2
@@ -24,10 +29,11 @@ jobs:
             **/node_modules
           key: ${{ hashFiles('**/yarn.lock') }}
 
-      - name: yarn install
-        uses: borales/actions-yarn@v2.0.0
-        with:
-          cmd: install
+      - name: Install Yarn Dependencies
+        run: yarn install
+        #uses: borales/actions-yarn@v2.0.0
+        #with:
+        #  cmd: install
 
       #- name: Move into API directory
       #  run: cd food-truck-api
@@ -46,6 +52,7 @@ jobs:
           cd food-truck-frontend
 
       - name: Test Frontend
-        uses: borales/actions-yarn@v2.0.0
-        with:
-          cmd: test --passWithNoTests
+        run: yarn test --pathWithNoTests
+        #uses: borales/actions-yarn@v2.0.0
+        #with:
+        #  cmd: test --passWithNoTests
