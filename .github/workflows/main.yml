@@ -32,7 +32,7 @@ jobs:
       - name: Install Yarn Dependencies
         run: |
           yarn install --production=false
-          yarn global add jest
+        #yarn global add jest
         #uses: borales/actions-yarn@v2.0.0
         #with:
         #  cmd: install
@@ -51,7 +51,7 @@ jobs:
       - name: Test Frontend
         run: |
           cd food-truck-frontend
-          yarn test --passWithNoTests
+          ./node_modules/.bin/jest --passWithNoTests
 
         #uses: borales/actions-yarn@v2.0.0
         #with:
