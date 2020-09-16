@@ -51,7 +51,11 @@ jobs:
       - name: Test Frontend
         run: |
           cd food-truck-frontend
-          ./node_modules/.bin/jest --passWithNoTests
+          pwd
+          cd node_modules
+          pwd
+          cd .bin
+          ./jest --passWithNoTests
 
         #uses: borales/actions-yarn@v2.0.0
         #with:
