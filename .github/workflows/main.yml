@@ -42,7 +42,8 @@ jobs:
 
       - name: Move into frontend directory
         run: |
-          cd ../food-truck-frontend
+          pwd
+          cd food-truck-frontend
 
       - name: Test Frontend
         uses: borales/actions-yarn@v2.0.0
