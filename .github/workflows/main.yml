@@ -30,7 +30,7 @@ jobs:
           key: ${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Yarn Dependencies
-        run: yarn install
+        run: yarn install --production=false
         #uses: borales/actions-yarn@v2.0.0
         #with:
         #  cmd: install
@@ -46,13 +46,11 @@ jobs:
         #with:
         #  arguments: test
 
-      - name: Move into frontend directory
-        run: |
-          pwd
-          cd food-truck-frontend
-
       - name: Test Frontend
-        run: yarn test --pathWithNoTests
+        run: |
+          cd food-truck-frontend
+          yarn test --pathWithNoTests
+
         #uses: borales/actions-yarn@v2.0.0
         #with:
         #  cmd: test --passWithNoTests
