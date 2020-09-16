@@ -51,7 +51,7 @@ jobs:
       - name: Test Frontend
         run: |
           cd food-truck-frontend
-          yarn test --pathWithNoTests
+          yarn test --passWithNoTests
 
         #uses: borales/actions-yarn@v2.0.0
         #with:
