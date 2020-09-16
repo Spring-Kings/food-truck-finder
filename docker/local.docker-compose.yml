@@ -5,8 +5,13 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     volumes:
-      - ./init.sql:/data/application/init.sql
+      - foodtruckdata:/var/lib/mysql
     ports:
       - '3306:3306'
     environment:
-      MYSQL_ROOT_PASSWORD: password
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=foodtruckdb
+      - MYSQL_USER=docker
+      - MYSQL_PASSWORD=password
+volumes:
+  foodtruckdata:
