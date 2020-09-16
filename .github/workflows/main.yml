@@ -16,7 +16,7 @@ jobs:
           java-package: jdk
           architecture: x64
 
-      - name: Get Node
+      - name: Get Nodejs
         uses: actions/setup-node@v1
         with:
           node-version: '14'
@@ -34,31 +34,12 @@ jobs:
           cd food-truck-frontend
           yarn install --production=false
 
-        #yarn global add jest
-        #uses: borales/actions-yarn@v2.0.0
-        #with:
-        #  cmd: install
-
-      #- name: Move into API directory
-      #  run: cd food-truck-api
-
       - name: Test API
         run: |
           cd food-truck-api
           ./gradlew test
-        #uses: eskatos/gradle-command-action@v1
-        #with:
-        #  arguments: test
 
       - name: Test Frontend
         run: |
           cd food-truck-frontend
-          pwd
-          cd node_modules
-          pwd
-          cd .bin
-          ./jest --passWithNoTests
-
-        #uses: borales/actions-yarn@v2.0.0
-        #with:
-        #  cmd: test --passWithNoTests
+          yarn test --passWithNoTests
