@@ -30,7 +30,9 @@ jobs:
           key: ${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Yarn Dependencies
-        run: yarn install --production=false
+        run: |
+          yarn install --production=false
+          yarn global add jest
         #uses: borales/actions-yarn@v2.0.0
         #with:
         #  cmd: install
