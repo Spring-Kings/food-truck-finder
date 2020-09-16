@@ -29,13 +29,16 @@ jobs:
         with:
           cmd: install
 
-      - name: Move into API directory
-        run: cd food-truck-api
+      #- name: Move into API directory
+      #  run: cd food-truck-api
 
       - name: Test API
-        uses: eskatos/gradle-command-action@v1
-        with:
-          arguments: test
+        run: |
+          cd food-truck-api
+          ./gradlew test
+        #uses: eskatos/gradle-command-action@v1
+        #with:
+        #  arguments: test
 
       - name: Move into frontend directory
         run: |
