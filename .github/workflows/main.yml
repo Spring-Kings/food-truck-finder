@@ -1,5 +1,5 @@
 name: Main workflow
-on: [push, merge]
+on: [push]
 
 jobs:
   test:
