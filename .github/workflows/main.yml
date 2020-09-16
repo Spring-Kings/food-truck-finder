@@ -19,10 +19,10 @@ jobs:
       # Cache build files
       - name: Cache
         uses: actions/cache@v2
-          with:
-            path: |
-              **/node_modules
-            key: ${{ hashFiles('**/yarn.lock') }}
+        with:
+          path: |
+            **/node_modules
+          key: ${{ hashFiles('**/yarn.lock') }}
 
       - name: yarn install
         uses: borales/actions-yarn@v2.0.0
