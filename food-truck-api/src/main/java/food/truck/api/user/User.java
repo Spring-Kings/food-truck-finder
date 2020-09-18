@@ -1,35 +1,24 @@
 package food.truck.api.user;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-
 import lombok.Data;
+
+import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = User.TABLE_NAME)
+@Table(name = "user")
 public class User {
-    public static final String TABLE_NAME = "USER";
-
     @Id
-    @GeneratedValue(generator = TABLE_NAME + "_GENERATOR")
-    @SequenceGenerator(
-            name = TABLE_NAME + "_GENERATOR",
-            sequenceName = TABLE_NAME + "_SEQUENCE"
-    )
-    @Column(name = "USER_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
     Long id;
 
-    @Column(name = "EMAIL_ADDRESS")
-    String emailAddress;
+    @Column(name = "username", nullable = false, unique = true)
+    String username;
 
-    @Column(name = "PASSWORD")
+    @Column(name = "email", nullable = false)
+    String email;
+
+    @Column(name = "hashed_password", nullable = false)
     String password;
-
-    @Column(name = "USER_TYPE")
-    String userType;
 }
