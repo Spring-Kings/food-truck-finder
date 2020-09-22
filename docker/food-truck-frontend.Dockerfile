@@ -4,7 +4,6 @@ COPY . .
 
 RUN yarn install
 RUN yarn run build
-RUN ls -lR
 
 FROM node:12
 WORKDIR /app
