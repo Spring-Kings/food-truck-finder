@@ -84,8 +84,8 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           cd ./food-truck-api
-          heroku container:push -a spring-kings ./Dockerfile.web
+          heroku container:push -a spring-kings web --recursive
           heroku container:release -a spring-kings web
           cd ../food-truck-frontend
-          heroku container:push -a spring-kings-frontend ./Dockerfile.web
+          heroku container:push -a spring-kings-frontend web --recursive
           heroku container:release -a spring-kings-frontend web
