@@ -1,4 +1,0 @@
-build:
-  docker:
-    web: docker/food-truck-api.Dockerfile
-    web: docker/food-truck-frontend.Dockerfile

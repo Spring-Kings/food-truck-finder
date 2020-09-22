@@ -11,5 +11,5 @@ FROM openjdk:14
 WORKDIR /app
 COPY --from=build /build/build/libs/build*.jar app.jar
 
-# Running the app
-ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
+# Running the app exec $JAVA_OPTS
+ENTRYPOINT java\ -jar\ app.jar

@@ -50,7 +50,8 @@ class RegistrationForm extends Component {
     }
 
     onSubmit(event) {
-        fetch('http://localhost:8080/user', {
+        console.log(process.env.FOOD_TRUCK_API_URL);
+        fetch(`${process.env.FOOD_TRUCK_API_URL}/user`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
