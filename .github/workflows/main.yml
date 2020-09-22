@@ -84,4 +84,4 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           heroku container:push -a spring-kings --recursive
-          heroku container:release api web
+          heroku container:release -a spring-kings api web
