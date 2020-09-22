@@ -76,8 +76,8 @@ jobs:
 
       - name: Tag Dockerfiles
         run: |
-          mv ./docker/food-truck-api.Dockerfile ./docker/Dockerfile.api
-          mv ./docker/food-truck-frontend.Dockerfile ./docker/Dockerfile.web
+          mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.api
+          mv ./docker/food-truck-frontend.Dockerfile ./food-truck-frontend/Dockerfile.web
 
       - name: Push to Heroku
         env:
