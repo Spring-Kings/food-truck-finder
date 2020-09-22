@@ -5,8 +5,8 @@ FROM openjdk:14 AS build
 WORKDIR /build
 
 COPY . .
-RUN ls -lR
 RUN ./gradlew build --no-daemon -p .
+RUN ls -lR
 
 FROM openjdk:14
 WORKDIR /app
