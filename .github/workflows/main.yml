@@ -74,10 +74,12 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:login
 
-      - name: Push to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      - name: Tag Dockerfiles
         run: |
           mv ./docker/food-truck-api.Dockerfile ./docker/food-truck-api.Dockerfile.web
           mv ./docker/food-truck-frontend.Dockerfile ./docker/food-truck-frontend.Dockerfile.web
-          heroku container:push --recursive
+
+      - name: Push to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:push -a spring-kings --recursive
