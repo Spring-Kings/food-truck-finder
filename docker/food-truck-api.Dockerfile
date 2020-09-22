@@ -5,11 +5,11 @@ FROM openjdk:14 AS build
 WORKDIR /build
 
 COPY . .
-RUN ./gradlew build --no-daemon -p .
+RUN ./food-truck-api/gradlew build --no-daemon -p .
 
 FROM openjdk:14
 WORKDIR /app
-COPY --from=build /build/build/libs/food-truck-api-*.jar app.jar
+COPY --from=build /build/food-truck-api/build/libs/food-truck-api-*.jar app.jar
 
 # Running the app
 ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
