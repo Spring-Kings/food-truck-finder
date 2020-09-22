@@ -5,6 +5,7 @@ COPY . .
 RUN cd food-truck-frontend
 RUN yarn install
 RUN yarn run build
+RUN ls -lR
 
 FROM node:12
 WORKDIR /app

@@ -5,6 +5,7 @@ FROM openjdk:14 AS build
 WORKDIR /build
 
 COPY . .
+RUN ls -lR
 RUN ./food-truck-api/gradlew build --no-daemon -p .
 
 FROM openjdk:14
