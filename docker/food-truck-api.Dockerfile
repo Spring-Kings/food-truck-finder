@@ -10,7 +10,7 @@ RUN ls -lR
 
 FROM openjdk:14
 WORKDIR /app
-COPY --from=build /build/build/libs/food-truck-api-*.jar app.jar
+COPY --from=build /build/build/libs/build*.jar app.jar
 
 # Running the app
 ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
