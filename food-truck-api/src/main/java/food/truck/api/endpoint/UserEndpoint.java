@@ -18,12 +18,6 @@ public class UserEndpoint {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/user/{id}")
-    public User findUserById(@PathVariable Long id) {
-        var user = userService.findUser(id);
-        return user.orElse(null);
-    }
-
     // Used because we don't have a valid user object from registration form,
     // because the password isn't hashed
     @Data
@@ -47,9 +41,10 @@ public class UserEndpoint {
         return userService.saveUser(u);
     }
 
-    @GetMapping("/search-usernames")
-    public String searchUsernames(@RequestParam String username) {
-        return ""; // TODO
+    @GetMapping("/user/{id}")
+    public User findUserById(@PathVariable Long id) {
+        var user = userService.findUser(id);
+        return user.orElse(null);
     }
 
     @Value
@@ -60,8 +55,37 @@ public class UserEndpoint {
         String newEmail;
     }
 
-    @PostMapping("/edit-user")
-    public String editUser(@RequestBody EditUserParams data) {
+    @PutMapping("/user/{id}")
+    public String editUser(@PathVariable long id, @RequestBody EditUserParams data) {
         return ""; // TODO
     }
+
+    @GetMapping("/search-usernames")
+    public String searchUsernames(@RequestParam String username) {
+        return ""; // TODO
+    }
+
+
+    @GetMapping("/user/{id}/subscriptions")
+    public String getUserSubscriptions(@PathVariable long id, @RequestParam String username, @RequestParam String token) {
+        return ""; // TODO
+    }
+
+    @Value
+    private static class SubscribeParams {
+        long truckId;
+        @NonNull String token;
+    }
+
+    @PostMapping("/user/{id}/subscriptions")
+    public String subscribe(@PathVariable long id, @RequestBody SubscribeParams data) {
+        return ""; // TODO
+    }
+
+    @DeleteMapping("/user/{id}/subscriptions/{subscriptionId}")
+    public String unsubscribe(@PathVariable long id, @PathVariable long subscriptionId, @RequestParam String token) {
+        return ""; // TODO
+    }
+
+
 }
