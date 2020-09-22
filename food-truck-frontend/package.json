@@ -3,7 +3,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "docker-start": "next start -p 80",
+    "docker-start": "next start -p $PORT",
     "test": "jest"
   },
   "dependencies": {
