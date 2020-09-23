@@ -1,3 +1,4 @@
+import { Console } from 'console';
 import React, {Component} from 'react'
 
 class RegistrationForm extends Component {
@@ -50,8 +51,8 @@ class RegistrationForm extends Component {
     }
 
     onSubmit(event) {
-        console.log(process.env.FOOD_TRUCK_API_URL);
-        fetch(`${process.env.FOOD_TRUCK_API_URL}/user`, {
+        console.log(process.env.FOOD_TRUCK_API_PROXY);
+        fetch(`${process.env.FOOD_TRUCK_API_PROXY}/user`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
