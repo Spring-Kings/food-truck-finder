@@ -3,10 +3,7 @@
 
 // Special thanks to Blanca Perello for the hint!
 // https://www.telerik.com/blogs/dealing-with-cors-in-create-react-app
-import {
-  createProxyMiddleware,
-  RequestHandler,
-} from "http-proxy-middleware";
+import { createProxyMiddleware, RequestHandler } from "http-proxy-middleware";
 
 /** Path that is used to reach the backend; string representation of a regex */
 const PROXY_PATH: string | undefined = process.env.FOOD_TRUCK_API_PROXY;
@@ -22,8 +19,13 @@ const PROXY: RequestHandler | null =
         target: FINAL_PATH,
         pathRewrite: {
           ["^".concat(PROXY_PATH)]: "",
-        }
+        },
       })
     : null;
 
-export default PROXY;
+// Apply proxy, if possible
+if (PROXY != null) {
+  module.exports = function (app: any) {
+    app.use(PROXY);
+  };
+}

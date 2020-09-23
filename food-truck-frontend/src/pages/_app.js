@@ -5,17 +5,9 @@ import { buildStore } from '../util/redux';
 import Head from 'next/head';
 import { CssBaseline } from '@material-ui/core';
 import { FoodTruckThemeProvider } from '../util/theme';
-import proxy from '../util/setupProxy';
 
 let initialState = {};
 let store = buildStore(initialState);
-
-// Apply proxy, if possible
-if (proxy != null) {
-    module.exports = function (app) {
-        app.use(proxy);
-    };
-}
 
 // Create app
 const FoodTruckApp = ({ Component, pageProps }) => {
