@@ -86,6 +86,7 @@ jobs:
           cd ./food-truck-api
           heroku container:push -a spring-kings web --recursive
           heroku container:release -a spring-kings web
+          heroku ps:scale -a spring-kings web=1
           cd ../food-truck-frontend
           heroku container:push -a spring-kings-frontend web --recursive
           heroku container:release -a spring-kings-frontend web
