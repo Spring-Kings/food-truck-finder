@@ -1,12 +1,10 @@
-// !! Warning !! Thanks to this file, the route /api-proxy is fully claimed. If you attempt
+// !! Warning !! Thanks to this file, the route `/api-proxy` is fully claimed. If you attempt
 // to direct to there, YOUR REQUEST WILL BE CONSUMED BY THE PROXY MONSTER!
 
 // Special thanks to Blanca Perello for the hint!
 // https://www.telerik.com/blogs/dealing-with-cors-in-create-react-app
 import {
   createProxyMiddleware,
-  Filter,
-  Options,
   RequestHandler,
 } from "http-proxy-middleware";
 
@@ -28,7 +26,4 @@ const PROXY: RequestHandler | null =
       })
     : null;
 
-// Apply the proxy, if possible
-module.exports = function (app: any) {
-  if (PROXY != null) app.use(PROXY);
-};
+export default PROXY;
