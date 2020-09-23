@@ -19,7 +19,7 @@ public class FoodTruckApplication {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("*").allowedOrigins(System.getenv("FOOD_TRUCK_FRONTEND"));
+                registry.addMapping("/**").allowedOrigins(System.getenv("FOOD_TRUCK_FRONTEND"));
             }
         };
     }
