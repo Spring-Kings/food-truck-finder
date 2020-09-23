@@ -1,4 +1,3 @@
-import { Console } from 'console';
 import React, {Component} from 'react'
 
 class RegistrationForm extends Component {
