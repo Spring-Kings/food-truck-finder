@@ -8,7 +8,6 @@ function HomePage() {
     return (
         <div>
             <p>This is the home page!</p>
-            <p>Added as a test</p>
             <Link href="/register" passHref>Register</Link><br/>
             <Link href="/dashboard/user" passHref>User Dashboard</Link><br/>
             <Link href="/dashboard/owner" passHref>Owner Dashboard</Link><br/>
