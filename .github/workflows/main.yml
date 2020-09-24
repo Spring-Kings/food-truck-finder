@@ -76,12 +76,17 @@ jobs:
 
       - name: Tag Dockerfiles
         run: |
-          mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.api
+          mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.web
           mv ./docker/food-truck-frontend.Dockerfile ./food-truck-frontend/Dockerfile.web
 
       - name: Push to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          heroku container:push -a spring-kings --recursive
-          heroku container:release -a spring-kings api web
+          cd ./food-truck-api
+          heroku container:push -a spring-kings web --recursive
+          heroku container:release -a spring-kings web
+          heroku ps:scale -a spring-kings web=1
+          cd ../food-truck-frontend
+          heroku container:push -a spring-kings-frontend web --recursive
+          heroku container:release -a spring-kings-frontend web

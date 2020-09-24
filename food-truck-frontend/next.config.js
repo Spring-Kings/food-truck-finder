@@ -4,6 +4,9 @@ const { parsed: localEnv } = require('dotenv').config();
 
 module.exports = withPlugins([withTM], {
     distDir: 'build',
+    [process.env.FOOD_TRUCK_API_PROXY]: {
+        externalResolver: true
+    },
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
         config.plugins.push(new webpack.EnvironmentPlugin(localEnv));
         config.node = { fs: 'empty' };
