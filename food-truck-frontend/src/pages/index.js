@@ -14,7 +14,10 @@ function HomePage() {
             <Link href="/interactive-map" passHref>Interactive Map</Link><br/>
             <Link href="/routes" passHref>Routes</Link><br/>
             <Link href="/login" passHref>Login</Link><br/>
-            <Link href="/manage-trucks" passHref>Manage Trucks</Link>
+            <Link href="/manage-trucks" passHref>Manage Trucks</Link><br/>
+            <Link href="/reviews" passHref>Reviews</Link><br/>
+            <Link href="/user-info" passHref>User info</Link><br/>
+            <Link href="/search" passHref>Search Page</Link><br/>
         </div>
     )
 }
