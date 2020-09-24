@@ -43,3 +43,50 @@ jobs:
         run: |
           cd food-truck-frontend
           yarn test --passWithNoTests
+
+  #deploy:
+  #  name:  Dispatch Deploy Workflow
+  #  runs-on: ubuntu-latest
+  #  needs: test
+  #  steps:
+  #    - name: Dispatch Repository
+  #      uses: peter-evans/repository-dispatch@v1
+  #      if: github.ref == 'refs/heads/master'
+  #      with:
+  #        token: ${{ secrets.GITHUB_TOKEN }}
+  #        repository: Spring-Kings/food-truck-finder
+  #        event-type: deploy
+
+  deploy:
+    name: Deploy to Heroku
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Heroku CLI
+        run: sudo curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Authenticate with Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: heroku container:login
+
+      - name: Tag Dockerfiles
+        run: |
+          mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.web
+          mv ./docker/food-truck-frontend.Dockerfile ./food-truck-frontend/Dockerfile.web
+
+      - name: Push to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          cd ./food-truck-api
+          heroku container:push -a spring-kings web --recursive
+          heroku container:release -a spring-kings web
+          heroku ps:scale -a spring-kings web=1
+          cd ../food-truck-frontend
+          heroku container:push -a spring-kings-frontend web --recursive
+          heroku container:release -a spring-kings-frontend web

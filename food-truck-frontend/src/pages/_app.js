@@ -9,6 +9,7 @@ import { FoodTruckThemeProvider } from '../util/theme';
 let initialState = {};
 let store = buildStore(initialState);
 
+// Create app
 const FoodTruckApp = ({ Component, pageProps }) => {
     React.useEffect(() => {
         // Remove the server-side injected CSS.
