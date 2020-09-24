@@ -1,17 +1,18 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.Constants;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Log4j2
 @RestController
-@CrossOrigin(origins = Constants.FRONTEND_URL)
 public class TruckEndpoint {
 
     @GetMapping("/nearby-trucks")
@@ -40,14 +41,13 @@ public class TruckEndpoint {
 
     @Value
     private static class PostReviewParams {
-        @NonNull long userId;
+        long userId;
         @NonNull String token;
-        @NonNull int score;
-        @NonNull int costRating;
+        int score;
+        int costRating;
         @Nullable
         String reviewText;
     }
-
     @PostMapping("/truck/{truckId}/reviews")
     public String postTruckReview(@PathVariable long truckId, @RequestBody PostReviewParams data) {
         return ""; // TODO
@@ -55,8 +55,9 @@ public class TruckEndpoint {
 
     @Value
     private static class UpdateTruckParams {
-        @NonNull long userId;
+        long userId;
         @NonNull String token;
+        long truckId;
         @Nullable
         String newName;
         @Nullable
@@ -68,13 +69,58 @@ public class TruckEndpoint {
         // TODO What about menu/schedule?
     }
 
-    @PutMapping("/truck/{truckId}")
-    public String updateTruck(@PathVariable long truckId) {
+    @PutMapping("/truck")
+    public String updateTruck(@RequestBody UpdateTruckParams data) {
         return "";
     }
 
     @GetMapping("/truck/{truckId}/routes")
     public String getRoutes(@PathVariable long truckId) {
         return ""; //TODO
+    }
+
+    @Value
+    private static class AddRouteParams {
+        long userId;
+        @NonNull String token;
+        @NonNull String routeName;
+    }
+
+    @PostMapping("/truck/{truckId}/routes")
+    public String addRoute(@PathVariable long truckId, @RequestBody AddRouteParams data) {
+        return ""; // TODO
+    }
+
+    @DeleteMapping("/truck/{truckId}/routes/{routeId}")
+    public String deleteRoute(@PathVariable long truckId, @PathVariable long routeId, @RequestParam long userId, @RequestParam String token) {
+        return ""; // TODO
+    }
+
+    @Value
+    private static class UpdateRouteParams {
+        long userId;
+        @NonNull String token;
+        long routeId;
+        @Nullable
+        String newRouteName;
+        @NonNull List<String> locations; // TODO: This isn't strings
+        boolean active;
+    }
+
+    @PutMapping("/truck/{truckId}/routes")
+    public String updateRoute(@PathVariable long truckId, @RequestBody UpdateTruckParams data) {
+        return ""; // TODO
+    }
+
+    @Value
+    private static class UpdateScheduleParams {
+        long userId;
+        @NonNull String token;
+        HashMap<DayOfWeek, List<String>> schedule; // TODO (1) Does HashMap work here? (2) How to represent time?
+    }
+
+    @PutMapping("/truck/{truckId}/schedule")
+    public String updateSchedule(@PathVariable long truckId, @RequestBody UpdateScheduleParams data) {
+        return ""; // TODO
     }
 }
