@@ -1,20 +1,34 @@
 import React, {Component} from 'react'
 
-class RegistrationForm extends Component {
+type Props = {
+    elementNames: string[],
+    submitUrl: string
+}
 
-    constructor(props) {
+type State = {
+    result: string | null;
+    formData: any
+};
+
+class Form extends Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             result: null,
-            formData: {
-                username: "",
-                password: "",
-                email: ""
-            }
+            formData: {}
         };
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onValueChanged = this.onValueChanged.bind(this);
+    }
+
+    renderFormElement(name: string) {
+        return (
+            <tr key={name}>
+                <td><label htmlFor={name}>{name}:</label></td>
+                <td><input name={name} onChange={this.onValueChanged}/></td>
+            </tr>
+        )
     }
 
     render() {
@@ -23,21 +37,7 @@ class RegistrationForm extends Component {
                 <form onSubmit={this.onSubmit}>
                     <table>
                         <tbody>
-                        <tr>
-                            <td><label htmlFor="username">Username:</label></td>
-                            <td><input name="username" onChange={this.onValueChanged}
-                                       value={this.state.formData.username}/></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor="password">Password:</label></td>
-                            <td><input name="password" onChange={this.onValueChanged}
-                                       value={this.state.formData.password}/></td>
-                        </tr>
-                        <tr>
-                            <td><label htmlFor="email">Email:</label></td>
-                            <td><input name="email" onChange={this.onValueChanged} value={this.state.formData.email}/>
-                            </td>
-                        </tr>
+                        {this.props.elementNames.map((name, idx) => this.renderFormElement(name))}
                         </tbody>
                     </table>
 
@@ -49,9 +49,9 @@ class RegistrationForm extends Component {
         )
     }
 
-    onSubmit(event) {
+    onSubmit(event: React.FormEvent) {
         console.log(process.env.FOOD_TRUCK_API_URL);
-        fetch(`${process.env.FOOD_TRUCK_API_URL}/user`, {
+        fetch(this.props.submitUrl, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -66,7 +66,7 @@ class RegistrationForm extends Component {
         event.preventDefault();
     }
 
-    onValueChanged(event) {
+    onValueChanged(event: React.ChangeEvent<HTMLInputElement>) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
@@ -77,8 +77,9 @@ class RegistrationForm extends Component {
                 [name]: value
             }
         }));
+        //console.log(this.state);
     }
 
 }
 
-export default RegistrationForm;
+export default Form;

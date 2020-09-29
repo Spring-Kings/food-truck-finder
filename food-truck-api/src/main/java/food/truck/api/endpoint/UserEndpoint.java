@@ -1,5 +1,6 @@
 package food.truck.api.endpoint;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.NonNull;
@@ -19,11 +20,13 @@ public class UserEndpoint {
 
     @Value
     static class RegistrationData {
+        @JsonProperty("Username")
         @NonNull String username;
+        @JsonProperty("Email")
         @NonNull String email;
+        @JsonProperty("Password")
         @NonNull String password;
     }
-
     @PostMapping("/user")
     public String saveUser(@RequestBody RegistrationData data) {
         var u = userService.findUser(data.getUsername());
