@@ -8,8 +8,10 @@ function HomePage() {
     return (
         <div>
             <p>This is the home page!</p>
+            <p>This is a test tag! Hello scrum!</p>
             <Link href="/register" passHref>Register</Link><br/>
-            <Link href="/dashboard" passHref>Dashboard</Link><br/>
+            <Link href="/dashboard/user" passHref>User Dashboard</Link><br/>
+            <Link href="/dashboard/owner" passHref>Owner Dashboard</Link><br/>
             <Link href="/account" passHref>Account</Link><br/>
             <Link href="/interactive-map" passHref>Interactive Map</Link><br/>
             <Link href="/routes" passHref>Routes</Link><br/>
@@ -17,7 +19,9 @@ function HomePage() {
             <Link href="/manage-trucks" passHref>Manage Trucks</Link><br/>
             <Link href="/reviews" passHref>Reviews</Link><br/>
             <Link href="/user-info" passHref>User info</Link><br/>
-            <Link href="/search" passHref>Search Page</Link><br/>
+            <Link href="/search/user" passHref>User Search Page</Link><br/>
+            <Link href="/search/owner" passHref>Owner Search Page</Link><br/>
+
         </div>
     )
 }
