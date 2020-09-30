@@ -5,7 +5,7 @@ import Form from "../components/Form";
 function RegisterPage() {
     return (
         <Form elementNames={["Username", "Password", "Email"]}
-              submitUrl={`${process.env.FOOD_TRUCK_API_URL}/user`}/>
+              submitUrl={`${process.env.FOOD_TRUCK_API_URL}/register`}/>
     )
 }
 

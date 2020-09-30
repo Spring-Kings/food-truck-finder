@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @RestController
@@ -18,36 +19,8 @@ public class UserEndpoint {
     @Autowired
     private UserService userService;
 
-    @Value
-    static class RegistrationData {
-        @JsonProperty("Username")
-        @NonNull String username;
-        @JsonProperty("Email")
-        @NonNull String email;
-        @JsonProperty("Password")
-        @NonNull String password;
-    }
-    @PostMapping("/user")
-    public String saveUser(@RequestBody RegistrationData data) {
-        var u = userService.findUser(data.getUsername());
-        if (u.isPresent()) {
-            return "Error: User already present";
-        } else {
-            // TODO: Hash the password, etc.
-            // TODO: Check username has only valid characters
-            // TODO: Check username isn't too similar to others (e.g. same but space at end)
-            var newU = new User();
-            newU.setUsername(data.getUsername());
-            newU.setPassword(data.getPassword());
-            newU.setEmail(data.getEmail());
-            newU = userService.saveUser(newU);
-            return "Created user with id " + newU.getId();
-        }
-    }
-
     @GetMapping("/user/{id}")
-    public User findUserById(@PathVariable Long id, @RequestParam long stalkerUserId, @RequestParam String stalkerToken) {
-        // TODO: check permissions for stalker?
+    public User findUserById(@PathVariable Long id, @RequestParam Optional<Long> viewerId, @RequestParam Optional<String> viewerToken) {
         var user = userService.findUser(id);
         return user.orElse(null);
     }
@@ -60,7 +33,6 @@ public class UserEndpoint {
         @Nullable
         String newEmail;
     }
-
     @PutMapping("/user")
     public String editUser(@RequestBody EditUserParams data) {
         return ""; // TODO

@@ -21,4 +21,7 @@ public class User {
 
     @Column(name = "hashed_password", nullable = false)
     String password;
+
+    @Column(name = "token", nullable = true)
+    String token;
 }
