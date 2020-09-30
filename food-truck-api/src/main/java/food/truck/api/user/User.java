@@ -3,6 +3,7 @@ package food.truck.api.user;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 
 @Data
 @Entity
@@ -24,4 +25,7 @@ public class User {
 
     @Column(name = "token", nullable = true)
     String token;
+
+    @Column(name = "token_expiry", nullable = true)
+    OffsetDateTime tokenExpiry;
 }

@@ -1,5 +1,6 @@
 package food.truck.api;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,7 @@ public class FoodTruckApplication {
         // TODO secure our endpoints a bit better than this
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(CorsRegistry registry) {
+            public void addCorsMappings(@NotNull CorsRegistry registry) {
                 var frontend = System.getenv("FOOD_TRUCK_FRONTEND");
                 if (frontend == null)
                     registry.addMapping("/**").allowedOrigins("https://localhost:3000", "http://localhost:3000");

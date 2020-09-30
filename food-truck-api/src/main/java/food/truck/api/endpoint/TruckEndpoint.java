@@ -108,7 +108,7 @@ public class TruckEndpoint {
     }
 
     @PutMapping("/truck/{truckId}/routes")
-    public String updateRoute(@PathVariable long truckId, @RequestBody UpdateTruckParams data) {
+    public String updateRoute(@PathVariable long truckId, @RequestBody UpdateRouteParams data) {
         return ""; // TODO
     }
 

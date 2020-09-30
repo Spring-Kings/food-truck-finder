@@ -1,28 +1,22 @@
 package food.truck.api.endpoint;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.NonNull;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
-import java.security.SecureRandom;
-
 @RestController
 public class AuthenticationEndpoint {
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
 
     @Autowired
     private UserService userService;
 
-    private static final SecureRandom RAND = new SecureRandom();
+
 
     @Value
     static class RegistrationData {
@@ -38,18 +32,14 @@ public class AuthenticationEndpoint {
 
     @PostMapping("/register")
     public String register(@RequestBody RegistrationData data) {
-        var u = userService.findUser(data.getUsername());
+        var u = userService.findUser(data.username);
         if (u.isPresent()) {
-            return "Error: Username " + data.getUsername() + " already taken";
-        } else if (!data.getUsername().matches("[a-zA-Z0-9_]{3,}")) {
+            return "Error: Username " + data.username + " already taken";
+        } else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
             return "Error: Invalid username";
         } else {
-            var newU = new User();
-            newU.setUsername(data.getUsername());
-            newU.setPassword(passwordEncoder.encode(data.getPassword()));
-            newU.setEmail(data.getEmail());
-            newU = userService.saveUser(newU);
-            return "Created user with id " + newU.getId();
+            var user = userService.createUser(data.username, data.password, data.email);
+            return "Created user with id " + user.getId();
         }
     }
 
@@ -71,23 +61,9 @@ public class AuthenticationEndpoint {
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginParams data) {
-        var u = userService.findUser(data.username);
-        if (u.isEmpty()) {
-            return new LoginResponse(false, null, null);
-        }
-        var user = u.get();
-        if (!passwordEncoder.matches(data.password, user.getPassword())) {
-            return new LoginResponse(false, null, null);
-        }
-
-        // Password OK
-        var bytes = new byte[64];
-        RAND.nextBytes(bytes);
-        // bytes to hex string
-        var token = new BigInteger(1, bytes).toString(16);
-        user.setToken(token);
-        userService.saveUser(user);
-
-        return new LoginResponse(true, token, user.getId());
+        return userService.findUser(data.username)
+                .flatMap(u -> userService.authByLogin(data.username, data.password))
+                .map(validUser -> new LoginResponse(true, validUser.getToken(), validUser.getId()))
+                .orElse(new LoginResponse(false, null, null));
     }
 }
