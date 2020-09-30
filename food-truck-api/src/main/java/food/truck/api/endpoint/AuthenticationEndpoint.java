@@ -66,4 +66,17 @@ public class AuthenticationEndpoint {
                 .map(validUser -> new LoginResponse(true, validUser.getToken(), validUser.getId()))
                 .orElse(new LoginResponse(false, null, null));
     }
+
+    // See https://stackoverflow.com/questions/3521290/logout-get-or-post for GET vs POST discussion
+    @Value
+    private static class LogoutParams {
+        @NonNull long id;
+        @NonNull String token;
+    }
+
+    @PostMapping("/logout")
+    public String logout(@RequestBody LogoutParams data) {
+        userService.logout(data.id, data.token);
+        return "Logged out.";
+    }
 }

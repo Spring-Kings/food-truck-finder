@@ -79,4 +79,12 @@ public class UserService {
         return u;
     }
 
+    public void logout(long id, String token) {
+        authByToken(id, token)
+                .ifPresent(u -> {
+                    u.setToken(null);
+                    u.setTokenExpiry(null);
+                    saveUser(u);
+                });
+    }
 }
