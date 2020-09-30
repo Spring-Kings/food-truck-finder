@@ -42,7 +42,7 @@ public class AuthenticationEndpoint {
         if (u.isPresent()) {
             return "Error: Username " + data.getUsername() + " already taken";
         } else if (!data.getUsername().matches("[a-zA-Z0-9_]{3,}")) {
-            return "Error: Username has invalid characters";
+            return "Error: Invalid username";
         } else {
             var newU = new User();
             newU.setUsername(data.getUsername());
@@ -66,27 +66,28 @@ public class AuthenticationEndpoint {
     private static class LoginResponse {
         boolean success;
         String token;
+        Long userId;
     }
 
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginParams data) {
         var u = userService.findUser(data.username);
         if (u.isEmpty()) {
-            return new LoginResponse(false, null);
+            return new LoginResponse(false, null, null);
         }
         var user = u.get();
         if (!passwordEncoder.matches(data.password, user.getPassword())) {
-            return new LoginResponse(false, null);
+            return new LoginResponse(false, null, null);
         }
 
         // Password OK
-        var bytes = new byte[128];
+        var bytes = new byte[64];
         RAND.nextBytes(bytes);
         // bytes to hex string
         var token = new BigInteger(1, bytes).toString(16);
         user.setToken(token);
         userService.saveUser(user);
 
-        return new LoginResponse(true, token);
+        return new LoginResponse(true, token, user.getId());
     }
 }

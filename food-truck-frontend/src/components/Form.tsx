@@ -2,7 +2,8 @@ import React, {Component} from 'react'
 
 type Props = {
     elementNames: string[],
-    submitUrl: string
+    submitUrl: string,
+    submitCallback?: (formData: any, response: Response) => void;
 }
 
 type State = {
@@ -59,8 +60,10 @@ class Form extends Component<Props, State> {
             },
             body: JSON.stringify(this.state.formData)
         })
-            .then(response => response.text())
-            .then(text => this.setState({result: text}))
+            .then(response => {
+                if (this.props.submitCallback)
+                    this.props.submitCallback(this.state.formData, response);
+            })
             .catch(fail => this.setState({result: "failed"}));
 
         event.preventDefault();

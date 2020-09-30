@@ -27,5 +27,11 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public Optional<User> authByToken(long id, String token) {
+        var u = userRepository.findById(id);
+        if (u.isEmpty() || !u.get().getToken().equals(token))
+            return Optional.empty();
+        return u;
+    }
 
 }
