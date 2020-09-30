@@ -1,6 +1,5 @@
 package food.truck.api.endpoint;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.NonNull;
