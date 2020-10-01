@@ -44,6 +44,7 @@ public class UserService {
             // Delete token if invalid to avoid brute force
             user.setToken(null);
             user.setTokenExpiry(null);
+            return Optional.empty();
         }
         return u;
     }
