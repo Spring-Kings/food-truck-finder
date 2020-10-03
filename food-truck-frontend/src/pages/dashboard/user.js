@@ -1,10 +1,10 @@
 import React from 'react'
 
+import UserDashboardComponent from '../../components/dashboards/user/UserDashboard';
+
 function UserDashboard(){
     return(
-        <div>
-            <p> User DashBoard Page</p>
-        </div>
+        <UserDashboardComponent/>
     )
 }
 
