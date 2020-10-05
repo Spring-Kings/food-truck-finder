@@ -15,7 +15,7 @@ class UserInfoPageComponent extends React.Component<{}, State> {
         const id = sessionStorage.getItem("userId");
         const token = sessionStorage.getItem("token");
         if (id && token) {
-            axios.get(`${process.env.FOOD_TRUCK_API_URL}/user/` + id, {
+            axios.get(`${process.env.FOOD_TRUCK_API_URL}/user/${id}`, {
                 params: {
                     viewerId: id,
                     viewerToken: token
