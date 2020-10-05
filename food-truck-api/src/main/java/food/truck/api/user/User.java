@@ -30,7 +30,7 @@ public class User implements UserDetails {
     // TODO: These overridden methods may need more functionality
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("user"));
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

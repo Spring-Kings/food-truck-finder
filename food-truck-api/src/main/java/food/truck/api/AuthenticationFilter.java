@@ -20,7 +20,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 
-
+// This filter is used to verify logins with username and password
+// Somehow it is automatically used for POST /login.
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
@@ -39,6 +40,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             // Read auth info from request body using jackson
             var authInfo = new ObjectMapper().readValue(req.getInputStream(), AuthenticationInfo.class);
 
+            // Use authMgr to authenticate. If successful, this.successfulAuthentication will be called.
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authInfo.getUsername(),
                             authInfo.getPassword(), new ArrayList<>())
@@ -50,7 +52,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
-        Date expiry = new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME_MS);
+        Date expiry = Date.from(Instant.now().plus(SecurityConstants.EXPIRATION_DURATION));
+        // Here we get a food.truck.api.User object because in SecurityConfig,
+        // we configured the AuthenticationManager to use our version of UserService which returns
+        // a User in loadUserByUsername.
         var username = ((User) auth.getPrincipal()).getUsername();
 
         String token = Jwts.builder()
@@ -59,6 +64,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .setIssuedAt(Date.from(Instant.now()))
                 .signWith(SecurityConstants.SECRET_KEY, SecurityConstants.SIGNATURE_ALGORITHM)
                 .compact();
+        // If login is successful, add the token in the HTTP headers
         res.addHeader("token", token);
 
     }

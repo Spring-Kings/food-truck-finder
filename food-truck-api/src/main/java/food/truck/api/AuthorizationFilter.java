@@ -16,8 +16,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 
+// This filter is used on every request to check for a header called SecurityConstants.HEADER_NAME
+// and it parses/verifies the token stored there, loads the User object, and sets the User as
+// the authentication principal
 @Log4j2
 public class AuthorizationFilter extends BasicAuthenticationFilter {
     private final UserService userService;
@@ -37,6 +39,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
             UsernamePasswordAuthenticationToken authentication = this.authenticate(request);
             // Set principal, using the principal stored in the token returned by authenticate
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         }
         chain.doFilter(request, response);
     }
@@ -65,7 +68,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (claims != null) {
             String username = claims.getSubject();
             var authPrincipal = userService.loadUserByUsername(username);
-            return new UsernamePasswordAuthenticationToken(authPrincipal, null, new ArrayList<>());
+            return new UsernamePasswordAuthenticationToken(authPrincipal, null, authPrincipal.getAuthorities());
         } else {
             return null;
         }

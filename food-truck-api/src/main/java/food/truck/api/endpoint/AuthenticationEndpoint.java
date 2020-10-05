@@ -41,44 +41,4 @@ public class AuthenticationEndpoint {
             return "Created user with id " + user.getId();
         }
     }
-
-    /*
-    @Value
-    private static class LoginParams {
-        @JsonProperty("Username")
-        @NonNull String username;
-
-        @JsonProperty("Password")
-        @NonNull String password;
-    }
-
-    @Value
-    private static class LoginResponse {
-        boolean success;
-        String token;
-        Long userId;
-    }
-
-    @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginParams data) {
-        return userService.findUser(data.username)
-                .flatMap(u -> userService.authByLogin(data.username, data.password))
-                .map(validUser -> new LoginResponse(true, validUser.getToken(), validUser.getId()))
-                .orElse(new LoginResponse(false, null, null));
-    }
-    */
-
-
-    // See https://stackoverflow.com/questions/3521290/logout-get-or-post for GET vs POST discussion
-    @Value
-    private static class LogoutParams {
-        @NonNull long id;
-        @NonNull String token;
-    }
-
-    @PostMapping("/logout")
-    public String logout(@RequestBody LogoutParams data) {
-        userService.logout(data.id, data.token);
-        return "Logged out.";
-    }
 }
