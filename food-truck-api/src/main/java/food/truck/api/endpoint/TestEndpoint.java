@@ -1,5 +1,6 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +18,8 @@ public class TestEndpoint {
     }
 
     @GetMapping("/authtest2")
-    public String authTest2(@AuthenticationPrincipal Object yeet) {
+    public String authTest2(@AuthenticationPrincipal User u) {
+        //var user = (User) auth.getDetails();
         return "auth test 2";
     }
 }

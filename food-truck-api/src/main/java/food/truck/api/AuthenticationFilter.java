@@ -2,6 +2,7 @@ package food.truck.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import food.truck.api.config.SecurityConstants;
+import food.truck.api.user.User;
 import io.jsonwebtoken.Jwts;
 import lombok.NonNull;
 import lombok.Value;
@@ -9,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -33,7 +33,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         @NonNull String Username;
         @NonNull String Password;
     }
-
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         try {
@@ -52,10 +51,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
         Date expiry = new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME_MS);
-        // coredetails user, not food truck user
         var username = ((User) auth.getPrincipal()).getUsername();
-        // Set subject to your username
-        var claims = Jwts.claims().setSubject(username);
+
         String token = Jwts.builder()
                 .setSubject(username)
                 .setExpiration(expiry)

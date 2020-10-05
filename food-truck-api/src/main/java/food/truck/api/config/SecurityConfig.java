@@ -2,7 +2,7 @@ package food.truck.api.config;
 
 import food.truck.api.AuthenticationFilter;
 import food.truck.api.AuthorizationFilter;
-import food.truck.api.FoodTruckUserDetailsService;
+import food.truck.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -21,7 +21,7 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private FoodTruckUserDetailsService userDetailsService;
+    private UserService userDetailsService;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 .addFilter(new AuthenticationFilter(authenticationManager()))
-                .addFilter(new AuthorizationFilter(authenticationManager()))
+                .addFilter(new AuthorizationFilter(authenticationManager(), userDetailsService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

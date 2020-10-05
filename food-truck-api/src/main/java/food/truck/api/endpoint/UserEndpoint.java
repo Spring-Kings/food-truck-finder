@@ -20,12 +20,8 @@ public class UserEndpoint {
 
     @GetMapping("/user/{id}")
     public User findUserById(@PathVariable long id, @RequestParam Optional<Long> viewerId, @RequestParam Optional<String> viewerToken) {
-        var user = userService.findUser(id);
-        // TODO: For testing, allowing only viewerId == id
-        if (viewerId.isPresent() && viewerToken.isPresent() && id == viewerId.get() && userService.authByToken(viewerId.get(), viewerToken.get()).isPresent())
-            return user.orElse(null);
-        else
-            return null;
+        var user = userService.findUserById(id);
+        return user.orElse(null);
     }
 
     @Value
