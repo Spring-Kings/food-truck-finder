@@ -6,7 +6,7 @@ import userDashboardReducer from '../components/dashboards/user/redux/UserDashbo
 import { userDashboardName } from '../components/dashboards/user/redux/UserDashboardAction'
 
 const reducers = combineReducers({
-    [userDashboardName]: userDashboardReducer
+    [userDashboardName]: userDashboardReducer.reducer
 });
 
 export const buildStore = (initialState) => {

@@ -11,9 +11,9 @@ import mapDispatchToProps from "./redux/UserDashboardD2P";
  */
 function mapStateToProps(state: any, myProps: any) : UserDashboardProps {
   return {
-    username: state.username,
-    pfp: state.pfp,
-    subscribedTrucks: []
+    username: state.userDashboard.username,
+    pfp: state.userDashboard.pfp,
+    subscribedTrucks: state.userDashboard.subscribedTrucks
   };
 }
 

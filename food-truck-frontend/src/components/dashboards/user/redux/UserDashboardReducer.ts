@@ -7,12 +7,13 @@ const userDashboardSlice = createSlice({
     name: userDashboardName,
     initialState: defaultState,
     reducers: {}, // That's for JavaScript users
-    extraReducers: {
+    extraReducers: (builder) => {
         // THIS is for TypeScript users. The key should be the 'type' value of the action.
-        [UserDashboardActionTypes.ADD_TRUCK_ACTION]: (state: any, action: AddTruckAction) => {
-            state.foodTrucks.concat(action.payload);
+        builder.addCase(UserDashboardActionTypes.ADD_TRUCK_ACTION, (state: any, action: AddTruckAction) => {
+            console.log(`New truck: ${action.payload}`);
+            state.subscribedTrucks = state.subscribedTrucks.concat(action.payload);
             return state;
-        }
+        });
     }
 });
 export default userDashboardSlice;

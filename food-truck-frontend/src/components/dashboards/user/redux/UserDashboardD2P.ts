@@ -1,4 +1,5 @@
-import { AnyAction, bindActionCreators, Dispatch } from 'redux'
+import { Dispatch } from 'redux'
+import { UserDashboardAction, UserDashboardActionTypes } from './UserDashboardAction';
 
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.
@@ -10,9 +11,9 @@ interface UserDashboardD2P {
 // Create a constant set of methods to dispatch on
 const dispatcher: UserDashboardD2P = {
     addTruck: (name: string) => {
-        return (dispatch: Dispatch<AnyAction>) => {
-            // Axios calls go here; return the promise.
-            alert("I thunk here...");
+        return (dispatch: Dispatch<UserDashboardAction>) => {
+            // Axios calls go here.
+            dispatch({ type: UserDashboardActionTypes.ADD_TRUCK_ACTION, payload: name });
         }
     }
 };

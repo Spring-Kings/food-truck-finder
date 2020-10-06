@@ -1,5 +1,5 @@
 export default {
-    username: "",
+    username: "InigoMontoya",
     pfp: "",
-    foodTrucks: []
+    subscribedTrucks: []
 };

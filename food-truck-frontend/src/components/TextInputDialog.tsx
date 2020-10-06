@@ -10,7 +10,7 @@ import { Button } from "@material-ui/core";
 
 // State of the dialog contents
 interface TextDialogState {
-    content: string
+  content: string;
 }
 
 // Props of the dialog contents
@@ -27,17 +27,23 @@ interface TextDialogProps {
 
 /**
  * Simple wrapper handling boilerplate of a text-input dialog.
- * 
+ *
  * Heavily inspired by: https://material-ui.com/components/dialogs/ (open form dialog version)
  */
-class TextInputDialogContent extends Component<TextDialogProps, TextDialogState> {
+class TextInputDialogContent extends Component<
+  TextDialogProps,
+  TextDialogState
+> {
   constructor(props: TextDialogProps) {
     super(props);
 
     // Create the default state
     this.state = {
-      content: ""
+      content: "",
     };
+
+    // Bind methods
+    this.onValueChanged = this.onValueChanged.bind(this);
   }
 
   render() {
@@ -46,27 +52,27 @@ class TextInputDialogContent extends Component<TextDialogProps, TextDialogState>
         <DialogTitle>{this.props.title}</DialogTitle>
         <DialogContent>
           <DialogText>{this.props.question}</DialogText>
-          <TextField onChange={this.onValueChanged}/>
+          <TextField onChange={this.onValueChanged} />
         </DialogContent>
 
         {/** Specifies OK button */}
         <DialogActions>
+          <Button onClick={this.props.onCancel} variant="outlined">
+            {this.props.cancelString ? this.props.cancelString : "Cancel"}{" "}
+          </Button>
           <Button onClick={() => this.props.onSubmit(this.state.content)}>
             {this.props.submitString ? this.props.submitString : "OK"}{" "}
-          </Button>
-          <Button onClick={this.props.onCancel} variant="outlined">
-            {this.props.submitString ? this.props.cancelString : "Cancel"}{" "}
           </Button>
         </DialogActions>
       </Dialog>
     );
   }
 
-  onValueChanged(event: React.ChangeEvent<Element>) {
-    var value: string | null = event.target.textContent;
+  onValueChanged(event: React.ChangeEvent<any>) {
+    var value: string | null = event.target.value;
     this.setState({
-        content: value? value : ""
-    })
+      content: value ? value : "",
+    });
   }
 }
 

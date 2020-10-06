@@ -15,9 +15,12 @@ class UserDashboardComponent extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      addTruck: false
+      addTruck: false,
     };
+
+    // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
+    this.addTruck = this.addTruck.bind(this);
   }
 
   render() {
@@ -47,7 +50,7 @@ class UserDashboardComponent extends Component<Props, State> {
           </Grid>
 
           {/** Where the map would be */}
-          <Grid item xs={12}>
+          <Grid item xl>
             <Paper>
               Imagine a beautiful map with food trucks marked here...
             </Paper>
@@ -61,7 +64,7 @@ class UserDashboardComponent extends Component<Props, State> {
           question="Input truck name"
           submitString="Submit"
           cancelString={null}
-          onSubmit={this.props.addTruck}
+          onSubmit={this.addTruck}
           onCancel={() =>
             this.setState({
               addTruck: false,
@@ -93,6 +96,17 @@ class UserDashboardComponent extends Component<Props, State> {
    */
   private viewTruck(name: string): void {
     alert(`Imagine looking at ${name}, but we haven't implemented it yet...`);
+  }
+
+  /**
+   * Add a truck to the subscribed list.
+   * @param name The name of the truck to add
+   */
+  private addTruck(name: string) {
+    this.props.addTruck(name);
+    this.setState({
+      addTruck: false,
+    });
   }
 }
 
