@@ -84,7 +84,7 @@ class UserDashboardComponent extends Component<Props, State> {
       <Grid container spacing={2}>
         <Grid item>{name}</Grid>
         <Grid item>
-          <Button onClick={() => this.props.viewTruck(name)}>View</Button>
+          <Button onClick={() => this.viewTruck(name)}>View</Button>
         </Grid>
       </Grid>
     );
