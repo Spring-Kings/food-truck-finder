@@ -1,6 +1,5 @@
-package food.truck.api;
+package food.truck.api.security;
 
-import food.truck.api.config.SecurityConstants;
 import food.truck.api.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

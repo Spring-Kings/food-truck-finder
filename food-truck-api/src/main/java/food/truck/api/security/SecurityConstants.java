@@ -1,4 +1,4 @@
-package food.truck.api.config;
+package food.truck.api.security;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

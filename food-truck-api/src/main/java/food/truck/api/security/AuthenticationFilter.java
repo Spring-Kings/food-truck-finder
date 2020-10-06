@@ -1,7 +1,6 @@
-package food.truck.api;
+package food.truck.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import food.truck.api.config.SecurityConstants;
 import food.truck.api.user.User;
 import io.jsonwebtoken.Jwts;
 import lombok.NonNull;

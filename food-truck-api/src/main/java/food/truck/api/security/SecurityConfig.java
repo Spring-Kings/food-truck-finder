@@ -1,7 +1,5 @@
-package food.truck.api.config;
+package food.truck.api.security;
 
-import food.truck.api.AuthenticationFilter;
-import food.truck.api.AuthorizationFilter;
 import food.truck.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
