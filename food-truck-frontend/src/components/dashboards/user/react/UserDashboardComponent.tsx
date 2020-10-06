@@ -2,14 +2,21 @@ import React, { Component } from "react";
 
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
+import { Paper } from "@material-ui/core";
 
 import State from "./UserDashboardState";
 import Props from "./UserDashboardProps";
-import { Paper } from "@material-ui/core";
+import TextInputDialog from "../../../TextInputDialog";
+
+// This is a lifesaver: https://material-ui.com/components/material-icons/
+import AddIcon from "@material-ui/icons/Add";
 
 class UserDashboardComponent extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
+    this.state = {
+      addTruck: false
+    };
     this.viewTruck = this.viewTruck.bind(this);
   }
 
@@ -28,13 +35,39 @@ class UserDashboardComponent extends Component<Props, State> {
             {this.props.subscribedTrucks.flatMap((name) =>
               this.createTruckEntry(name)
             )}
+            <Button
+              onClick={() =>
+                this.setState({
+                  addTruck: true,
+                })
+              }
+            >
+              <AddIcon />
+            </Button>
           </Grid>
 
           {/** Where the map would be */}
           <Grid item xs={12}>
-                <Paper>Imagine a beautiful map with food trucks marked here...</Paper>
+            <Paper>
+              Imagine a beautiful map with food trucks marked here...
+            </Paper>
           </Grid>
         </Grid>
+
+        {/** A text-input dialog */}
+        <TextInputDialog
+          open={this.state.addTruck}
+          title="Add Truck..."
+          question="Input truck name"
+          submitString="Submit"
+          cancelString={null}
+          onSubmit={this.props.addTruck}
+          onCancel={() =>
+            this.setState({
+              addTruck: false,
+            })
+          }
+        />
       </React.Fragment>
     );
   }
@@ -48,12 +81,16 @@ class UserDashboardComponent extends Component<Props, State> {
       <Grid container spacing={2}>
         <Grid item>{name}</Grid>
         <Grid item>
-          <Button onClick={() => this.viewTruck(name)}>View</Button>
+          <Button onClick={() => this.props.viewTruck(name)}>View</Button>
         </Grid>
       </Grid>
     );
   };
 
+  /**
+   * Placeholder for viewing a truck's info
+   * @param name The name of the truck to view
+   */
   private viewTruck(name: string): void {
     alert(`Imagine looking at ${name}, but we haven't implemented it yet...`);
   }

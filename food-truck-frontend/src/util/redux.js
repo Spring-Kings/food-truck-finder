@@ -2,8 +2,11 @@ import { combineReducers } from 'redux';
 import { configureStore } from '@reduxjs/toolkit';
 import thunk from 'redux-thunk';
 
+import userDashboardReducer from '../components/dashboards/user/redux/UserDashboardReducer';
+import { userDashboardName } from '../components/dashboards/user/redux/UserDashboardAction'
+
 const reducers = combineReducers({
-    // Add your reducers here
+    [userDashboardName]: userDashboardReducer
 });
 
 export const buildStore = (initialState) => {

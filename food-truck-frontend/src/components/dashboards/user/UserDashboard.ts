@@ -1,6 +1,7 @@
 import { connect } from "react-redux";
 
 import UserDashboardComponent from "./react/UserDashboardComponent";
+import UserDashboardProps from "./react/UserDashboardProps";
 import mapDispatchToProps from "./redux/UserDashboardD2P";
 
 /**
@@ -8,10 +9,11 @@ import mapDispatchToProps from "./redux/UserDashboardD2P";
  * @param state The state of the Redux store. Any since I don't know what's in the store, but I recall there's a better pattern.
  * @param myProps My own current props
  */
-function mapStateToProps(state: any, myProps: any) {
+function mapStateToProps(state: any, myProps: any) : UserDashboardProps {
   return {
     username: state.username,
     pfp: state.pfp,
+    subscribedTrucks: []
   };
 }
 
@@ -20,5 +22,5 @@ function mapStateToProps(state: any, myProps: any) {
  */
 export default connect(
   mapStateToProps,
-  new mapDispatchToProps()
+  mapDispatchToProps
 )(UserDashboardComponent);

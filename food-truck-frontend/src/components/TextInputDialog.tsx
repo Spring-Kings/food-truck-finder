@@ -1,5 +1,6 @@
-import React, { Component, ReactFragment } from "react";
+import React, { Component } from "react";
 
+import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogText from "@material-ui/core/DialogContentText";
@@ -8,16 +9,17 @@ import TextField from "@material-ui/core/TextField";
 import { Button } from "@material-ui/core";
 
 // State of the dialog contents
-interface DialogContentState {
+interface TextDialogState {
     content: string
 }
 
 // Props of the dialog contents
-interface DialogContentProps {
+interface TextDialogProps {
   title: string;
   question: string;
   submitString: string | null;
   cancelString: string | null;
+  open: boolean;
 
   onSubmit: (text: string) => void;
   onCancel: () => void;
@@ -25,15 +27,11 @@ interface DialogContentProps {
 
 /**
  * Simple wrapper handling boilerplate of a text-input dialog.
- * Needs to be wrapped in a 'Dialog' which handles opening/closing. I could have used some Redux wizardry to bypass this,
- * but determined that it would not be time-efficient when a simple solution exists.
- * 
- * May fix it later to be at true drop-in dialog.
  * 
  * Heavily inspired by: https://material-ui.com/components/dialogs/ (open form dialog version)
  */
-class TextInputDialogContent extends Component<DialogContentProps, DialogContentState> {
-  constructor(props: DialogContentProps) {
+class TextInputDialogContent extends Component<TextDialogProps, TextDialogState> {
+  constructor(props: TextDialogProps) {
     super(props);
 
     // Create the default state
@@ -44,7 +42,7 @@ class TextInputDialogContent extends Component<DialogContentProps, DialogContent
 
   render() {
     return (
-      <React.Fragment>
+      <Dialog open={this.props.open}>
         <DialogTitle>{this.props.title}</DialogTitle>
         <DialogContent>
           <DialogText>{this.props.question}</DialogText>
@@ -60,7 +58,7 @@ class TextInputDialogContent extends Component<DialogContentProps, DialogContent
             {this.props.submitString ? this.props.cancelString : "Cancel"}{" "}
           </Button>
         </DialogActions>
-      </React.Fragment>
+      </Dialog>
     );
   }
 
@@ -71,3 +69,5 @@ class TextInputDialogContent extends Component<DialogContentProps, DialogContent
     })
   }
 }
+
+export default TextInputDialogContent;
