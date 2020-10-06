@@ -57,10 +57,10 @@ class TextInputDialogContent extends Component<
 
         {/** Specifies OK button */}
         <DialogActions>
-          <Button onClick={this.props.onCancel} variant="outlined">
+          <Button variant="outlined" onClick={this.props.onCancel}>
             {this.props.cancelString ? this.props.cancelString : "Cancel"}{" "}
           </Button>
-          <Button onClick={() => this.props.onSubmit(this.state.content)}>
+          <Button variant="contained" onClick={() => this.props.onSubmit(this.state.content)}>
             {this.props.submitString ? this.props.submitString : "OK"}{" "}
           </Button>
         </DialogActions>

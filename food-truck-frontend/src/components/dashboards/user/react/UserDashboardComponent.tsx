@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import { Paper } from "@material-ui/core";
+import { Card, CardContent, Paper } from "@material-ui/core";
 
 import State from "./UserDashboardState";
 import Props from "./UserDashboardProps";
@@ -51,9 +51,11 @@ class UserDashboardComponent extends Component<Props, State> {
 
           {/** Where the map would be */}
           <Grid item xl>
-            <Paper>
-              Imagine a beautiful map with food trucks marked here...
-            </Paper>
+            <Card>
+              <CardContent>
+                Imagine a beautiful map with food trucks marked here...
+              </CardContent>
+            </Card>
           </Grid>
         </Grid>
 
@@ -81,10 +83,22 @@ class UserDashboardComponent extends Component<Props, State> {
    */
   private createTruckEntry = (name: string) => {
     return (
-      <Grid container spacing={2}>
-        <Grid item>{name}</Grid>
-        <Grid item>
-          <Button onClick={() => this.viewTruck(name)}>View</Button>
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        spacing={2}
+      >
+        <Grid item xs>
+          <Card>
+            <CardContent>{name}</CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs>
+          <Button variant="contained" onClick={() => this.viewTruck(name)}>
+            View
+          </Button>
         </Grid>
       </Grid>
     );
