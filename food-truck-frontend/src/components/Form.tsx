@@ -1,9 +1,11 @@
 import React, {Component} from 'react'
+import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 
 type Props = {
     elementNames: string[],
     submitUrl: string,
-    submitCallback?: (formData: any, response: Response) => void;
+    onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void;
+    onFailedSubmit?: (formData: any, response: any) => void; // TODO: Figure out type of response
 }
 
 type State = {
@@ -51,20 +53,32 @@ class Form extends Component<Props, State> {
     }
 
     onSubmit(event: React.FormEvent) {
-        console.log(process.env.FOOD_TRUCK_API_URL);
-        fetch(this.props.submitUrl, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.state.formData)
-        })
+        // TODO: Use redux or something to automatically handle auth header anywhere
+        let config: AxiosRequestConfig | undefined;
+        if (sessionStorage.getItem('authToken')) {
+            config = {headers: {'Authorization': sessionStorage.getItem('authToken')}};
+        }
+
+        axios.post(this.props.submitUrl,
+            this.state.formData,
+            config
+        )
             .then(response => {
-                if (this.props.submitCallback)
-                    this.props.submitCallback(this.state.formData, response);
+                if (this.props.onSuccessfulSubmit)
+                    this.props.onSuccessfulSubmit(this.state.formData, response);
+                console.log(`Submitted to ${process.env.FOOD_TRUCK_API_URL}`);
             })
-            .catch(fail => this.setState({result: "failed"}));
+            .catch(error => {
+                if (error.response) {
+                    console.log("Got response with error status code");
+                } else if (error.request) {
+                    console.log("Got no response")
+                } else {
+                    console.log('Failed to make request', error.message);
+                }
+                if (this.props.onFailedSubmit)
+                    this.props.onFailedSubmit(this.state.formData, error);
+            })
 
         event.preventDefault();
     }

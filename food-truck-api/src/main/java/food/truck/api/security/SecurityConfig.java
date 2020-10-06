@@ -50,9 +50,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
 
         var config = new CorsConfiguration();
-        config
-                .applyPermitDefaultValues()
-                .setAllowedOrigins(origins);
+        config.applyPermitDefaultValues();
+        config.setAllowedOrigins(origins);
+        config.addExposedHeader("token");
 
         configSource.registerCorsConfiguration("/**", config);
         return configSource;
