@@ -1,5 +1,6 @@
 package food.truck.api.truck;
 
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +20,14 @@ public class TruckService {
         return truckRepository.findByUserId(userId);
     }
 
+    public Optional<Truck> findTryById(Long truckId) {
+        return truckRepository.findById(truckId);
+    }
+
     public Truck saveTruck(Truck truck) {
         return truckRepository.save(truck);
     }
 
-    // Consider how to pass optional parameters more cleanly.
-    // e.g.   Optional<byte[]> menu,
-    //        Optional<String> textMenu,
-    //        Optional<Long> priceRating,
-    //        Optional<String> description,
-    //        Optional<byte[]> schedule,
-    //        Optional<String> foodCategory
-    // without the list being huge (endpoint params object?)
     public Truck createTruck(Long userId, String name) {
         var t = new Truck();
         t.setName(name);
@@ -38,8 +35,30 @@ public class TruckService {
         return saveTruck(t);
     }
 
-    public Truck updateTruck(Truck truck) {
-        // TODO
-        return null;
+    public void deleteTruck(Long truckId) {
+        truckRepository
+            .findById(truckId)
+            .ifPresent(truckRepository::delete);
+    }
+
+    public Truck updateTruck(
+        @NonNull
+        Truck truck,
+        Optional<String> name,
+        Optional<byte[]> menu,
+        Optional<String> textMenu,
+        Optional<Long> priceRating,
+        Optional<String> description,
+        Optional<byte[]> schedule,
+        Optional<String> foodCategory
+    ) {
+        name.ifPresent(truck::setName);
+        truck.setMenu(menu.orElse(null));
+        truck.setTextMenu(textMenu.orElse(null));
+        truck.setPriceRating(priceRating.orElse(null));
+        truck.setDescription(description.orElse(null));
+        truck.setSchedule(schedule.orElse(null));
+        truck.setFoodCategory(foodCategory.orElse(null));
+        return saveTruck(truck);
     }
 }

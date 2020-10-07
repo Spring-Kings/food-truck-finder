@@ -1,8 +1,11 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.truck.Truck;
+import food.truck.api.truck.TruckService;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +17,8 @@ import java.util.Optional;
 @Log4j2
 @RestController
 public class TruckEndpoint {
+    @Autowired
+    private TruckService truckService;
 
     @GetMapping("/nearby-trucks")
     public String getNearbyTrucks(@RequestParam String location) {
@@ -54,6 +59,36 @@ public class TruckEndpoint {
     }
 
     @Value
+    private static class CreateTruckParams {
+        @NonNull
+        long userId;
+        @NonNull
+        String token;
+        @Nullable
+        String truckName;
+    }
+
+    @PostMapping("/truck/create")
+    public Truck createTruck(@RequestBody CreateTruckParams data) {
+        return truckService.createTruck(data.userId, data.truckName);
+    }
+
+    @Value
+    private static class DeleteTruckParams {
+        @NonNull
+        long userId;
+        @NonNull
+        String token;
+        @NonNull
+        long truckId;
+    }
+
+    @PostMapping("/truck/delete")
+    public void deleteTruck(@RequestBody DeleteTruckParams data) {
+        truckService.deleteTruck(data.truckId);
+    }
+
+    @Value
     private static class UpdateTruckParams {
         long userId;
         @NonNull String token;
@@ -63,15 +98,35 @@ public class TruckEndpoint {
         @Nullable
         String newDescription;
         @Nullable
-        Integer newPriceRating;
+        Long newPriceRating;
         @Nullable
         String newFoodCategory;
         // TODO What about menu/schedule?
+        @Nullable
+        byte[] newMenu;
+        @Nullable
+        String newTextMenu;
+        @Nullable
+        byte[] newSchedule;
     }
 
     @PutMapping("/truck")
-    public String updateTruck(@RequestBody UpdateTruckParams data) {
-        return "";
+    public Truck updateTruck(@RequestBody UpdateTruckParams data) {
+        var truck = truckService.findTryById(data.truckId);
+        if (truck.isPresent()) {
+            truckService.updateTruck(
+                truck.get(),
+                Optional.ofNullable(data.newName),
+                Optional.ofNullable(data.newMenu),
+                Optional.ofNullable(data.newTextMenu),
+                Optional.ofNullable(data.newPriceRating),
+                Optional.ofNullable(data.newDescription),
+                Optional.ofNullable(data.newSchedule),
+                Optional.ofNullable(data.newFoodCategory)
+            );
+            return truck.get();
+        }
+        return null;
     }
 
     @GetMapping("/truck/{truckId}/routes")
