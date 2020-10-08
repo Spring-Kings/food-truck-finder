@@ -21,7 +21,11 @@ public class UserEndpoint {
     @GetMapping("/user/{id}")
     public User findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
         var user = userService.findUserById(id);
-        return user.orElse(null);
+        if (user.isPresent()) {
+            user.get().setPassword("[REDACTED]"); // probably shouldn't expose this
+            return user.get();
+        }
+        return null;
     }
 
     @Value

@@ -55,10 +55,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // Here we get a food.truck.api.User object because in SecurityConfig,
         // we configured the AuthenticationManager to use our version of UserService which returns
         // a User in loadUserByUsername.
-        var username = ((User) auth.getPrincipal()).getUsername();
+        var user = (User) auth.getPrincipal();
+        String username = user.getUsername();
+        long id = user.getId();
 
         String token = Jwts.builder()
                 .setSubject(username)
+                .claim("userID", id)
                 .setExpiration(expiry)
                 .setIssuedAt(Date.from(Instant.now()))
                 .signWith(SecurityConstants.SECRET_KEY, SecurityConstants.SIGNATURE_ALGORITHM)
