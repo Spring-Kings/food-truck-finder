@@ -28,7 +28,7 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
 
     componentDidMount() {
         const token = sessionStorage.getItem('authToken');
-        const decoded = token ? jwt_decode(token) : null;
+        const decoded: any = token ? jwt_decode(token) : null;
         if (!decoded) {
             this.setState({
                 done: true,
