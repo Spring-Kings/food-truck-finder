@@ -83,7 +83,7 @@ public class TruckEndpoint {
         long truckId;
     }
 
-    @PostMapping("/truck/delete")
+    @DeleteMapping("/truck/delete")
     public void deleteTruck(@RequestBody DeleteTruckParams data) {
         truckService.deleteTruck(data.truckId);
     }
