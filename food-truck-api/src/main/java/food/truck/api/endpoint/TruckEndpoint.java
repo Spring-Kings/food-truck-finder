@@ -2,15 +2,15 @@ package food.truck.api.endpoint;
 
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
+import food.truck.api.user.User;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +27,8 @@ public class TruckEndpoint {
 
     @GetMapping(path = "/recommended-trucks")
     public String getRecommendedTrucks(
-            @RequestParam String location,
-            @RequestParam Optional<String> username,
-            @RequestParam Optional<String> token
+            @AuthenticationPrincipal @Nullable User user,
+            @RequestParam String location
     ) {
         return ""; // TODO
     }
@@ -46,15 +45,14 @@ public class TruckEndpoint {
 
     @Value
     private static class PostReviewParams {
-        long userId;
-        @NonNull String token;
         int score;
         int costRating;
         @Nullable
         String reviewText;
     }
+
     @PostMapping("/truck/{truckId}/reviews")
-    public String postTruckReview(@PathVariable long truckId, @RequestBody PostReviewParams data) {
+    public String postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
         return ""; // TODO
     }
 
@@ -90,8 +88,6 @@ public class TruckEndpoint {
 
     @Value
     private static class UpdateTruckParams {
-        long userId;
-        @NonNull String token;
         long truckId;
         @Nullable
         String newName;
@@ -111,7 +107,7 @@ public class TruckEndpoint {
     }
 
     @PutMapping("/truck")
-    public Truck updateTruck(@RequestBody UpdateTruckParams data) {
+    public Truck updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var truck = truckService.findTryById(data.truckId);
         if (truck.isPresent()) {
             truckService.updateTruck(
@@ -134,27 +130,18 @@ public class TruckEndpoint {
         return ""; //TODO
     }
 
-    @Value
-    private static class AddRouteParams {
-        long userId;
-        @NonNull String token;
-        @NonNull String routeName;
-    }
-
     @PostMapping("/truck/{truckId}/routes")
-    public String addRoute(@PathVariable long truckId, @RequestBody AddRouteParams data) {
+    public String addRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String routeName) {
         return ""; // TODO
     }
 
     @DeleteMapping("/truck/{truckId}/routes/{routeId}")
-    public String deleteRoute(@PathVariable long truckId, @PathVariable long routeId, @RequestParam long userId, @RequestParam String token) {
+    public String deleteRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @PathVariable long routeId) {
         return ""; // TODO
     }
 
     @Value
     private static class UpdateRouteParams {
-        long userId;
-        @NonNull String token;
         long routeId;
         @Nullable
         String newRouteName;
@@ -163,19 +150,13 @@ public class TruckEndpoint {
     }
 
     @PutMapping("/truck/{truckId}/routes")
-    public String updateRoute(@PathVariable long truckId, @RequestBody UpdateRouteParams data) {
+    public String updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
         return ""; // TODO
     }
 
-    @Value
-    private static class UpdateScheduleParams {
-        long userId;
-        @NonNull String token;
-        HashMap<DayOfWeek, List<String>> schedule; // TODO (1) Does HashMap work here? (2) How to represent time?
-    }
-
+    // TODO: How to represent data?
     @PutMapping("/truck/{truckId}/schedule")
-    public String updateSchedule(@PathVariable long truckId, @RequestBody UpdateScheduleParams data) {
+    public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
         return ""; // TODO
     }
 }
