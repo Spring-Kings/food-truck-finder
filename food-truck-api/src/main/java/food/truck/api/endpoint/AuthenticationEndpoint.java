@@ -11,12 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthenticationEndpoint {
-
-
     @Autowired
     private UserService userService;
-
-
 
     @Value
     static class RegistrationData {
@@ -32,51 +28,17 @@ public class AuthenticationEndpoint {
 
     @PostMapping("/register")
     public String register(@RequestBody RegistrationData data) {
-        var u = userService.findUser(data.username);
+        var u = userService.findUserByUsername(data.username);
         if (u.isPresent()) {
             return "Error: Username " + data.username + " already taken";
-        } else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
+
+        }
+        // TODO: Max length for username, password, email
+        else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
             return "Error: Invalid username";
         } else {
             var user = userService.createUser(data.username, data.password, data.email);
             return "Created user with id " + user.getId();
         }
-    }
-
-    @Value
-    private static class LoginParams {
-        @JsonProperty("Username")
-        @NonNull String username;
-
-        @JsonProperty("Password")
-        @NonNull String password;
-    }
-
-    @Value
-    private static class LoginResponse {
-        boolean success;
-        String token;
-        Long userId;
-    }
-
-    @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginParams data) {
-        return userService.findUser(data.username)
-                .flatMap(u -> userService.authByLogin(data.username, data.password))
-                .map(validUser -> new LoginResponse(true, validUser.getToken(), validUser.getId()))
-                .orElse(new LoginResponse(false, null, null));
-    }
-
-    // See https://stackoverflow.com/questions/3521290/logout-get-or-post for GET vs POST discussion
-    @Value
-    private static class LogoutParams {
-        @NonNull long id;
-        @NonNull String token;
-    }
-
-    @PostMapping("/logout")
-    public String logout(@RequestBody LogoutParams data) {
-        userService.logout(data.id, data.token);
-        return "Logged out.";
     }
 }
