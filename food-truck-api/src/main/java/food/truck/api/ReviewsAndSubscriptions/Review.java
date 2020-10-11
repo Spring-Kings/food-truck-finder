@@ -1,7 +1,8 @@
-package food.truck.api.user;
+package food.truck.api.ReviewsAndSubscriptions;
 
 
 import food.truck.api.truck.Truck;
+import food.truck.api.user.User;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -15,22 +16,20 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_ID", nullable = false)
-    long id;
+    @Column(name = "review_id", nullable = false)
+    Long id;
 
-    @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
-    User user;
+    @JoinColumn(foreignKey = @ForeignKey(name = "user_id"), nullable = false)
+    Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "truck_id", nullable = false)
-    Truck truck;
+    @JoinColumn(foreignKey = @ForeignKey(name = "truck_id"), nullable = false)
+    Long truckId;
 
     @Column(name = "star_rating", nullable = false)
-    int starRating;
+    Integer starRating;
 
     @Column(name = "cost_rating", nullable = false)
-    int costRating;
+    Integer costRating;
 
     @Column(name = "review_text", nullable = true)
     String reviewText;

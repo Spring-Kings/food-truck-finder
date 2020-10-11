@@ -1,5 +1,10 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.ReviewsAndSubscriptions.Review;
+import food.truck.api.ReviewsAndSubscriptions.ReviewService;
+import food.truck.api.ReviewsAndSubscriptions.Subscription;
+import food.truck.api.ReviewsAndSubscriptions.SubscriptionService;
+import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.Value;
@@ -10,13 +15,21 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @RestController
 public class UserEndpoint {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ReviewService reviewService;
+
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @GetMapping("/user/{id}")
     public User findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
@@ -48,8 +61,11 @@ public class UserEndpoint {
 
 
     @GetMapping("/user/{id}/subscriptions")
-    public String getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @PathVariable long id) {
-        return ""; // TODO
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @PathVariable long id) {
+        var user = userService.findUserById(id);
+        List<Truck> trucks = new LinkedList<>();
+        subscriptionService.findSubsByUser(user.get()).stream().forEach(s -> trucks.add(s.getTruck()));
+        return trucks;
     }
 
     @PostMapping("/user/subscribe")
@@ -63,8 +79,17 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
-    public String getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
-        return ""; // TODO
+    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
+        return reviewService.findReviewsByUserId(userId);
+    }
+
+    @GetMapping("/user/reviews")
+    public List<Review> getUserReviews(@RequestParam String username) {
+        List<User> users = userService.searchUsernames(username);
+        if(users.isEmpty()){
+            return null;
+        }
+        return reviewService.findReviewsByUserId(users.get(0).getId());
     }
 
     @Secured({"ROLE_USER"})
