@@ -1,5 +1,7 @@
 import React, {Component} from 'react'
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
+import {AxiosResponse} from 'axios'
+import api from '../util/api'
+import {Button, Grid, TextField} from '@material-ui/core';
 
 type Props = {
     elementNames: string[],
@@ -27,10 +29,9 @@ class Form extends Component<Props, State> {
 
     renderFormElement(name: string) {
         return (
-            <tr key={name}>
-                <td><label htmlFor={name}>{name}:</label></td>
-                <td><input name={name} onChange={this.onValueChanged}/></td>
-            </tr>
+            <Grid key={name} item>
+                <TextField label={name} variant="outlined" name={name} onChange={this.onValueChanged}/>
+            </Grid>
         )
     }
 
@@ -38,13 +39,10 @@ class Form extends Component<Props, State> {
         return (
             <div>
                 <form onSubmit={this.onSubmit}>
-                    <table>
-                        <tbody>
+                    <Grid container justify="center" direction="column" alignItems="center" spacing={2}>
                         {this.props.elementNames.map((name, idx) => this.renderFormElement(name))}
-                        </tbody>
-                    </table>
-
-                    <button type="submit">Submit</button>
+                        <Button variant="contained" type="submit">Submit</Button>
+                    </Grid>
                 </form>
                 <div>{this.state.result}</div>
             </div>
@@ -53,20 +51,11 @@ class Form extends Component<Props, State> {
     }
 
     onSubmit(event: React.FormEvent) {
-        // TODO: Use redux or something to automatically handle auth header anywhere
-        let config: AxiosRequestConfig | undefined;
-        if (sessionStorage.getItem('authToken')) {
-            config = {headers: {'Authorization': sessionStorage.getItem('authToken')}};
-        }
-
-        axios.post(this.props.submitUrl,
-            this.state.formData,
-            config
-        )
+        api.post(this.props.submitUrl, this.state.formData)
             .then(response => {
                 if (this.props.onSuccessfulSubmit)
                     this.props.onSuccessfulSubmit(this.state.formData, response);
-                console.log(`Submitted to ${process.env.FOOD_TRUCK_API_URL}`);
+                console.log(`Submitted to ${this.props.submitUrl}`);
             })
             .catch(error => {
                 if (error.response) {

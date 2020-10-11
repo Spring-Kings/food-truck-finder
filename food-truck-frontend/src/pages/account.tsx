@@ -1,6 +1,6 @@
 import React from 'react'
-import axios from 'axios'
-import jwt_decode from 'jwt-decode'
+import api from '../util/api'
+import getUserInfo from "../util/token";
 
 type PageState = {
     done: boolean,
@@ -27,16 +27,14 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
     }
 
     componentDidMount() {
-        const token = sessionStorage.getItem('authToken');
-        const decoded: any = token ? jwt_decode(token) : null;
-        if (!decoded) {
+        const userInfo = getUserInfo();
+        if (!userInfo) {
             this.setState({
                 done: true,
                 error: "You are not currently logged in."
             });
         } else {
-            console.log(`Username = ${decoded.sub}, id = ${decoded.userID}`);
-            axios.get(`${process.env.FOOD_TRUCK_API_URL}/user/${decoded.userID}`)
+            api.get(`/user/${userInfo.userID}`)
                 .then(response => {
                     this.setState({
                         done: true,
