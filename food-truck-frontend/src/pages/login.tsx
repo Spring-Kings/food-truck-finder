@@ -1,7 +1,7 @@
 import React from 'react'
 import Form from "../components/Form";
 import {AxiosResponse} from 'axios';
-import {Grid} from '@material-ui/core'
+import {Grid, TextField} from '@material-ui/core'
 
 type State = {
     resultText: string
@@ -17,11 +17,10 @@ class LoginPageComponent extends React.Component<{}, State> {
         return (
             <Grid container direction="column" justify="center" xs={4}>
                 <h1>Login</h1>
-                <Form elementNames={["Username", "Password"]}
-                      submitUrl={'/login'}
-                      onSuccessfulSubmit={this.onSubmit}
-                      onFailedSubmit={this.onFail}
-                />
+                <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
+                    <TextField label="Username" variant="outlined" name="Username"/>
+                    <TextField label="Password" variant="outlined" name="Password" type="password"/>
+                </Form>
 
                 <p>{this.state.resultText}</p>
             </Grid>
