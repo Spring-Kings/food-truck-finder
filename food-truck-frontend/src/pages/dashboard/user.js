@@ -1,10 +1,11 @@
+import CoolLayout from '../../components/CoolLayout'
 import React from 'react'
 
 function UserDashboard(){
     return(
-        <div>
+        <CoolLayout>
             <p> User DashBoard Page</p>
-        </div>
+        </CoolLayout>
     )
 }
 

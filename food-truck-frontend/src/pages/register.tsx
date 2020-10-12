@@ -1,4 +1,4 @@
-"use strict";
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 import Form from "../components/Form";
 import {AxiosResponse} from 'axios'
@@ -16,28 +16,43 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
     render() {
         return (
-            <Grid container direction="column" justify="center" xs={4}>
-                <h1>Register</h1>
-                <Form submitUrl={'/register'} onSuccessfulSubmit={this.onSubmit}>
-                    <TextField label="Username" name="Username" variant="outlined"/>
-                    <TextField label="Password" name="Password" type="password" variant="outlined"/>
-                    <TextField label="Email" name="Email" variant="outlined"/>
-                </Form>
+            <Grid container direction="column" justify="center" alignItems="center">
+                <Grid item>
+                    <h1>Register</h1>
+                </Grid>
+                <Grid item>
+                    <Form submitUrl={'/register'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
+                        <TextField label="Username" name="Username" variant="outlined"/>
+                        <TextField label="Password" name="Password" type="password" variant="outlined"/>
+                        <TextField label="Email" name="Email" variant="outlined"/>
+                    </Form>
+                </Grid>
+                <Grid item>
+                    <p>{this.state.resultText}</p>
+                </Grid>
 
-                <p>{this.state.resultText}</p>
             </Grid>
 
         )
     }
 
     onSubmit = (formData: any, response: AxiosResponse<any>) => {
-        this.setState({resultText: JSON.stringify(response.data)});
+        this.setState({resultText: response.data});
+    }
+
+    onFail = (formData: any, err: any) => {
+        let text = "Failed to register";
+        if (err.response)
+            text += ": " + err.response;
+        this.setState({resultText: text});
     }
 }
 
 function RegisterPage() {
     return (
-        <RegisterPageComponent/>
+        <CoolLayout>
+            <RegisterPageComponent/>
+        </CoolLayout>
     )
 }
 

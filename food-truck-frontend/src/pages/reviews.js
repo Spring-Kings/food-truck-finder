@@ -1,10 +1,11 @@
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 
 function ReviewPage(){
     return(
-        <div>
+        <CoolLayout>
             <p>Review Page</p>
-        </div>
+        </CoolLayout>
     )
 }
 

@@ -1,10 +1,11 @@
+import CoolLayout from '../../components/CoolLayout'
 import React from 'react'
 
 function OwnerDashboard(){
-    return(
-        <div>
-            <p>Onwer DashBoard Page</p>
-        </div>
+    return (
+        <CoolLayout>
+            <p>Owner DashBoard Page</p>
+        </CoolLayout>
     )
 }
 

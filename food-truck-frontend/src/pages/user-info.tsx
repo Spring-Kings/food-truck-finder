@@ -1,3 +1,4 @@
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 import api from '../util/api'
 
@@ -33,7 +34,9 @@ class UserInfoPageComponent extends React.Component<{}, State> {
 
 function UserInfoPage() {
     return (
-        <UserInfoPageComponent/>
+        <CoolLayout>
+            <UserInfoPageComponent/>
+        </CoolLayout>
     )
 }
 

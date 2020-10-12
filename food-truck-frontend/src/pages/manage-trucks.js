@@ -1,10 +1,11 @@
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 
 function ManageTrucksPage(){
     return(
-        <div>
+        <CoolLayout>
             <p>Manage Trucks Page</p>
-        </div>
+        </CoolLayout>
     )
 }
 
