@@ -8,18 +8,23 @@ import getUserInfo from "../../../../util/token";
  * Interface providing the actions that are used by the UserDashboard to update the store.
  */
 interface UserDashboardD2P {
-    addTruck: (name: string) => void;
+    loadSubscriptions: () => void;
 }
 
 // Create a constant set of methods to dispatch on
 const dispatcher: UserDashboardD2P = {
-    addTruck: (name: string) => {
+    loadSubscriptions: () => {
         return (dispatch: Dispatch<UserDashboardAction>) => {
-            var subscribed : any = api.request({
-                url: `/user/${getUserInfo()}/subscriptions`,
+            api.request({
+                url: `/user/${getUserInfo()?.userID}/subscriptions`,
                 method: "GET"
-            });
-            dispatch({ type: UserDashboardActionTypes.ADD_TRUCK_ACTION, payload: name });
+            }).then(
+                response => {
+                    dispatch({ type: UserDashboardActionTypes.LOAD_SUBS_ACTION, payload: response.data });
+                }, err => {
+                    console.log(err);
+                }
+            );
         }
     }
 };

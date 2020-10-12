@@ -1,17 +1,19 @@
+import { Subscription } from "final-form";
+import UserSubscription from "../../../../domain/Subscription";
+
 // UserDashboard's redux name
 export const userDashboardName = "userDashboard";
 
 // Action types--flags used to ID which action was received--go here.
 // NOTE: must be prepended with the above name for some Redux automation to work.
 export enum UserDashboardActionTypes {
-  ADD_TRUCK_ACTION = "userDashboard/add"
+  LOAD_SUBS_ACTION = "userDashboard/fetchSub"
 };
 
 // Aggregate action type; | all action types together
-export type UserDashboardAction = AddTruckAction;
+export type UserDashboardAction = LoadSubscriptionsAction;
 
-// Actions used by this part of the program
-export interface AddTruckAction {
-  type: UserDashboardActionTypes.ADD_TRUCK_ACTION;
-  payload: string;
-}
+export interface LoadSubscriptionsAction {
+  type: UserDashboardActionTypes.LOAD_SUBS_ACTION
+  payload: UserSubscription[]
+};

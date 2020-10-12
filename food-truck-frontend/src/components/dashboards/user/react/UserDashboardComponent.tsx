@@ -16,22 +16,22 @@ import {
 
 import State from "./UserDashboardState";
 import Props from "./UserDashboardProps";
-import TextInputDialog from "../../../TextInputDialog";
 
-// This is a lifesaver: https://material-ui.com/components/material-icons/
-import AddIcon from "@material-ui/icons/Add";
 import UserSubscription from "../../../../domain/Subscription";
 
 class UserDashboardComponent extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = {
-      addTruck: false,
-    };
 
     // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
-    this.addTruck = this.addTruck.bind(this);
+  }
+
+  /**
+   * Used to pull subscriptions from the backend
+   */
+  componentDidMount() {
+    this.props.loadSubscriptions();
   }
 
   render() {
@@ -51,18 +51,15 @@ class UserDashboardComponent extends Component<Props, State> {
               <AccordionSummary>Subscribed Trucks</AccordionSummary>
               <AccordionDetails>
                 <List>
-                  {this.props.subscribedTrucks.flatMap((name) =>
-                    this.createTruckEntry(name)
+                  {this.props.subscribedTrucks.length > 0 ? (
+                    this.props.subscribedTrucks.flatMap((name) =>
+                      this.createTruckEntry(name)
+                    )
+                  ) : (
+                    <ListItem>
+                      <Card>No trucks available</Card>
+                    </ListItem>
                   )}
-                  <Button
-                    onClick={() =>
-                      this.setState({
-                        addTruck: true,
-                      })
-                    }
-                  >
-                    <AddIcon />
-                  </Button>
                 </List>
               </AccordionDetails>
             </Accordion>
@@ -77,21 +74,6 @@ class UserDashboardComponent extends Component<Props, State> {
             </Card>
           </GridListTile>
         </GridList>
-
-        {/** A text-input dialog */}
-        <TextInputDialog
-          open={this.state.addTruck}
-          title="Add Truck..."
-          question="Input truck name"
-          submitString="Submit"
-          cancelString={null}
-          onSubmit={this.addTruck}
-          onCancel={() =>
-            this.setState({
-              addTruck: false,
-            })
-          }
-        />
       </React.Fragment>
     );
   }
@@ -134,18 +116,6 @@ class UserDashboardComponent extends Component<Props, State> {
    */
   private viewTruck(id: number): void {
     alert(`Imagine looking at ${id}, but we haven't implemented it yet...`);
-  }
-
-  /**
-   * Add a truck to the subscribed list.
-   * @param name The name of the truck to add
-   */
-  private addTruck(name: string) {
-    // TODO fix here
-    this.props.addTruck(name);
-    this.setState({
-      addTruck: false,
-    });
   }
 }
 
