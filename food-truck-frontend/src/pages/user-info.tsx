@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import api from '../util/api'
 
 type State = {
     coolInfo: string;
@@ -12,24 +12,13 @@ class UserInfoPageComponent extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        const id = sessionStorage.getItem("userId");
-        const token = sessionStorage.getItem("token");
-        if (id && token) {
-            axios.get(`${process.env.FOOD_TRUCK_API_URL}/user/` + id, {
-                params: {
-                    viewerId: id,
-                    viewerToken: token
-                }
+        api.get('/authtest2')
+            .then(response => {
+                this.setState({coolInfo: response.data});
             })
-                .then(response => {
-                    this.setState({coolInfo: JSON.stringify(response, null, 4)});
-                })
-                .catch(error => {
-                    this.setState({coolInfo: "Failed to authenticate: " + JSON.stringify(error, null, 4)});
-                })
-        } else {
-            this.setState({coolInfo: "Not logged in."});
-        }
+            .catch(error => {
+                this.setState({coolInfo: `Something bad happened: ${JSON.stringify(error)}`});
+            })
     }
 
     render() {

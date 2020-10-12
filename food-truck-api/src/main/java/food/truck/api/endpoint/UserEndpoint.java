@@ -2,15 +2,18 @@ package food.truck.api.endpoint;
 
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
+import food.truck.api.user.UserView;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -19,63 +22,68 @@ public class UserEndpoint {
     private UserService userService;
 
     @GetMapping("/user/{id}")
-    public User findUserById(@PathVariable long id, @RequestParam Optional<Long> viewerId, @RequestParam Optional<String> viewerToken) {
-        var user = userService.findUser(id);
-        // TODO: For testing, allowing only viewerId == id
-        if (viewerId.isPresent() && viewerToken.isPresent() && id == viewerId.get() && userService.authByToken(viewerId.get(), viewerToken.get()).isPresent())
-            return user.orElse(null);
-        else
-            return null;
+    public UserView findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
+        return userService.findUserById(id)
+                .map(UserView::of)
+                .orElse(null);
     }
 
     @Value
     private static class EditUserParams {
-        long userId;
+        @NonNull String password;
         @Nullable
         String newPassword;
         @Nullable
         String newEmail;
     }
+
     @PutMapping("/user")
-    public String editUser(@RequestBody EditUserParams data) {
-        return ""; // TODO
+    public boolean editUser(@AuthenticationPrincipal User u, @RequestBody EditUserParams data) {
+        if (!userService.passwordMatches(u, data.password)) {
+            return false;
+        }
+
+        if (data.newPassword != null) {
+            userService.changePassword(u, data.newPassword);
+        }
+        if (data.newEmail != null) {
+            u.setEmail(data.newEmail);
+        }
+        userService.saveUser(u);
+        return true;
     }
 
     @GetMapping("/search-usernames")
-    public List<User> searchUsernames(@RequestParam String username) {
-        return userService.searchUsernames(username);
+    public List<UserView> searchUsernames(@RequestParam String username) {
+        return userService.searchUsernames(username).stream()
+                .map(UserView::of)
+                .collect(Collectors.toList());
     }
 
 
     @GetMapping("/user/{id}/subscriptions")
-    public String getUserSubscriptions(@PathVariable long id, @RequestParam String username, @RequestParam String token) {
+    public String getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @PathVariable long id) {
         return ""; // TODO
     }
 
-    @Value
-    private static class SubscribeParams {
-        long truckId;
-        @NonNull String token;
-    }
-
-    @PostMapping("/user/{id}/subscriptions")
-    public String subscribe(@PathVariable long id, @RequestBody SubscribeParams data) {
+    @PostMapping("/user/subscribe")
+    public String subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
         return ""; // TODO
     }
 
-    @DeleteMapping("/user/{id}/subscriptions/{subscriptionId}")
-    public String unsubscribe(@PathVariable long id, @PathVariable long subscriptionId, @RequestParam String token) {
+    @PostMapping("/user/unsubscribe")
+    public String unsubscribe(@AuthenticationPrincipal User u, @RequestBody long subscriptionId) {
         return ""; // TODO
     }
 
     @GetMapping("/user/{userId}/reviews")
-    public String getUserReviews(@PathVariable long userId, @RequestParam long stalkerUserId, @RequestParam String stalkerToken) {
-        // TODO: check permissions for stalker?
+    public String getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
         return ""; // TODO
     }
 
-    @DeleteMapping("/user/{userId}/reviews")
-    public String deleteReview(@PathVariable long userId, @RequestParam long reviewId, @RequestParam String token) {
+    @Secured({"ROLE_USER"})
+    @PostMapping("/delete-review")
+    public String deleteReview(@AuthenticationPrincipal User u, @RequestBody long reviewId) {
         return ""; // TODO
     }
 
