@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import axios, { AxiosRequestConfig } from 'axios'
 import {Container} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
+import api from "../util/api";
 
 interface TruckState {
   notFound: boolean | null;
-  truckId: number;
+  id: number;
   name: string;
   description: string | null;
   priceRating: number | null;
@@ -22,25 +22,18 @@ class Truck extends Component<TruckProps, TruckState> {
   constructor(props: TruckProps) {
     super(props);
 
-    this.setState({
+    this.state = {
       notFound: null,
-      truckId: 0,
+      id: 0,
       name: "",
       description: null,
       priceRating: null,
       foodCategory: null,
-    });
+    };
   }
 
   componentDidMount() {
-    const url = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.props.truckId}`;
-    let config: AxiosRequestConfig = {
-      params: {
-        truckId: this.props.truckId
-      }
-    };
-
-    axios.get(url, config)
+    api.get(`/truck/${this.props.truckId}`, {})
       .then(res => this.setState(res.data))
       .catch(err => {
         if (err.response) {
@@ -50,24 +43,15 @@ class Truck extends Component<TruckProps, TruckState> {
         } else {
           console.log(err);
         }
-
-        this.setState({
-          notFound: true,
-          truckId: 0,
-          name: "",
-          description: null,
-          priceRating: null,
-          foodCategory: null,
-        });
       });
   }
 
   render() {
-    if (this.state.notFound === true) {
+    if (!this.state) {
       return (
         <NotFound/>
       );
-    } else if (this.state.truckId < 1 && !this.state.notFound) {
+    } else if (this.state.id < 1) {
       return (
         <Container>
           <CircularProgress/>
@@ -87,3 +71,5 @@ class Truck extends Component<TruckProps, TruckState> {
     );
   }
 }
+
+export default Truck;

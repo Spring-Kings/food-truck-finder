@@ -34,8 +34,8 @@ public class TruckEndpoint {
     }
 
     @GetMapping(path = "/truck/{id}")
-    public String getTruckInfo(@PathVariable long id) {
-        return ""; //TODO
+    public Optional<Truck> getTruckInfo(@PathVariable long id) {
+        return truckService.findTruckById(id);
     }
 
     @GetMapping("/truck/{truckId}/reviews")
@@ -106,9 +106,9 @@ public class TruckEndpoint {
         byte[] newSchedule;
     }
 
-    @PutMapping("/truck")
+    @PutMapping("/update-truck")
     public Truck updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
-        var truck = truckService.findTryById(data.truckId);
+        var truck = truckService.findTruckById(data.truckId);
         if (truck.isPresent()) {
             truckService.updateTruck(
                 truck.get(),

@@ -27,4 +27,6 @@ function HomePage() {
     )
 }
 
+/*<Link href={`/truck/${}`}*/
+
 export default HomePage
