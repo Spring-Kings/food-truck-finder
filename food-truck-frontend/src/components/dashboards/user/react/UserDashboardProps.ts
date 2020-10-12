@@ -1,5 +1,7 @@
 /** TODO: fix pfp to not be an any type */
 
+import UserSubscription from "../../../../domain/Subscription";
+
 /**
  * Props used by the UserDashboardComponent
  */
@@ -8,7 +10,7 @@ interface UserDashboardProps {
   pfp: any;
 
   /** To be changed later */
-  subscribedTrucks: string[];
+  subscribedTrucks: UserSubscription[];
 
   // This says: let me index into this interface using strings, but only to access
   // the elements that are here, not to add new ones.

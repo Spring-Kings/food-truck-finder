@@ -1,6 +1,9 @@
 import { Dispatch } from 'redux'
 import { UserDashboardAction, UserDashboardActionTypes } from './UserDashboardAction';
 
+import api from "../../../../util/api";
+import getUserInfo from "../../../../util/token";
+
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.
  */
@@ -12,7 +15,10 @@ interface UserDashboardD2P {
 const dispatcher: UserDashboardD2P = {
     addTruck: (name: string) => {
         return (dispatch: Dispatch<UserDashboardAction>) => {
-            // Axios calls go here.
+            var subscribed : any = api.request({
+                url: `/user/${getUserInfo()}/subscriptions`,
+                method: "GET"
+            });
             dispatch({ type: UserDashboardActionTypes.ADD_TRUCK_ACTION, payload: name });
         }
     }
