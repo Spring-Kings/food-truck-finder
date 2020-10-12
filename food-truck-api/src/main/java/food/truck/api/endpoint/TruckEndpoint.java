@@ -58,32 +58,29 @@ public class TruckEndpoint {
 
     @Value
     private static class CreateTruckParams {
-        @NonNull
-        long userId;
-        @NonNull
-        String token;
         @Nullable
         String truckName;
     }
 
     @PostMapping("/truck/create")
-    public Truck createTruck(@RequestBody CreateTruckParams data) {
-        return truckService.createTruck(data.userId, data.truckName);
+    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
+        return truckService.createTruck(u.getId(), data.truckName);
     }
 
     @Value
     private static class DeleteTruckParams {
         @NonNull
-        long userId;
-        @NonNull
-        String token;
-        @NonNull
         long truckId;
     }
 
     @DeleteMapping("/truck/delete")
-    public void deleteTruck(@RequestBody DeleteTruckParams data) {
-        truckService.deleteTruck(data.truckId);
+    public void deleteTruck(@AuthenticationPrincipal User u, @RequestBody DeleteTruckParams data) {
+        var t = truckService.findTruckById(data.truckId);
+        t.ifPresent(truck -> {
+            if (truck.getUserId().equals(u.getId())) {
+                truckService.deleteTruck(data.truckId);
+            }
+        });
     }
 
     @Value
@@ -106,7 +103,7 @@ public class TruckEndpoint {
         byte[] newSchedule;
     }
 
-    @PutMapping("/update-truck")
+    @PutMapping("/truck/update")
     public Truck updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var truck = truckService.findTruckById(data.truckId);
         if (truck.isPresent()) {
