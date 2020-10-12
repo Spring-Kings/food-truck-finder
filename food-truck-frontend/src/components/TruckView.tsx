@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Container} from "@material-ui/core";
+import { Container, List, ListItem, Typography } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
@@ -11,14 +11,16 @@ interface TruckState {
   description: string | null;
   priceRating: number | null;
   foodCategory: string | null;
-  // TODO add more here
+  // menu: string | null;
+  textMenu: string | null;
+  // schedule: string | null;
 }
 
 interface TruckProps {
     truckId: number;
 }
 
-class Truck extends Component<TruckProps, TruckState> {
+class TruckView extends Component<TruckProps, TruckState> {
   constructor(props: TruckProps) {
     super(props);
 
@@ -29,6 +31,7 @@ class Truck extends Component<TruckProps, TruckState> {
       description: null,
       priceRating: null,
       foodCategory: null,
+      textMenu: null,
     };
   }
 
@@ -60,16 +63,26 @@ class Truck extends Component<TruckProps, TruckState> {
     }
 
     return (
-      <Container>
-        <div>
-          Truck Name: {this.state.name}
-        </div>
-        <div>
-          Truck Description: {this.state.description}
-        </div>
-      </Container>
+      <>
+        <Typography variant="h4">{this.state.name}</Typography>
+        <List>
+          <ListItem>
+            Truck Description: {this.state.description}
+          </ListItem>
+          <ListItem>
+            Price Rating: {this.state.priceRating}
+          </ListItem>
+          <ListItem>
+            Food Category: {this.state.foodCategory}
+          </ListItem>
+          <ListItem>
+            Text Menu:
+            {this.state.textMenu}
+          </ListItem>
+        </List>
+      </>
     );
   }
 }
 
-export default Truck;
+export default TruckView;
