@@ -39,7 +39,7 @@ class TruckView extends Component<TruckProps, TruckState> {
 
   componentDidMount() {
     api.get(`/truck/${this.props.truckId}`, {})
-      .then(res => this.setState(res.data))
+      .then(res => this.setState(res ? res.data : null))
       .catch(err => {
         if (err.response) {
           console.log('Got error response code');
@@ -48,6 +48,7 @@ class TruckView extends Component<TruckProps, TruckState> {
         } else {
           console.log(err);
         }
+        this.setState(null);
       });
   }
 
@@ -83,15 +84,16 @@ class TruckView extends Component<TruckProps, TruckState> {
         </List>
         <Button variant="outlined"
                 color="secondary"
-                onClick={() => this.deleteTruck(this.state.id)}>
+                onClick={this.deleteTruck}>
           Delete
         </Button>
       </>
     );
   }
 
-  deleteTruck(id: number) {
-    api.delete(`/truck/delete/${id}`, {})
+  deleteTruck = () => {
+    api.delete(`/truck/delete/${this.state.id}`, {})
+      .then(res => this.setState(null))
       .catch(err => {
         if (err.response) {
           console.log('Got error response code for truck deletion');

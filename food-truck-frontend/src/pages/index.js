@@ -22,7 +22,7 @@ function HomePage() {
                 <Link href="/user-info" passHref>User info</Link><br/>
             <Link href="/search/user" passHref>User Search Page</Link><br/>
             <Link href="/search/owner" passHref>Owner Search Page</Link><br/>
-
+            <Link href="/create-truck" passHref>Create Truck Page</Link>
         </div>
     )
 }
