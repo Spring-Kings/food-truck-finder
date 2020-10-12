@@ -7,6 +7,8 @@ import food.truck.api.ReviewsAndSubscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
+import food.truck.api.user.UserView;
+import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Log4j2
 @RestController
@@ -32,17 +35,15 @@ public class UserEndpoint {
     private SubscriptionService subscriptionService;
 
     @GetMapping("/user/{id}")
-    public User findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
-        var user = userService.findUserById(id);
-        if (user.isPresent()) {
-            user.get().setPassword("[REDACTED]"); // probably shouldn't expose this
-            return user.get();
-        }
-        return null;
+    public UserView findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
+        return userService.findUserById(id)
+                .map(UserView::of)
+                .orElse(null);
     }
 
     @Value
     private static class EditUserParams {
+        @NonNull String password;
         @Nullable
         String newPassword;
         @Nullable
@@ -50,13 +51,26 @@ public class UserEndpoint {
     }
 
     @PutMapping("/user")
-    public String editUser(@AuthenticationPrincipal User u, @RequestBody EditUserParams data) {
-        return ""; // TODO
+    public boolean editUser(@AuthenticationPrincipal User u, @RequestBody EditUserParams data) {
+        if (!userService.passwordMatches(u, data.password)) {
+            return false;
+        }
+
+        if (data.newPassword != null) {
+            userService.changePassword(u, data.newPassword);
+        }
+        if (data.newEmail != null) {
+            u.setEmail(data.newEmail);
+        }
+        userService.saveUser(u);
+        return true;
     }
 
     @GetMapping("/search-usernames")
-    public List<User> searchUsernames(@RequestParam String username) {
-        return userService.searchUsernames(username);
+    public List<UserView> searchUsernames(@RequestParam String username) {
+        return userService.searchUsernames(username).stream()
+                .map(UserView::of)
+                .collect(Collectors.toList());
     }
 
 

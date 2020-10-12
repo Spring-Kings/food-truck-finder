@@ -1,5 +1,5 @@
 function logout() {
-    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("authToken");
 }
 
 export default logout;

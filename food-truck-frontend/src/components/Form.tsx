@@ -1,23 +1,29 @@
 import React, {Component} from 'react'
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
+import {AxiosResponse} from 'axios'
+import api from '../util/api'
+import {Button, Grid} from '@material-ui/core';
 
 type Props = {
-    elementNames: string[],
     submitUrl: string,
-    onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void;
-    onFailedSubmit?: (formData: any, response: any) => void; // TODO: Figure out type of response
+    submitMethod?: "POST" | "PUT" | "DELETE",
+    onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
+    onFailedSubmit?: (formData: any, response: any) => void, // TODO: Figure out type of response
+    children?: React.ReactNode
 }
 
 type State = {
-    result: string | null;
     formData: any
 };
 
 class Form extends Component<Props, State> {
+    static defaultProps = {
+        submitMethod: "POST"
+    }
+
     constructor(props: Props) {
         super(props);
+
         this.state = {
-            result: null,
             formData: {}
         };
 
@@ -25,48 +31,40 @@ class Form extends Component<Props, State> {
         this.onValueChanged = this.onValueChanged.bind(this);
     }
 
-    renderFormElement(name: string) {
+    /*renderFormElement(name: string) {
         return (
-            <tr key={name}>
-                <td><label htmlFor={name}>{name}:</label></td>
-                <td><input name={name} onChange={this.onValueChanged}/></td>
-            </tr>
+            <Grid key={name} item>
+                <TextField label={name} variant="outlined" name={name} onChange={this.onValueChanged}/>
+            </Grid>
         )
-    }
+    }*/
 
     render() {
         return (
-            <div>
-                <form onSubmit={this.onSubmit}>
-                    <table>
-                        <tbody>
-                        {this.props.elementNames.map((name, idx) => this.renderFormElement(name))}
-                        </tbody>
-                    </table>
-
-                    <button type="submit">Submit</button>
-                </form>
-                <div>{this.state.result}</div>
-            </div>
-
+            <form onSubmit={this.onSubmit}>
+                <Grid container direction="column" alignItems="center" spacing={2}>
+                    {/* For each child, shove it in a Grid and add the onChange event callback */}
+                    {React.Children.map(this.props.children,
+                        child => <Grid item>
+                            {React.cloneElement(child as React.ReactElement, {onChange: this.onValueChanged})}
+                        </Grid>
+                    )}
+                    <Button variant="contained" type="submit">Submit</Button>
+                </Grid>
+            </form>
         )
     }
 
     onSubmit(event: React.FormEvent) {
-        // TODO: Use redux or something to automatically handle auth header anywhere
-        let config: AxiosRequestConfig | undefined;
-        if (sessionStorage.getItem('authToken')) {
-            config = {headers: {'Authorization': sessionStorage.getItem('authToken')}};
-        }
-
-        axios.post(this.props.submitUrl,
-            this.state.formData,
-            config
-        )
+        api.request({
+            url: this.props.submitUrl,
+            data: this.state.formData,
+            method: this.props.submitMethod,
+        })
             .then(response => {
                 if (this.props.onSuccessfulSubmit)
                     this.props.onSuccessfulSubmit(this.state.formData, response);
-                console.log(`Submitted to ${process.env.FOOD_TRUCK_API_URL}`);
+                console.log(`Submitted to ${this.props.submitUrl}`);
             })
             .catch(error => {
                 if (error.response) {

@@ -1,6 +1,7 @@
 import React from 'react'
 import Form from "../components/Form";
 import {AxiosResponse} from 'axios';
+import {Grid, TextField} from '@material-ui/core'
 
 type State = {
     resultText: string
@@ -14,22 +15,22 @@ class LoginPageComponent extends React.Component<{}, State> {
 
     render() {
         return (
-            <div>
-                <Form elementNames={["Username", "Password"]}
-                      submitUrl={`${process.env.FOOD_TRUCK_API_URL}/login`}
-                      onSuccessfulSubmit={this.onSubmit}
-                      onFailedSubmit={this.onFail}
-                />
+            <Grid container direction="column" justify="center" xs={4}>
+                <h1>Login</h1>
+                <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
+                    <TextField label="Username" variant="outlined" name="Username"/>
+                    <TextField label="Password" variant="outlined" name="Password" type="password"/>
+                </Form>
 
                 <p>{this.state.resultText}</p>
-            </div>
+            </Grid>
 
         )
     }
 
     onSubmit = (formData: any, response: AxiosResponse<any>) => {
         const token = response.headers['token'];
-        sessionStorage.setItem('authToken', token);
+        localStorage.setItem('authToken', token);
         this.setState({resultText: `Set token to ${token}`});
     }
     // TODO: change this once we find the type for the error response

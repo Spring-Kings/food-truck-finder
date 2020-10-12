@@ -48,9 +48,12 @@ public class UserService implements UserDetailsService {
         return u;
     }
 
-    public void logout(long id, String token) {
-        //TODO
+    public void changePassword(User u, String newPassword) {
+        u.setPassword(passwordEncoder.encode(newPassword));
     }
 
+    public boolean passwordMatches(User u, String password) {
+        return passwordEncoder.matches(password, u.getPassword());
+    }
 
 }

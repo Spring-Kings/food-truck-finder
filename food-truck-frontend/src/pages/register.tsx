@@ -2,6 +2,7 @@
 import React from 'react'
 import Form from "../components/Form";
 import {AxiosResponse} from 'axios'
+import {Grid, TextField} from '@material-ui/core';
 
 type State = {
     resultText: string
@@ -15,13 +16,16 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
     render() {
         return (
-            <div>
-                <Form elementNames={["Username", "Password", "Email"]}
-                      submitUrl={`${process.env.FOOD_TRUCK_API_URL}/register`}
-                      onSuccessfulSubmit={this.onSubmit}/>
+            <Grid container direction="column" justify="center" xs={4}>
+                <h1>Register</h1>
+                <Form submitUrl={'/register'} onSuccessfulSubmit={this.onSubmit}>
+                    <TextField label="Username" name="Username" variant="outlined"/>
+                    <TextField label="Password" name="Password" type="password" variant="outlined"/>
+                    <TextField label="Email" name="Email" variant="outlined"/>
+                </Form>
 
                 <p>{this.state.resultText}</p>
-            </div>
+            </Grid>
 
         )
     }
