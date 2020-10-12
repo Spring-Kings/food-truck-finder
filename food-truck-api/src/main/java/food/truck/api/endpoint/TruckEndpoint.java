@@ -87,39 +87,38 @@ public class TruckEndpoint {
     private static class UpdateTruckParams {
         long truckId;
         @Nullable
-        String newName;
+        String name;
         @Nullable
-        String newDescription;
+        String description;
         @Nullable
-        Long newPriceRating;
+        Long priceRating;
         @Nullable
-        String newFoodCategory;
+        String foodCategory;
         // TODO What about menu/schedule?
         @Nullable
-        byte[] newMenu;
+        byte[] menu;
         @Nullable
-        String newTextMenu;
+        String textMenu;
         @Nullable
-        byte[] newSchedule;
+        byte[] schedule;
     }
 
     @PutMapping("/truck/update")
-    public Truck updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
-        var truck = truckService.findTruckById(data.truckId);
-        if (truck.isPresent()) {
-            truckService.updateTruck(
-                truck.get(),
-                Optional.ofNullable(data.newName),
-                Optional.ofNullable(data.newMenu),
-                Optional.ofNullable(data.newTextMenu),
-                Optional.ofNullable(data.newPriceRating),
-                Optional.ofNullable(data.newDescription),
-                Optional.ofNullable(data.newSchedule),
-                Optional.ofNullable(data.newFoodCategory)
-            );
-            return truck.get();
+    public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
+        if (!u.getId().equals(data.truckId)) {
+            return Optional.empty();
         }
-        return null;
+        var truck = truckService.findTruckById(data.truckId);
+        return truck.map(value -> truckService.updateTruck(
+            value,
+            Optional.ofNullable(data.name),
+            Optional.ofNullable(data.menu),
+            Optional.ofNullable(data.textMenu),
+            Optional.ofNullable(data.priceRating),
+            Optional.ofNullable(data.description),
+            Optional.ofNullable(data.schedule),
+            Optional.ofNullable(data.foodCategory)
+        ));
     }
 
     @GetMapping("/truck/{truckId}/routes")
