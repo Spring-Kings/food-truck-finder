@@ -3,6 +3,7 @@ package food.truck.api.security;
 import food.truck.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -42,7 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         String frontendUrl = System.getenv("FOOD_TRUCK_FRONTEND");
         if (frontendUrl != null) {
-            // TODO: this is a gross way to allow both http and https
             origins = List.of(frontendUrl, frontendUrl.replace("https://", "http://"));
         } else {
             // If frontend not configured, set to localhost for dev
@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         var config = new CorsConfiguration();
         config.applyPermitDefaultValues();
+        config.addAllowedMethod(HttpMethod.DELETE);
+        config.addAllowedMethod(HttpMethod.PUT);
         config.setAllowedOrigins(origins);
         config.addExposedHeader("token");
 

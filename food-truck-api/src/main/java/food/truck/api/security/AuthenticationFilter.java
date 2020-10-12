@@ -5,7 +5,9 @@ import food.truck.api.user.User;
 import io.jsonwebtoken.Jwts;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +23,7 @@ import java.util.Date;
 
 // This filter is used to verify logins with username and password
 // Somehow it is automatically used for POST /login.
+@Log4j2
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
 
@@ -45,7 +48,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                             authInfo.getPassword(), new ArrayList<>())
             );
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // The BadCredentialsException is caught by the superclass, I think
+            throw new BadCredentialsException("Failed to read auth info", e);
         }
     }
 

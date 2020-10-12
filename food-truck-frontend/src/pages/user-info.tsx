@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import api from '../util/api'
 
 type State = {
     coolInfo: string;
@@ -12,10 +12,7 @@ class UserInfoPageComponent extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        const token = sessionStorage.getItem('authToken');
-        axios.get(`${process.env.FOOD_TRUCK_API_URL}/authtest2`, {
-            headers: (token) ? {'Authorization': token} : {}
-        })
+        api.get('/authtest2')
             .then(response => {
                 this.setState({coolInfo: response.data});
             })
