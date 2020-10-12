@@ -1,16 +1,23 @@
 import React, {Component} from 'react';
-import axios, {AxiosResponse} from 'axios'
-import index from "jest-leak-detector";
+import axios, {AxiosResponse} from 'axios';
 
 const reviewsJSON = [{
     "id": "",
     "userId": "",
-    "truckId": "",
+    "truckId": "",/*{"id": "",
+        "userId": "",
+        "name": "",
+        "menu": "",
+        "textMenu": "",
+        "priceRating": "",
+        "description": "",
+        "schedule": "",
+        "foodCategory": ""},*/
     "starRating": "",
     "costRating": "",
     "reviewText": "",
     "day_time": ""
-}]
+}];
 
 type Props = {
     username: string | string[] | undefined
@@ -19,11 +26,19 @@ type Props = {
 type State = {
     data : {
     "id": string,
-    "userId": string,
-    "truckId": string,
+    "userId": string | undefined,
+    "truckId": string,/*{"id": string,
+            "userId": string | undefined,
+            "name": string,
+            "menu": string | undefined,
+            "textMenu": string | undefined,
+            "priceRating": string | undefined,
+            "description": string | undefined,
+            "schedule": string | undefined,
+            "foodCategory": string | undefined },*/
     "starRating": string,
     "costRating": string,
-    "reviewText": string,
+    "reviewText": string | undefined,
     "day_time": string
     }[]
 }
@@ -54,9 +69,12 @@ class ReviewsList extends React.Component<Props, State>{
 
     renderReviewElement(index: number){
         return(
-            <div>
-                <p>{this.state.data[index].reviewText}</p>
-            </div>
+            <tr>
+                <td>{this.state.data[index]}</td>
+                <td>{this.state.data[index].starRating}</td>
+                <td>{this.state.data[index].costRating}</td>
+
+            </tr>
         );
     }
 
@@ -65,7 +83,16 @@ class ReviewsList extends React.Component<Props, State>{
             <div>
             <h2>Reviews</h2>
                 <div>
-                    <p>{this.state.data.map((value,index) => this.renderReviewElement(index))}</p>
+                    <table>
+                        <tr>
+                            <th>Truck</th>
+                            <th>Overall Rating</th>
+                            <th>Price Rating</th>
+                            <th>Review</th>
+                        </tr>
+
+                    </table>
+                    {this.state.data[0]}
                 </div>
             </div>
         );
