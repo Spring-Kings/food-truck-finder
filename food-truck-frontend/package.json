@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@bessemer/cornerstone": "1.0.23",
+    "@google/maps": "^1.1.3",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "4.9.1",
     "@reduxjs/toolkit": "1.4.0",
