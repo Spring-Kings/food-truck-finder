@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-import axios, {AxiosResponse} from 'axios';
 import api from "../util/api";
 
-const reviewsJSON = {
+const reviewsJSON = [{
     "id": "",
     "userId": "",
-    "truckId": "",/*{"id": "",
+    "truck": {"id": "",
         "userId": "",
         "name": "",
         "menu": "",
@@ -13,37 +12,35 @@ const reviewsJSON = {
         "priceRating": "",
         "description": "",
         "schedule": "",
-        "foodCategory": ""},*/
+        "foodCategory": ""},
     "starRating": "",
     "costRating": "",
     "reviewText": "",
     "day_time": ""
-};
+}];
 
 type Props = {
-    username: string | string[] | undefined
+    username: string
 }
 
 type State = {
-    data : [{
+    data : {
     "id": string,
     "userId": string,
-    "truckId": string,
-            /*{"id": string,
-            "userId": string | undefined,
+    "truck": {"id": string,
+            "userId": string,
             "name": string,
-            "menu": string | undefined,
-            "textMenu": string | undefined,
-            "priceRating": string | undefined,
-            "description": string | undefined,
-            "schedule": string | undefined,
-            "foodCategory": string | undefined },*/
+            "menu": string,
+            "textMenu": string,
+            "priceRating": string,
+            "description": string,
+            "schedule": string,
+            "foodCategory": string},
     "starRating": string,
     "costRating": string,
     "reviewText": string,
     "day_time": string
-    }],
-    dataStr: string
+    }[],
 }
 
 
@@ -54,47 +51,51 @@ class ReviewsList extends React.Component<Props, State>{
 
     constructor(props: Props) {
         super(props);
-        this.state = {data: [reviewsJSON],
-            dataStr: "hey"
-        };
+        this.state = {data: reviewsJSON};
     }
 
 
-    componentDidMount() {
-
+    componentDidMount(){
         api.get('/user/reviews?username=' + this.props.username).then((response) => {
-                this.setState({dataStr: JSON.stringify(response.data)})
+                this.setState({data: response.data})
         }).catch((error) => {
-                this.setState({dataStr: error.toString() + " " + process.env.FOOD_TRUCK_API_URL})
+                console.log(error.toString())
         });
     }
 
     renderReviewElement(index: number){
         return(
             <tr>
-                <td>{this.state.data[index].truckId}</td>
+                <td>{this.state.data[index].truck.name}</td>
                 <td>{this.state.data[index].starRating}</td>
                 <td>{this.state.data[index].costRating}</td>
-                <td>{this.state.data[index].reviewText} </td>
+                <td>{this.state.data[index].reviewText}<br/>{this.state.data[index].day_time}</td>
             </tr>
         );
     }
 
     render() {
+
+        if(this.state.data.length == 0){
+            return(
+                <div>
+                    <h2>No Reviews</h2>
+                </div>
+            )
+        }
         return (
             <div>
             <h2>Reviews</h2>
                 <div>
                     <table>
                         <tr>
-                            <th>Truck</th>
+                            <th>Food Truck</th>
                             <th>Overall Rating</th>
                             <th>Price Rating</th>
                             <th>Review</th>
                         </tr>
-
+                        {this.state.data.map(((value, index) => this.renderReviewElement(index)))}
                     </table>
-                    <p>{this.state.dataStr}</p>
                 </div>
             </div>
         );

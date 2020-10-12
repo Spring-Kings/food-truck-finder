@@ -1,15 +1,32 @@
 import React from 'react';
 import {NextRouter, useRouter} from 'next/router';
-import ReviewsList from "../../components/ReviewsList";
+import api from "../../util/api";
+import UserDetails from "../../components/UserDetails";
+
+
+function renderError(){
+    return (
+        <div>
+            <p>Error: Wrong URL</p>
+        </div>
+    );
+}
+
 
 function CustomerDetailPage(){
     const router: NextRouter = useRouter();
     const {username} = router.query;
 
+    if(username == undefined){
+        return renderError();
+    }
+    if(Array.isArray(username)){
+        return renderError();
+    }
+
     return (
         <div>
-            <h1>{username}</h1>
-            <ReviewsList username={username}/>
+            <UserDetails username={username}/>
         </div>
     );
 

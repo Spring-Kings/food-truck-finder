@@ -1,9 +1,8 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.ReviewsAndSubscriptions.Review;
-import food.truck.api.ReviewsAndSubscriptions.ReviewService;
-import food.truck.api.ReviewsAndSubscriptions.Subscription;
-import food.truck.api.ReviewsAndSubscriptions.SubscriptionService;
+import food.truck.api.reviews_and_subscriptions.Review;
+import food.truck.api.reviews_and_subscriptions.ReviewService;
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
@@ -82,6 +81,14 @@ public class UserEndpoint {
         return trucks;
     }
 
+    @GetMapping("/user/subscriptions")
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @RequestParam String username) {
+        User user = userService.loadUserByUsername(username);
+        List<Truck> trucks = new LinkedList<>();
+        subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
+        return trucks;
+    }
+
     @PostMapping("/user/subscribe")
     public String subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
         return ""; // TODO
@@ -98,12 +105,9 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/reviews")
-    public List<Review> getUserReviews(@RequestParam String username) {
-        List<User> users = userService.searchUsernames(username);
-        if(users.isEmpty()){
-            return null;
-        }
-        return reviewService.findReviewsByUserId(users.get(0).getId());
+    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @RequestParam String username) {
+        User user = userService.loadUserByUsername(username);
+        return reviewService.findReviewsByUserId(user.getId());
     }
 
     @Secured({"ROLE_USER"})
