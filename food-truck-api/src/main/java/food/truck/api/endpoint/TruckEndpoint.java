@@ -67,18 +67,12 @@ public class TruckEndpoint {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
-    @Value
-    private static class DeleteTruckParams {
-        @NonNull
-        long truckId;
-    }
-
-    @DeleteMapping("/truck/delete")
-    public void deleteTruck(@AuthenticationPrincipal User u, @RequestBody DeleteTruckParams data) {
-        var t = truckService.findTruckById(data.truckId);
+    @DeleteMapping("/truck/delete/{truckId}")
+    public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var t = truckService.findTruckById(truckId);
         t.ifPresent(truck -> {
             if (truck.getUserId().equals(u.getId())) {
-                truckService.deleteTruck(data.truckId);
+                truckService.deleteTruck(truckId);
             }
         });
     }

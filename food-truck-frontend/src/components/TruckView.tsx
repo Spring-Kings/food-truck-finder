@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Container, List, ListItem, Typography } from "@material-ui/core";
+import {Button, Container, List, ListItem, Typography} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
@@ -7,6 +7,7 @@ import api from "../util/api";
 interface TruckState {
   notFound: boolean | null;
   id: number;
+  userId: number | null;
   name: string;
   description: string | null;
   priceRating: number | null;
@@ -27,6 +28,7 @@ class TruckView extends Component<TruckProps, TruckState> {
     this.state = {
       notFound: null,
       id: 0,
+      userId: null,
       name: "",
       description: null,
       priceRating: null,
@@ -76,12 +78,29 @@ class TruckView extends Component<TruckProps, TruckState> {
             Food Category: {this.state.foodCategory}
           </ListItem>
           <ListItem>
-            Text Menu:
-            {this.state.textMenu}
+            Text Menu: {this.state.textMenu}
           </ListItem>
         </List>
+        <Button variant="outlined"
+                color="secondary"
+                onClick={() => this.deleteTruck(this.state.id)}>
+          Delete
+        </Button>
       </>
     );
+  }
+
+  deleteTruck(id: number) {
+    api.delete(`/truck/delete/${id}`, {})
+      .catch(err => {
+        if (err.response) {
+          console.log('Got error response code for truck deletion');
+        } else if (err.request) {
+          console.log('Could not delete truck');
+        } else {
+          console.log(err);
+        }
+      });
   }
 }
 
