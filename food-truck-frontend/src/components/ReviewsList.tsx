@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import axios, {AxiosResponse} from 'axios';
-import api from "../util/api";
 
-const reviewsJSON = {
+const reviewsJSON = [{
     "id": "",
     "userId": "",
     "truckId": "",/*{"id": "",
@@ -18,18 +17,17 @@ const reviewsJSON = {
     "costRating": "",
     "reviewText": "",
     "day_time": ""
-};
+}];
 
 type Props = {
     username: string | string[] | undefined
 }
 
 type State = {
-    data : [{
+    data : {
     "id": string,
-    "userId": string,
-    "truckId": string,
-            /*{"id": string,
+    "userId": string | undefined,
+    "truckId": string,/*{"id": string,
             "userId": string | undefined,
             "name": string,
             "menu": string | undefined,
@@ -40,10 +38,9 @@ type State = {
             "foodCategory": string | undefined },*/
     "starRating": string,
     "costRating": string,
-    "reviewText": string,
+    "reviewText": string | undefined,
     "day_time": string
-    }],
-    dataStr: string
+    }[]
 }
 
 
@@ -54,28 +51,29 @@ class ReviewsList extends React.Component<Props, State>{
 
     constructor(props: Props) {
         super(props);
-        this.state = {data: [reviewsJSON],
-            dataStr: "hey"
-        };
+        this.state = {data: reviewsJSON};
     }
 
 
     componentDidMount() {
-
-        api.get('/user/reviews?username=' + this.props.username).then((response) => {
-                this.setState({dataStr: JSON.stringify(response.data)})
+        axios.get(`${process.env.FOOD_TRUCK_API_URL}/user/reviews`, {
+            params: {
+                username: this.props.username,
+            }
+        }).then((response) => {
+                this.setState({ data: response.data })
         }).catch((error) => {
-                this.setState({dataStr: error.toString() + " " + process.env.FOOD_TRUCK_API_URL})
+                this.setState({data: error.toString()})
         });
     }
 
     renderReviewElement(index: number){
         return(
             <tr>
-                <td>{this.state.data[index].truckId}</td>
+                <td>{this.state.data[index]}</td>
                 <td>{this.state.data[index].starRating}</td>
                 <td>{this.state.data[index].costRating}</td>
-                <td>{this.state.data[index].reviewText} </td>
+
             </tr>
         );
     }
@@ -94,7 +92,7 @@ class ReviewsList extends React.Component<Props, State>{
                         </tr>
 
                     </table>
-                    <p>{this.state.dataStr}</p>
+                    {this.state.data[0]}
                 </div>
             </div>
         );
