@@ -74,18 +74,23 @@ public class UserEndpoint {
 
 
     @GetMapping("/user/{id}/subscriptions")
-    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @PathVariable long id) {
+    public List<Truck> getUserSubscriptions(@PathVariable long id) {
         var user = userService.findUserById(id);
         List<Truck> trucks = new LinkedList<>();
-        subscriptionService.findSubsByUser(user.get()).stream().forEach(s -> trucks.add(s.getTruck()));
+        if(user != null) {
+            subscriptionService.findSubsByUser(user.get()).stream().forEach(s -> trucks.add(s.getTruck()));
+        }
+
         return trucks;
     }
 
     @GetMapping("/user/subscriptions")
-    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @RequestParam String username) {
+    public List<Truck> getUserSubscriptions(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         List<Truck> trucks = new LinkedList<>();
-        subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
+        if(user != null) {
+            subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
+        }
         return trucks;
     }
 
@@ -100,13 +105,16 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
-    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
+    public List<Review> getUserReviews(@PathVariable long userId) {
         return reviewService.findReviewsByUserId(userId);
     }
 
     @GetMapping("/user/reviews")
-    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @RequestParam String username) {
+    public List<Review> getUserReviews(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
+        if(user == null){
+            return new LinkedList<Review>();
+        }
         return reviewService.findReviewsByUserId(user.getId());
     }
 

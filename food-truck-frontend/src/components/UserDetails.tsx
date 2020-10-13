@@ -20,7 +20,7 @@ class UserDetails extends React.Component<Props, State>{
     }
 
     componentDidMount() {
-        api.get('/search-usernames?username=' + this.props.username)
+        api.get(`/search-usernames?username=${this.props.username}`)
             .then(response => {
                 this.setState({data: response.data});
             }).catch(error => {
