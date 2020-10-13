@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
 import {AxiosResponse} from "axios";
 import api from "../util/api";
+import {Subscriptions} from "@material-ui/icons";
 
-type Props = {
+type SubscriptionProps = {
         username: string
 }
 
-type State = {
+type SubscriptionState = {
         data:
             {
                     "id": string,
@@ -35,9 +36,9 @@ const subscriptionJSON =
     }];
 
 
-class SubscriptionList extends React.Component<Props, State>{
+class SubscriptionList extends React.Component<SubscriptionProps, SubscriptionState>{
 
-        constructor(props: Props) {
+        constructor(props: SubscriptionProps) {
                 super(props);
 
                 this.state = {data: subscriptionJSON}

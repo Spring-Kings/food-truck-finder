@@ -1,20 +1,20 @@
-import React, {Component} from 'react';
+import React from 'react';
 import ReviewsList from "./ReviewsList";
 import SubscriptionList from "./SubscriptionList";
 import api from "../util/api";
 
-type Props = {
+type UserDetailsProps = {
     username: string
 }
 
-type State = {
+type UserDetailsState = {
     data: {username: string,
             id: string,
             email: string}[];
 }
 
-class UserDetails extends React.Component<Props, State>{
-    constructor(props: Props) {
+class UserDetails extends React.Component<UserDetailsProps, UserDetailsState>{
+    constructor(props: UserDetailsProps) {
         super(props);
         this.state = {data: [{username: "", id: "", email: ""}]}
     }

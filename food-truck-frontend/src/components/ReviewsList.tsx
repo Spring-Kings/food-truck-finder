@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import api from "../util/api";
 
 const reviewsJSON = [{
@@ -19,11 +19,11 @@ const reviewsJSON = [{
     "day_time": ""
 }];
 
-type Props = {
+type ReviewProps = {
     username: string
 }
 
-type State = {
+type ReviewState = {
     data : {
         "id": string,
         "userId": string,
@@ -47,9 +47,9 @@ type State = {
 
 
 
-class ReviewsList extends React.Component<Props, State>{
+class ReviewsList extends React.Component<ReviewProps, ReviewState>{
 
-    constructor(props: Props) {
+    constructor(props: ReviewProps) {
         super(props);
         this.state = {data: reviewsJSON};
     }
