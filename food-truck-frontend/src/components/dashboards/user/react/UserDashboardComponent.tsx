@@ -18,6 +18,7 @@ import State from "./UserDashboardState";
 import Props from "./UserDashboardProps";
 
 import UserSubscription from "../../../../domain/Subscription";
+import GoogleMapComponent from "../../../map";
 
 class UserDashboardComponent extends Component<Props, State> {
   constructor(props: Props) {
@@ -38,9 +39,11 @@ class UserDashboardComponent extends Component<Props, State> {
     return (
       <React.Fragment>
         {/** Props IDd using: https://material-ui.com/components/grid/ */}
-        <GridList cols={5}>
+        <GridList cols={5} style={{
+          height: "100vh"
+        }}>
           {/** Side list */}
-          <GridListTile cols={1}>
+          <GridListTile cols={1} style={{ height: "100vh" }}>
             {/* Image */}
             <Card>
               <img src="TODO insert logo" alt="STACKED TRUCKS" />
@@ -66,12 +69,8 @@ class UserDashboardComponent extends Component<Props, State> {
           </GridListTile>
 
           {/** Where the map would be */}
-          <GridListTile cols={4}>
-            <Card>
-              <CardContent>
-                Imagine a beautiful map with food trucks marked here...
-              </CardContent>
-            </Card>
+          <GridListTile cols={4} style={{ height: "100vh" }}>
+            <GoogleMapComponent/>
           </GridListTile>
         </GridList>
       </React.Fragment>
