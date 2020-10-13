@@ -1,14 +1,7 @@
 import React, {Component} from 'react';
-<<<<<<< HEAD
-=======
-import axios, {AxiosResponse} from 'axios';
-<<<<<<< HEAD
->>>>>>> parent of 7105ddd... Revert "changes"
-=======
->>>>>>> parent of 7105ddd... Revert "changes"
 import api from "../util/api";
 
-const reviewsJSON = {
+const reviewsJSON = [{
     "id": "",
     "userId": "",
     "truck": {"id": "",
@@ -24,27 +17,18 @@ const reviewsJSON = {
     "costRating": "",
     "reviewText": "",
     "day_time": ""
-};
+}];
 
 type Props = {
     username: string
 }
 
 type State = {
-    data : [{
-    "id": string,
-    "userId": string,
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "truck": {"id": string,
+    data : {
+        "id": string,
+        "userId": string,
+        "truck": {"id": string,
             "userId": string,
-=======
-=======
->>>>>>> parent of 7105ddd... Revert "changes"
-    "truckId": string,
-            /*{"id": string,
-            "userId": string | undefined,
->>>>>>> parent of 7105ddd... Revert "changes"
             "name": string,
             "menu": string,
             "textMenu": string,
@@ -52,21 +36,11 @@ type State = {
             "description": string,
             "schedule": string,
             "foodCategory": string},
-    "starRating": string,
-    "costRating": string,
-    "reviewText": string,
-    "day_time": string
-<<<<<<< HEAD
-<<<<<<< HEAD
+        "starRating": string,
+        "costRating": string,
+        "reviewText": string,
+        "day_time": string
     }[],
-=======
-    }],
-    dataStr: string
->>>>>>> parent of 7105ddd... Revert "changes"
-=======
-    }],
-    dataStr: string
->>>>>>> parent of 7105ddd... Revert "changes"
 }
 
 
@@ -77,53 +51,25 @@ class ReviewsList extends React.Component<Props, State>{
 
     constructor(props: Props) {
         super(props);
-        this.state = {data: [reviewsJSON],
-            dataStr: "hey"
-        };
+        this.state = {data: reviewsJSON};
     }
 
 
-<<<<<<< HEAD
     componentDidMount(){
         api.get('/user/reviews?username=' + this.props.username).then((response) => {
-                this.setState({data: response.data})
+            this.setState({data: response.data})
         }).catch((error) => {
-                console.log(error.toString())
-=======
-    componentDidMount() {
-
-        api.get('/user/reviews?username=' + this.props.username).then((response) => {
-                this.setState({dataStr: JSON.stringify(response.data)})
-        }).catch((error) => {
-                this.setState({dataStr: error.toString() + " " + process.env.FOOD_TRUCK_API_URL})
-<<<<<<< HEAD
->>>>>>> parent of 7105ddd... Revert "changes"
-=======
->>>>>>> parent of 7105ddd... Revert "changes"
+            console.log(error.toString())
         });
     }
 
     renderReviewElement(index: number){
         return(
             <tr>
-<<<<<<< HEAD
-<<<<<<< HEAD
                 <td>{this.state.data[index].truck.name}</td>
                 <td>{this.state.data[index].starRating}</td>
                 <td>{this.state.data[index].costRating}</td>
                 <td>{this.state.data[index].reviewText}<br/>{this.state.data[index].day_time}</td>
-=======
-                <td>{this.state.data[index].truckId}</td>
-                <td>{this.state.data[index].starRating}</td>
-                <td>{this.state.data[index].costRating}</td>
-                <td>{this.state.data[index].reviewText} </td>
->>>>>>> parent of 7105ddd... Revert "changes"
-=======
-                <td>{this.state.data[index].truckId}</td>
-                <td>{this.state.data[index].starRating}</td>
-                <td>{this.state.data[index].costRating}</td>
-                <td>{this.state.data[index].reviewText} </td>
->>>>>>> parent of 7105ddd... Revert "changes"
             </tr>
         );
     }
@@ -139,7 +85,7 @@ class ReviewsList extends React.Component<Props, State>{
         }
         return (
             <div>
-            <h2>Reviews</h2>
+                <h2>Reviews</h2>
                 <div>
                     <table>
                         <tr>
@@ -150,14 +96,6 @@ class ReviewsList extends React.Component<Props, State>{
                         </tr>
                         {this.state.data.map(((value, index) => this.renderReviewElement(index)))}
                     </table>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-                    <p>{this.state.dataStr}</p>
->>>>>>> parent of 7105ddd... Revert "changes"
-=======
-                    <p>{this.state.dataStr}</p>
->>>>>>> parent of 7105ddd... Revert "changes"
                 </div>
             </div>
         );
