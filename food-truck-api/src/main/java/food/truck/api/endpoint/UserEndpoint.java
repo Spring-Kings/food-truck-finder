@@ -1,5 +1,12 @@
 package food.truck.api.endpoint;
 
+<<<<<<< HEAD
+=======
+import food.truck.api.reviews_and_subscriptions.Review;
+import food.truck.api.reviews_and_subscriptions.ReviewService;
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
+import food.truck.api.truck.Truck;
+>>>>>>> parent of 8845378... Revert "working requirement of view customer details"
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import food.truck.api.user.UserView;
@@ -66,6 +73,14 @@ public class UserEndpoint {
         return ""; // TODO
     }
 
+    @GetMapping("/user/subscriptions")
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal @Nullable User u, @RequestParam String username) {
+        User user = userService.loadUserByUsername(username);
+        List<Truck> trucks = new LinkedList<>();
+        subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
+        return trucks;
+    }
+
     @PostMapping("/user/subscribe")
     public String subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
         return ""; // TODO
@@ -77,8 +92,19 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
+<<<<<<< HEAD
     public String getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
         return ""; // TODO
+=======
+    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
+        return reviewService.findReviewsByUserId(userId);
+    }
+
+    @GetMapping("/user/reviews")
+    public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @RequestParam String username) {
+        User user = userService.loadUserByUsername(username);
+        return reviewService.findReviewsByUserId(user.getId());
+>>>>>>> parent of 8845378... Revert "working requirement of view customer details"
     }
 
     @Secured({"ROLE_USER"})
