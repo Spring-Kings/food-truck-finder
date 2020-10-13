@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import Router, { useRouter } from "next/router";
+
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
 import {
@@ -26,6 +28,7 @@ class UserDashboardComponent extends Component<Props, State> {
 
     // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
+    this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
   }
 
   /**
@@ -39,15 +42,26 @@ class UserDashboardComponent extends Component<Props, State> {
     return (
       <React.Fragment>
         {/** Props IDd using: https://material-ui.com/components/grid/ */}
-        <GridList cols={5} style={{
-          height: "100vh", width: "100%"
-        }}>
+        <GridList
+          cols={5}
+          style={{
+            height: "100vh",
+            width: "100%",
+          }}
+        >
           {/** Side list */}
           <GridListTile cols={1} style={{ height: "100vh" }}>
             {/* Image */}
             <Card>
               <img src="TODO insert logo" alt="STACKED TRUCKS" />
             </Card>
+
+            {/* Go to owner dashboard */}
+            {this.props.isOwner ? (
+              <Button onClick={this.toOwnerDashboard}>
+                TO OWNER DASHBOARD
+              </Button>
+            ) : null}
 
             {/* Subscribe list */}
             <Accordion>
@@ -60,7 +74,7 @@ class UserDashboardComponent extends Component<Props, State> {
                     )
                   ) : (
                     <ListItem>
-                      <Card>No trucks available</Card>
+                      <Card>No subscriptions</Card>
                     </ListItem>
                   )}
                 </List>
@@ -70,7 +84,7 @@ class UserDashboardComponent extends Component<Props, State> {
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <GoogleMapComponent/>
+            <GoogleMapComponent />
           </GridListTile>
         </GridList>
       </React.Fragment>
@@ -114,7 +128,11 @@ class UserDashboardComponent extends Component<Props, State> {
    * @param id The TruckID of the truck to view
    */
   private viewTruck(id: number): void {
-    alert(`Imagine looking at ${id}, but we haven't implemented it yet...`);
+    Router.replace(`/truck/${id}`);
+  }
+
+  private toOwnerDashboard() {
+    Router.replace("/dashboard/owner");
   }
 }
 

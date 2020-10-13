@@ -25,10 +25,12 @@ export class GoogleMapComponent extends React.Component<MapProps, MapState> {
     this.state = {
       coordinates: {
         lat: 0,
-        lng: 0
-      }
-    }
-    
+        lng: 0,
+      },
+    };
+  }
+
+  componentDidMount() {
     // get location
     navigator.geolocation.getCurrentPosition((location) => {
       this.setState({

@@ -9,8 +9,8 @@ interface UserDashboardProps {
   username: string;
   pfp: any;
 
-  /** To be changed later */
   subscribedTrucks: UserSubscription[];
+  isOwner: boolean;
 
   // This says: let me index into this interface using strings, but only to access
   // the elements that are here, not to add new ones.
