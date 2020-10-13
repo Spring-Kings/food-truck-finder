@@ -5,26 +5,16 @@ import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import Form from "../../../components/Form";
 import NotFound from "../../../components/NotFound";
+import { TruckProps, TruckState } from "../../../components/TruckView";
 
 interface EditTruckState {
-  id: number;
-  userId: number | null;
-  name: string;
-  description: string | null;
-  priceRating: number | null;
-  foodCategory: string | null;
-  // menu: string | null;
-  textMenu: string | null;
-  // schedule: string | null;
   message: string;
 }
 
-interface EditTruckProps {
-  truckId: number;
-}
+type State = TruckState & EditTruckState;
 
-class EditTruck extends Component<EditTruckProps, EditTruckState> {
-  constructor(props: EditTruckProps) {
+class EditTruck extends Component<TruckProps, State> {
+  constructor(props: TruckProps) {
     super(props);
     this.state = {
       id: 0,

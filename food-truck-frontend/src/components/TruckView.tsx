@@ -5,8 +5,7 @@ import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
 
-interface TruckState {
-  notFound: boolean | null;
+export interface TruckState {
   id: number;
   userId: number | null;
   name: string;
@@ -18,11 +17,17 @@ interface TruckState {
   // schedule: string | null;
 }
 
-interface TruckProps {
+interface TruckViewState {
+  notFound: boolean | null;
+}
+
+export interface TruckProps {
     truckId: number;
 }
 
-class TruckView extends Component<TruckProps, TruckState> {
+type State = TruckState & TruckViewState;
+
+class TruckView extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
     super(props);
 
