@@ -17,7 +17,7 @@ class EditTruck extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
     super(props);
     this.state = {
-      id: 0,
+      id: this.props.truckId,
       userId: null,
       name: "",
       description: null,
@@ -33,7 +33,7 @@ class EditTruck extends Component<TruckProps, State> {
       <>
         <Typography variant={'h4'}>Edit Truck ID: {this.state.id}</Typography>
         <Form submitMethod="PUT" submitUrl={'/truck/update'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-          <TextField disabled hidden label="Truck ID" variant="outlined" name="truckId" defaultValue={this.state.id}/>
+          <TextField disabled label="Truck ID" variant="outlined" name="truckId" defaultValue={this.state.id}/>
           <TextField label="Truck Name" variant="outlined" name="name" defaultValue={this.state.name}/>
           <TextField label="Description" variant="outlined" name="description" defaultValue={this.state.description}/>
           <TextField label="Price Rating" variant="outlined" name="priceRating" defaultValue={this.state.priceRating}/>

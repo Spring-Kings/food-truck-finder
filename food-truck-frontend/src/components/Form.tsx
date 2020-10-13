@@ -27,10 +27,13 @@ class Form extends Component<Props, State> {
         React.Children.forEach(this.props.children, c => {
             const child = c as ReactElement;
             if (typeof (child.props.name) !== 'undefined') {
-                if (typeof (child.props.value) !== 'undefined')
+                if (typeof (child.props.value) !== 'undefined') {
                     this.state.formData[child.props.name] = child.props.value;
-                else
+                } else if (typeof (child.props.defaultValue) !== 'undefined') {
+                    this.state.formData[child.props.name] = child.props.defaultValue;
+                } else {
                     this.state.formData[child.props.name] = "";
+                }
             }
         });
 
