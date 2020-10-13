@@ -99,20 +99,24 @@ public class TruckEndpoint {
 
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
-        if (!u.getId().equals(data.truckId)) {
-            return Optional.empty();
+        var t = truckService.findTruckById(data.truckId);
+        if (t.isPresent()) {
+            var truck = t.get();
+            if (!u.getId().equals(truck.getUserId())) {
+                return Optional.empty();
+            }
+            return Optional.of(truckService.updateTruck(
+                truck,
+                Optional.ofNullable(data.name),
+                Optional.ofNullable(data.menu),
+                Optional.ofNullable(data.textMenu),
+                Optional.ofNullable(data.priceRating),
+                Optional.ofNullable(data.description),
+                Optional.ofNullable(data.schedule),
+                Optional.ofNullable(data.foodCategory)
+            ));
         }
-        var truck = truckService.findTruckById(data.truckId);
-        return truck.map(value -> truckService.updateTruck(
-            value,
-            Optional.ofNullable(data.name),
-            Optional.ofNullable(data.menu),
-            Optional.ofNullable(data.textMenu),
-            Optional.ofNullable(data.priceRating),
-            Optional.ofNullable(data.description),
-            Optional.ofNullable(data.schedule),
-            Optional.ofNullable(data.foodCategory)
-        ));
+        return null;
     }
 
     @GetMapping("/truck/{truckId}/routes")

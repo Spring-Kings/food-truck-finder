@@ -56,6 +56,7 @@ class Form extends Component<Props, State> {
     }
 
     onSubmit(event: React.FormEvent) {
+        console.log(this.state.formData);
         api.request({
             url: this.props.submitUrl,
             data: this.state.formData,

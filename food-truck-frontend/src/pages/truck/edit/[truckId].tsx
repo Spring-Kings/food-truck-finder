@@ -43,7 +43,7 @@ class EditTruck extends Component<EditTruckProps, EditTruckState> {
       <>
         <Typography variant={'h4'}>Edit Truck ID: {this.state.id}</Typography>
         <Form submitMethod="PUT" submitUrl={'/truck/update'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-          <TextField label="Truck ID" variant="outlined" name="truckId" value={this.state.id}/>
+          <TextField disabled hidden label="Truck ID" variant="outlined" name="truckId" value={this.state.id} defaultValue={this.state.id}/>
           <TextField label="Truck Name" variant="outlined" name="name" defaultValue={this.state.name}/>
           <TextField label="Description" variant="outlined" name="description" defaultValue={this.state.description}/>
           <TextField label="Price Rating" variant="outlined" name="priceRating" defaultValue={this.state.priceRating}/>
@@ -76,7 +76,7 @@ class EditTruck extends Component<EditTruckProps, EditTruckState> {
   }
 
   onSubmit = (formData: any, response: AxiosResponse) => {
-    Router.replace(`/truck/${this.state.id}`);
+    // Router.replace(`/truck/${this.state.id}`);
   }
 
   onFail = (formData: any, response: AxiosResponse) => {
