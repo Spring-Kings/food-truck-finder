@@ -15,6 +15,7 @@ export interface UserDashboardData {
  */
 interface UserDashboardProps {
   data: UserDashboardData | undefined;
+//  inError: boolean;
 
   // This says: let me index into this interface using strings, but only to access
   // the elements that are here, not to add new ones.

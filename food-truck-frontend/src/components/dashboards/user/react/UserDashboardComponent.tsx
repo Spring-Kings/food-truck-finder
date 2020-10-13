@@ -24,34 +24,35 @@ import UserDashboardProps from "./UserDashboardProps";
 import UserSubscription from "../../../../domain/Subscription";
 import GoogleMapComponent from "../../../map";
 
-class UserDashboardComponent extends Component<UserDashboardProps, UserDashboardState> {
+class UserDashboardComponent extends Component<
+  UserDashboardProps,
+  UserDashboardState
+> {
   constructor(props: UserDashboardProps) {
     super(props);
 
     // Create state
     this.state = {
       addTruck: false,
+      inError: false
     };
 
     // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
-  }
 
-  /**
-   * Used to pull subscriptions from the backend
-   */
-  componentDidMount() {
-    console.log("heyo")
-    this.props.loadUserFromBackend();
+    // Load
+    this.props.loadUserFromBackend().then(
+      (_response : any) => this.setState({ inError: false }),
+      (_err : any) => this.setState({ inError: true })
+    );
   }
 
   render() {
     // Ensure the state is OK
-    if (this.props.data === undefined)
-      return <Typography variant="h1">ERROR: not logged in</Typography>
-    else if (this.props.data.username === null)
-      return <CircularProgress />;
+    if (this.state.inError)
+      return <Typography variant="h1">ERROR: not logged in</Typography>;
+    else if (this.props.data === undefined) return <CircularProgress />;
 
     // If OK, return actual component
     return (
@@ -68,11 +69,16 @@ class UserDashboardComponent extends Component<UserDashboardProps, UserDashboard
           <GridListTile cols={1} style={{ height: "100vh" }}>
             {/* Image */}
             <Card>
-              <img src="../../../../resources/stacked_trucks_wheany_CCBY2,0.jpg" alt="STACKED TRUCKS" />
+              <img
+                src="../../../../resources/stacked_trucks_wheany_CCBY2,0.jpg"
+                alt="STACKED TRUCKS"
+              />
             </Card>
 
             {/* Name, for debug */}
-            <Card><CardContent>Hello {this.props.data.username}!</CardContent></Card>
+            <Card>
+              <CardContent>Hello {this.props.data.username}!</CardContent>
+            </Card>
 
             {/* Go to owner dashboard */}
             {this.props.data.isOwner ? (

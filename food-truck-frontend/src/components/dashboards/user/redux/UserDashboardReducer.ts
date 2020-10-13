@@ -15,9 +15,8 @@ const userDashboardSlice = createSlice({
         })
         
         .addCase(UserDashboardActionTypes.LOAD_PROPS_ACTION, (state: any, action: LoadPropsAction) => {
-           return {
-               ...action.payload
-           };
+            state.data = action.payload;
+            return state;
         });
     }
 });

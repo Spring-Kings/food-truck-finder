@@ -8,6 +8,7 @@ import api from "../../../../util/api";
 import getUserInfo from "../../../../util/token";
 import { AxiosResponse } from "axios";
 import UserSubscription from "../../../../domain/Subscription";
+import UserDashboardProps from "../react/UserDashboardProps";
 
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.
@@ -42,7 +43,7 @@ function updateUser(
             username: response.data.username,
             pfp: undefined,
             subscribedTrucks: subscribed,
-            isOwner: false
+            isOwner: false,
           },
         });
       },
@@ -53,9 +54,9 @@ function updateUser(
 }
 
 // Create a constant set of methods to dispatch on
-const dispatcher: UserDashboardD2P = {
-  loadSubscriptions: () => {
-    return (dispatch: Dispatch<UserDashboardAction>) => {
+const mapDispatchToProps = (dispatch: Dispatch<UserDashboardAction>) => {
+  return {
+    loadSubscriptions: () => {
       var id = getUserInfo()?.userID;
       console.log(id);
       if (id !== undefined)
@@ -70,12 +71,10 @@ const dispatcher: UserDashboardD2P = {
             console.log(err);
           }
         );
-    };
-  },
-  loadUserFromBackend: () => {
-    console.log("create");
-    return (dispatch: Dispatch<UserDashboardAction>) => {
+    },
+    loadUserFromBackend: () => {
       var id: number | undefined = getUserInfo()?.userID;
+      console.log(`${id}`);
       if (id !== undefined) {
         requestSubscribed(id).then(
           (response) => updateUser(dispatch, id as number, response.data),
@@ -84,9 +83,10 @@ const dispatcher: UserDashboardD2P = {
             updateUser(dispatch, id as number, []);
           }
         );
-      } else
-        console.log(`ERROR: ${id}`);
-    };
-  },
+      } else console.log(`ERROR: ${id}`);
+    },
+    dispatch,
+  };
 };
-export default dispatcher;
+
+export default mapDispatchToProps;
