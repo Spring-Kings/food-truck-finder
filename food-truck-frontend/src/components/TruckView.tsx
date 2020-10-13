@@ -4,10 +4,23 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
+import getUserInfo from "../util/token";
+
+export const userCanEditTruck = (truckOwnerId: number): boolean => {
+  const user = getUserInfo();
+  if (user) {
+    if (truckOwnerId !== user.userID) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
 
 export interface TruckState {
   id: number;
-  userId: number | null;
+  userId: number;
   name: string;
   description: string | null;
   priceRating: number | null;
@@ -34,7 +47,7 @@ class TruckView extends Component<TruckProps, State> {
     this.state = {
       notFound: null,
       id: 0,
-      userId: null,
+      userId: 0,
       name: "",
       description: null,
       priceRating: null,
@@ -88,11 +101,13 @@ class TruckView extends Component<TruckProps, State> {
             Text Menu: {this.state.textMenu}
           </ListItem>
         </List>
-        <Button variant="outlined"
-                color="primary"
-                onClick={this.editTruck}>
-          Edit
-        </Button>
+        {userCanEditTruck(this.state.userId) &&
+          <Button variant="outlined"
+                  color="primary"
+                  onClick={this.editTruck}>
+            Edit
+          </Button>
+        }
       </>
     );
   }

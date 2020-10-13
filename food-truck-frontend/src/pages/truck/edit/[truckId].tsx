@@ -5,7 +5,7 @@ import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import Form from "../../../components/Form";
 import NotFound from "../../../components/NotFound";
-import { TruckProps, TruckState } from "../../../components/TruckView";
+import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
 
 interface EditTruckState {
   message: string;
@@ -18,7 +18,7 @@ class EditTruck extends Component<TruckProps, State> {
     super(props);
     this.state = {
       id: this.props.truckId,
-      userId: null,
+      userId: 0,
       name: "",
       description: null,
       priceRating: null,
@@ -63,6 +63,9 @@ class EditTruck extends Component<TruckProps, State> {
           console.log(err);
         }
       });
+    if (!userCanEditTruck(this.state.userId)) {
+      Router.replace('/');
+    }
   }
 
   onSubmit = (formData: any, response: AxiosResponse) => {
