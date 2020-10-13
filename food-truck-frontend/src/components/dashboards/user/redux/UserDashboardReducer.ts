@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-import { UserDashboardActionTypes, userDashboardName, LoadSubscriptionsAction } from "./UserDashboardAction"
+import { UserDashboardActionTypes, userDashboardName, LoadSubscriptionsAction, LoadPropsAction } from "./UserDashboardAction"
 import defaultState from "./DefaultState"
 
 const userDashboardSlice = createSlice({
@@ -12,6 +12,12 @@ const userDashboardSlice = createSlice({
         builder.addCase(UserDashboardActionTypes.LOAD_SUBS_ACTION, (state: any, action: LoadSubscriptionsAction) => {
             state.subscribedTrucks = action.payload;
             return state;
+        })
+        
+        .addCase(UserDashboardActionTypes.LOAD_PROPS_ACTION, (state: any, action: LoadPropsAction) => {
+           return {
+               ...action.payload
+           };
         });
     }
 });

@@ -1,5 +1,1 @@
-export default {
-    username: "InigoMontoya",
-    pfp: "",
-    subscribedTrucks: []
-};
+export default {};

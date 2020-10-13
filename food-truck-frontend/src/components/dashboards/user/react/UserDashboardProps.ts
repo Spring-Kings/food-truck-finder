@@ -2,15 +2,19 @@
 
 import UserSubscription from "../../../../domain/Subscription";
 
-/**
- * Props used by the UserDashboardComponent
- */
-interface UserDashboardProps {
+export interface UserDashboardData {
   username: string;
   pfp: any;
 
   subscribedTrucks: UserSubscription[];
   isOwner: boolean;
+}
+
+/**
+ * Props used by the UserDashboardComponent
+ */
+interface UserDashboardProps {
+  data: UserDashboardData | undefined;
 
   // This says: let me index into this interface using strings, but only to access
   // the elements that are here, not to add new ones.

@@ -2,7 +2,7 @@
  * React state of the UserDashboard
  */
 interface UserDashboardState {
-  addTruck: boolean
+  addTruck: boolean;
 }
 
 export default UserDashboardState;

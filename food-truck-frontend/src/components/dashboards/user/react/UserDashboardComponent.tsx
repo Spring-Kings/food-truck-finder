@@ -10,21 +10,28 @@ import {
   AccordionSummary,
   Card,
   CardContent,
+  CircularProgress,
   GridList,
   GridListTile,
   List,
   ListItem,
+  Typography,
 } from "@material-ui/core";
 
-import State from "./UserDashboardState";
-import Props from "./UserDashboardProps";
+import UserDashboardState from "./UserDashboardState";
+import UserDashboardProps from "./UserDashboardProps";
 
 import UserSubscription from "../../../../domain/Subscription";
 import GoogleMapComponent from "../../../map";
 
-class UserDashboardComponent extends Component<Props, State> {
-  constructor(props: Props) {
+class UserDashboardComponent extends Component<UserDashboardProps, UserDashboardState> {
+  constructor(props: UserDashboardProps) {
     super(props);
+
+    // Create state
+    this.state = {
+      addTruck: false,
+    };
 
     // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
@@ -35,10 +42,18 @@ class UserDashboardComponent extends Component<Props, State> {
    * Used to pull subscriptions from the backend
    */
   componentDidMount() {
-    this.props.loadSubscriptions();
+    console.log("heyo")
+    this.props.loadUserFromBackend();
   }
 
   render() {
+    // Ensure the state is OK
+    if (this.props.data === undefined)
+      return <Typography variant="h1">ERROR: not logged in</Typography>
+    else if (this.props.data.username === null)
+      return <CircularProgress />;
+
+    // If OK, return actual component
     return (
       <React.Fragment>
         {/** Props IDd using: https://material-ui.com/components/grid/ */}
@@ -53,11 +68,14 @@ class UserDashboardComponent extends Component<Props, State> {
           <GridListTile cols={1} style={{ height: "100vh" }}>
             {/* Image */}
             <Card>
-              <img src="TODO insert logo" alt="STACKED TRUCKS" />
+              <img src="../../../../resources/stacked_trucks_wheany_CCBY2,0.jpg" alt="STACKED TRUCKS" />
             </Card>
 
+            {/* Name, for debug */}
+            <Card><CardContent>Hello {this.props.data.username}!</CardContent></Card>
+
             {/* Go to owner dashboard */}
-            {this.props.isOwner ? (
+            {this.props.data.isOwner ? (
               <Button onClick={this.toOwnerDashboard}>
                 TO OWNER DASHBOARD
               </Button>
@@ -68,8 +86,8 @@ class UserDashboardComponent extends Component<Props, State> {
               <AccordionSummary>Subscribed Trucks</AccordionSummary>
               <AccordionDetails>
                 <List>
-                  {this.props.subscribedTrucks.length > 0 ? (
-                    this.props.subscribedTrucks.flatMap((name) =>
+                  {this.props.data.subscribedTrucks.length > 0 ? (
+                    this.props.data.subscribedTrucks.flatMap((name) =>
                       this.createTruckEntry(name)
                     )
                   ) : (

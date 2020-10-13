@@ -1,7 +1,6 @@
 import { connect } from "react-redux";
 
 import UserDashboardComponent from "./react/UserDashboardComponent";
-import UserDashboardProps from "./react/UserDashboardProps";
 import mapDispatchToProps from "./redux/UserDashboardD2P";
 
 /**
@@ -9,7 +8,7 @@ import mapDispatchToProps from "./redux/UserDashboardD2P";
  * @param state The state of the Redux store. Any since I don't know what's in the store, but I recall there's a better pattern.
  * @param myProps My own current props
  */
-function mapStateToProps(state: any, myProps: any) : UserDashboardProps {
+function mapStateToProps(state: any, myProps: any) {
   return {
     username: state.userDashboard.username,
     pfp: state.userDashboard.pfp,
