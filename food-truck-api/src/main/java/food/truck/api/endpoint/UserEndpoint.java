@@ -92,10 +92,7 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
-<<<<<<< HEAD
-    public String getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
-        return ""; // TODO
-=======
+
     public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long userId) {
         return reviewService.findReviewsByUserId(userId);
     }
@@ -104,7 +101,6 @@ public class UserEndpoint {
     public List<Review> getUserReviews(@AuthenticationPrincipal @Nullable User viewer, @RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         return reviewService.findReviewsByUserId(user.getId());
->>>>>>> parent of 8845378... Revert "working requirement of view customer details"
     }
 
     @Secured({"ROLE_USER"})
