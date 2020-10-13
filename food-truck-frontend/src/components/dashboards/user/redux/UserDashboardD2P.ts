@@ -57,33 +57,39 @@ function updateUser(
 const mapDispatchToProps = (dispatch: Dispatch<UserDashboardAction>) => {
   return {
     loadSubscriptions: () => {
-      var id = getUserInfo()?.userID;
-      console.log(id);
-      if (id !== undefined)
-        requestSubscribed(id).then(
-          (response) => {
-            dispatch({
-              type: UserDashboardActionTypes.LOAD_SUBS_ACTION,
-              payload: response.data,
-            });
-          },
-          (err) => {
-            console.log(err);
-          }
-        );
+      return new Promise<void>(() => {
+        var id = getUserInfo()?.userID;
+        console.log(id);
+        if (id !== undefined)
+          requestSubscribed(id).then(
+            (response) => {
+              dispatch({
+                type: UserDashboardActionTypes.LOAD_SUBS_ACTION,
+                payload: response.data,
+              });
+            },
+            (err) => {
+              console.log(err);
+            }
+          );
+      });
     },
     loadUserFromBackend: () => {
-      var id: number | undefined = getUserInfo()?.userID;
-      console.log(`${id}`);
-      if (id !== undefined) {
-        requestSubscribed(id).then(
-          (response) => updateUser(dispatch, id as number, response.data),
-          (err) => {
-            console.log(err);
-            updateUser(dispatch, id as number, []);
-          }
-        );
-      } else console.log(`ERROR: ${id}`);
+      return new Promise<void>(() => {
+        var id: number | undefined = getUserInfo()?.userID;
+        console.log(`${id}`);
+        if (id !== undefined) {
+          requestSubscribed(id).then(
+            (response) => updateUser(dispatch, id as number, response.data),
+            (err) => {
+              console.log(err);
+              updateUser(dispatch, id as number, []);
+            }
+          );
+        } else {
+          throw "No user logged in!";
+        }
+      });
     },
     dispatch,
   };

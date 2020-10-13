@@ -3,7 +3,7 @@
  */
 interface UserDashboardState {
   addTruck: boolean;
-  inError: boolean;
+  inError: string | null;
 }
 
 export default UserDashboardState;

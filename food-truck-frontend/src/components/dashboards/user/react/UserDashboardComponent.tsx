@@ -34,17 +34,19 @@ class UserDashboardComponent extends Component<
     // Create state
     this.state = {
       addTruck: false,
-      inError: false
+      inError: null,
     };
 
     // Bind methods
     this.viewTruck = this.viewTruck.bind(this);
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
+  }
 
+  componentDidMount() {
     // Load
     this.props.loadUserFromBackend().then(
-      (_response : any) => this.setState({ inError: false }),
-      (_err : any) => this.setState({ inError: true })
+      (_response: any) => this.setState({ inError: null }),
+      (err: any) => this.setState({ inError: err })
     );
   }
 
