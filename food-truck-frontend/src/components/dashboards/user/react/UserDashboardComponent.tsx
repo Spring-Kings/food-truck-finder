@@ -40,7 +40,7 @@ class UserDashboardComponent extends Component<Props, State> {
       <React.Fragment>
         {/** Props IDd using: https://material-ui.com/components/grid/ */}
         <GridList cols={5} style={{
-          height: "100vh"
+          height: "100vh", width: "100%"
         }}>
           {/** Side list */}
           <GridListTile cols={1} style={{ height: "100vh" }}>

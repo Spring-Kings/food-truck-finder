@@ -16,22 +16,28 @@ interface MapState {
   coordinates: LatLngLiteral;
 }
 
+const LOC_PERMISSION_GRANTED: string = "granted_location_permission";
+
 export class GoogleMapComponent extends React.Component<MapProps, MapState> {
   constructor(props: MapProps) {
     super(props);
 
     this.state = {
       coordinates: {
-        lat: 0.0,
-        lng: 0.0,
-      },
-    };
-
-    this.accept = this.accept.bind(this);
-  }
-
-  componentDidMount() {
-    console.log("we be here lads");
+        lat: 0,
+        lng: 0
+      }
+    }
+    
+    // get location
+    navigator.geolocation.getCurrentPosition((location) => {
+      this.setState({
+        coordinates: {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        },
+      });
+    });
   }
 
   render() {
@@ -42,7 +48,7 @@ export class GoogleMapComponent extends React.Component<MapProps, MapState> {
           <GoogleMap
             mapContainerStyle={{
               height: "100vh",
-              width: "100%"
+              width: "100%",
             }}
             zoom={10}
             center={this.state.coordinates}
@@ -50,31 +56,5 @@ export class GoogleMapComponent extends React.Component<MapProps, MapState> {
         </LoadScript>
       </Container>
     );
-  }
-
-  private requestPermissionDialog() {
-    return (
-      <Dialog open={this.state.coordinates !== undefined}>
-        <DialogTitle>Share Location</DialogTitle>
-        <DialogContent>
-          May we use your current location to show you food trucks in your area?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={this.accept}>AGREE</Button>
-          <Button>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-
-  private accept() {
-    navigator.geolocation.getCurrentPosition((location) => {
-      this.setState({
-        coordinates: {
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        },
-      });
-    });
   }
 }
