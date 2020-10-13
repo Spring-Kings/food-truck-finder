@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {AxiosResponse} from "axios";
 import api from "../util/api";
-import {Subscriptions} from "@material-ui/icons";
 
 type SubscriptionProps = {
         username: string
@@ -10,29 +9,29 @@ type SubscriptionProps = {
 type SubscriptionState = {
         data:
             {
-                    "id": string,
-                    "userId": string,
-                    "name": string,
-                    "menu": string,
-                    "textMenu": string,
-                    "priceRating": string,
-                    "description": string,
-                    "schedule": string,
-                    "foodCategory": string
+                    id: string,
+                    userId: string,
+                    name: string,
+                    menu: string,
+                    textMenu: string,
+                    priceRating: string,
+                    description: string,
+                    schedule: string,
+                    foodCategory: string
             }[]
 }
 
 const subscriptionJSON =
     [{
-            "id": "",
-            "userId": "",
-            "name": "ice cream",
-            "menu": "",
-            "textMenu": "",
-            "priceRating": "",
-            "description": "",
-            "schedule": "",
-            "foodCategory": ""
+            id: "",
+            userId: "",
+            name: "ice cream",
+            menu: "",
+            textMenu: "",
+            priceRating: "",
+            description: "",
+            schedule: "",
+            foodCategory: ""
     }];
 
 

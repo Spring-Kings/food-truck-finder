@@ -2,21 +2,21 @@ import React from 'react';
 import api from "../util/api";
 
 const reviewsJSON = [{
-    "id": "",
-    "userId": "",
-    "truck": {"id": "",
-        "userId": "",
-        "name": "",
-        "menu": "",
-        "textMenu": "",
-        "priceRating": "",
-        "description": "",
-        "schedule": "",
-        "foodCategory": ""},
-    "starRating": "",
-    "costRating": "",
-    "reviewText": "",
-    "day_time": ""
+    id: "",
+    userId: "",
+    truck: {"id": "",
+        userId: "",
+        name: "",
+        menu: "",
+        textMenu: "",
+        priceRating: "",
+        description: "",
+        schedule: "",
+        foodCategory: ""},
+    starRating: "",
+    costRating: "",
+    reviewText: "",
+    day_time: ""
 }];
 
 type ReviewProps = {
@@ -25,21 +25,21 @@ type ReviewProps = {
 
 type ReviewState = {
     data : {
-        "id": string,
-        "userId": string,
-        "truck": {"id": string,
-            "userId": string,
-            "name": string,
-            "menu": string,
-            "textMenu": string,
-            "priceRating": string,
-            "description": string,
-            "schedule": string,
-            "foodCategory": string},
-        "starRating": string,
-        "costRating": string,
-        "reviewText": string,
-        "day_time": string
+        id: string,
+        userId: string,
+        truck: {"id": string,
+            userId: string,
+            name: string,
+            menu: string,
+            textMenu: string,
+            priceRating: string,
+            description: string,
+            schedule: string,
+            foodCategory: string},
+        starRating: string,
+        costRating: string,
+        reviewText: string,
+        day_time: string
     }[],
 }
 

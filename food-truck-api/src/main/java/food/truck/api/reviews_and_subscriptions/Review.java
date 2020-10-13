@@ -35,7 +35,7 @@ public class Review {
     String reviewText;
 
     @Column(name = "date", nullable = false)
-    Date day_time;
+    Timestamp day_time;
 
 
 }
