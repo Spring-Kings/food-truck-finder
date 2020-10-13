@@ -116,7 +116,7 @@ public class TruckEndpoint {
                 Optional.ofNullable(data.foodCategory)
             ));
         }
-        return null;
+        return Optional.empty();
     }
 
     @GetMapping("/truck/{truckId}/routes")
