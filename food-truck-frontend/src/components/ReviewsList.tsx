@@ -2,6 +2,9 @@ import React, {Component} from 'react';
 <<<<<<< HEAD
 =======
 import axios, {AxiosResponse} from 'axios';
+<<<<<<< HEAD
+>>>>>>> parent of 7105ddd... Revert "changes"
+=======
 >>>>>>> parent of 7105ddd... Revert "changes"
 import api from "../util/api";
 
@@ -32,9 +35,12 @@ type State = {
     "id": string,
     "userId": string,
 <<<<<<< HEAD
+<<<<<<< HEAD
     "truck": {"id": string,
             "userId": string,
 =======
+=======
+>>>>>>> parent of 7105ddd... Revert "changes"
     "truckId": string,
             /*{"id": string,
             "userId": string | undefined,
@@ -51,7 +57,12 @@ type State = {
     "reviewText": string,
     "day_time": string
 <<<<<<< HEAD
+<<<<<<< HEAD
     }[],
+=======
+    }],
+    dataStr: string
+>>>>>>> parent of 7105ddd... Revert "changes"
 =======
     }],
     dataStr: string
@@ -85,6 +96,9 @@ class ReviewsList extends React.Component<Props, State>{
                 this.setState({dataStr: JSON.stringify(response.data)})
         }).catch((error) => {
                 this.setState({dataStr: error.toString() + " " + process.env.FOOD_TRUCK_API_URL})
+<<<<<<< HEAD
+>>>>>>> parent of 7105ddd... Revert "changes"
+=======
 >>>>>>> parent of 7105ddd... Revert "changes"
         });
     }
@@ -93,10 +107,17 @@ class ReviewsList extends React.Component<Props, State>{
         return(
             <tr>
 <<<<<<< HEAD
+<<<<<<< HEAD
                 <td>{this.state.data[index].truck.name}</td>
                 <td>{this.state.data[index].starRating}</td>
                 <td>{this.state.data[index].costRating}</td>
                 <td>{this.state.data[index].reviewText}<br/>{this.state.data[index].day_time}</td>
+=======
+                <td>{this.state.data[index].truckId}</td>
+                <td>{this.state.data[index].starRating}</td>
+                <td>{this.state.data[index].costRating}</td>
+                <td>{this.state.data[index].reviewText} </td>
+>>>>>>> parent of 7105ddd... Revert "changes"
 =======
                 <td>{this.state.data[index].truckId}</td>
                 <td>{this.state.data[index].starRating}</td>
@@ -130,6 +151,10 @@ class ReviewsList extends React.Component<Props, State>{
                         {this.state.data.map(((value, index) => this.renderReviewElement(index)))}
                     </table>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    <p>{this.state.dataStr}</p>
+>>>>>>> parent of 7105ddd... Revert "changes"
 =======
                     <p>{this.state.dataStr}</p>
 >>>>>>> parent of 7105ddd... Revert "changes"
