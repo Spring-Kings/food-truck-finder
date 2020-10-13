@@ -32,7 +32,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Value
-    private static class AuthenticationInfo {
+    public static class AuthenticationInfo {
         @NonNull String Username;
         @NonNull String Password;
     }

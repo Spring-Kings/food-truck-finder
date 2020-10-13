@@ -15,7 +15,7 @@ public class AuthenticationEndpoint {
     private UserService userService;
 
     @Value
-    static class RegistrationData {
+    public static class RegistrationData {
         @JsonProperty("Username")
         @NonNull String username;
 

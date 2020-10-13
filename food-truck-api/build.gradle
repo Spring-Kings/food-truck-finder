@@ -130,6 +130,10 @@ configurations {
     }
 }
 
+test {
+    systemProperty 'spring.profiles.active', 'DEV'
+}
+
 artifacts {
     tests buildTests
 }
