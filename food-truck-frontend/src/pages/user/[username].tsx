@@ -7,7 +7,7 @@ import UserDetails from "../../components/UserDetails";
 function renderError(){
     return (
         <div>
-            <p>Error: Wrong URL</p>
+            <p>Error: Wrong URL or User Not Found</p>
         </div>
     );
 }
