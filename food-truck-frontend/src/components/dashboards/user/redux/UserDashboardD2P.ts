@@ -1,14 +1,12 @@
 import { Dispatch } from "redux";
-import {
-  UserDashboardAction,
-  UserDashboardActionTypes,
-} from "./UserDashboardAction";
-
 import api from "../../../../util/api";
 import getUserInfo from "../../../../util/token";
 import { AxiosResponse } from "axios";
-import UserSubscription from "../../../../domain/Subscription";
-import UserDashboardProps from "../react/UserDashboardProps";
+import {
+  UserAction,
+  UserActionTypes,
+} from "../../../../redux/user/UserActions";
+import { SimpleTruck } from "../../../../redux/user/UserReducer";
 
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.
@@ -25,25 +23,37 @@ function requestSubscribed(id: number): Promise<AxiosResponse<any>> {
   });
 }
 
-function updateUser(
-  dispatch: Dispatch<UserDashboardAction>,
+async function requestOwnedTrucks(id: number): Promise<SimpleTruck[] | undefined> {
+  var result : AxiosResponse = await api.request({
+    url: `/user/${id}/trucks`,
+    method: "GET",
+  });
+  return result.data.trucks;
+}
+
+async function updateUser(
+  dispatch: Dispatch<UserAction>,
   id: number,
-  subscribed: UserSubscription[]
+  subscribed: SimpleTruck[]
 ) {
+  // Fetch user data
   api
     .request({
       url: `/user/${id}`,
       method: "GET",
     })
     .then(
-      (response) => {
+      async (response) => {
+        // Dispatch update
         dispatch({
-          type: UserDashboardActionTypes.LOAD_PROPS_ACTION,
+          type: UserActionTypes.LOAD_USER_ACTION,
           payload: {
             username: response.data.username,
             pfp: undefined,
             subscribedTrucks: subscribed,
-            isOwner: false,
+            ownedTrucks: response.data.isOwner
+              ? await requestOwnedTrucks(id)
+              : undefined,
           },
         });
       },
@@ -54,30 +64,11 @@ function updateUser(
 }
 
 // Create a constant set of methods to dispatch on
-const mapDispatchToProps = (dispatch: Dispatch<UserDashboardAction>) => {
+const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
   return {
-    loadSubscriptions: () => {
-      return new Promise<void>(() => {
-        var id = getUserInfo()?.userID;
-        console.log(id);
-        if (id !== undefined)
-          requestSubscribed(id).then(
-            (response) => {
-              dispatch({
-                type: UserDashboardActionTypes.LOAD_SUBS_ACTION,
-                payload: response.data,
-              });
-            },
-            (err) => {
-              console.log(err);
-            }
-          );
-      });
-    },
     loadUserFromBackend: () => {
       return new Promise<void>(() => {
         var id: number | undefined = getUserInfo()?.userID;
-        console.log(`${id}`);
         if (id !== undefined) {
           requestSubscribed(id).then(
             (response) => updateUser(dispatch, id as number, response.data),

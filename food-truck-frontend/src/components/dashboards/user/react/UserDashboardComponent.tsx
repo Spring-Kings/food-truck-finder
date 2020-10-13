@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import Router, { useRouter } from "next/router";
+import Router from "next/router";
 
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
@@ -18,12 +18,22 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import UserDashboardState from "./UserDashboardState";
-import UserDashboardProps from "./UserDashboardProps";
-
-import UserSubscription from "../../../../domain/Subscription";
 import GoogleMapComponent from "../../../map";
+import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 
+// Dashboard props
+interface UserDashboardProps {
+  data: UserData | undefined;
+  readonly [x: string]: any;
+}
+
+// Dashboard state
+interface UserDashboardState {
+  addTruck: boolean;
+  inError: string | null;
+}
+
+// Dashboard component
 class UserDashboardComponent extends Component<
   UserDashboardProps,
   UserDashboardState
@@ -83,7 +93,7 @@ class UserDashboardComponent extends Component<
             </Card>
 
             {/* Go to owner dashboard */}
-            {this.props.data.isOwner ? (
+            {this.props.data.ownedTrucks ? (
               <Button onClick={this.toOwnerDashboard}>
                 TO OWNER DASHBOARD
               </Button>
@@ -121,7 +131,7 @@ class UserDashboardComponent extends Component<
    * Placeholder for listing a subscribed truck
    * @param name Name of the truck
    */
-  private createTruckEntry = (sub: UserSubscription) => {
+  private createTruckEntry = (sub: SimpleTruck) => {
     return (
       <ListItem>
         <Grid
@@ -133,13 +143,13 @@ class UserDashboardComponent extends Component<
         >
           <Grid item xs>
             <Card>
-              <CardContent>{sub.truckName}</CardContent>
+              <CardContent>{sub.name}</CardContent>
             </Card>
           </Grid>
           <Grid item xs>
             <Button
               variant="contained"
-              onClick={() => this.viewTruck(sub.truckID)}
+              onClick={() => this.viewTruck(sub.id)}
             >
               View
             </Button>

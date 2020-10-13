@@ -10,7 +10,7 @@ import mapDispatchToProps from "./redux/UserDashboardD2P";
  */
 function mapStateToProps(state: any, myProps: any) {
   return {
-    data: state.userDashboard.data
+    data: state.user.data
   };
 }
 
