@@ -1,6 +1,6 @@
 import React from 'react';
 import {NextRouter, useRouter} from 'next/router';
-import ReviewsList from "../../components/ReviewsList";
+import LoginPageComponent from "../login";
 
 function CustomerDetailPage(){
     const router: NextRouter = useRouter();
@@ -8,8 +8,8 @@ function CustomerDetailPage(){
 
     return (
         <div>
-            <h1>{username}</h1>
-            <ReviewsList username={username}/>
+            <h1>hello {username}.</h1>
+            <LoginPageComponent/>
         </div>
     );
 
