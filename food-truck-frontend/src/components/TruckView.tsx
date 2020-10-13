@@ -3,6 +3,7 @@ import {Button, Container, List, ListItem, Typography} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
+import Router from "next/router";
 
 interface TruckState {
   notFound: boolean | null;
@@ -83,26 +84,16 @@ class TruckView extends Component<TruckProps, TruckState> {
           </ListItem>
         </List>
         <Button variant="outlined"
-                color="secondary"
-                onClick={this.deleteTruck}>
-          Delete
+                color="primary"
+                onClick={this.editTruck}>
+          Edit
         </Button>
       </>
     );
   }
 
-  deleteTruck = () => {
-    api.delete(`/truck/delete/${this.state.id}`, {})
-      .then(res => this.setState(null))
-      .catch(err => {
-        if (err.response) {
-          console.log('Got error response code for truck deletion');
-        } else if (err.request) {
-          console.log('Could not delete truck');
-        } else {
-          console.log(err);
-        }
-      });
+  editTruck = () => {
+    Router.replace(`/truck/edit/${this.state.id}`);
   }
 }
 

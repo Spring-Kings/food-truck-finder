@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Grid, TextField, Typography} from "@material-ui/core";
 import {AxiosResponse} from "axios";
 import Form from "./Form";
+import Router from "next/router";
 
 type State = {
   result: string
@@ -32,6 +33,7 @@ class CreateTruckForm extends Component<{}, State> {
 
   onSubmit = (formData: any, response: AxiosResponse) => {
     this.setState({result: `Created truck with id: ${response.data.id}`});
+    Router.replace(`/truck/${response.data.id}`);
   }
 
   onFail = (formData: any, response: any) => {
