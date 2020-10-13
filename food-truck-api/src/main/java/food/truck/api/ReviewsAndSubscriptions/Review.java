@@ -1,12 +1,13 @@
-package food.truck.api.reviews_and_subscriptions;
+package food.truck.api.ReviewsAndSubscriptions;
 
 
 import food.truck.api.truck.Truck;
+import food.truck.api.user.User;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -21,9 +22,8 @@ public class Review {
     @JoinColumn(foreignKey = @ForeignKey(name = "user_id"), nullable = false)
     Long userId;
 
-    @ManyToOne
-    @JoinColumn(name = "truck_id", nullable = false)
-    Truck truck;
+    @JoinColumn(foreignKey = @ForeignKey(name = "truck_id"), nullable = false)
+    Long truckId;
 
     @Column(name = "star_rating", nullable = false)
     Integer starRating;
