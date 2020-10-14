@@ -1,9 +1,11 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.security.AuthenticationFilter;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.lang.annotation.Inherited;
 
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
