@@ -4,6 +4,16 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+enum Days{
+    SUNDAY,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY
+}
+
 @Data
 @Table(name="route_days")
 public class RouteDays {
