@@ -1,27 +1,26 @@
 import food.truck.api.FoodTruckApplication;
 import food.truck.api.endpoint.AuthenticationEndpoint;
-import food.truck.api.user.UserRepository;
-import food.truck.api.user.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.servlet.Registration;
-
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = FoodTruckApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 public class RegisterTest {
 //    @InjectMocks
 //    AuthenticationEndpoint auth;
@@ -52,8 +51,5 @@ public class RegisterTest {
         var data = new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password");
         ResponseEntity<String> response = template.postForEntity(path, data, String.class);
         assertThat(response.getBody(), startsWith("Created user"));
-
-//        var response = auth.register(data);
-//        assertThat(response, startsWith("Created user"));
     }
 }
