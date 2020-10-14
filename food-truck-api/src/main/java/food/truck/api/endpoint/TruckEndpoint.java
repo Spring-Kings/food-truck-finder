@@ -8,6 +8,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,10 +68,12 @@ public class TruckEndpoint {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
+    @Secured({"ROLE_USER"})
     @DeleteMapping("/truck/delete/{truckId}")
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
         t.ifPresent(truck -> {
+            System.out.println(truck + " " +  u);
             if (truck.getUserId().equals(u.getId())) {
                 truckService.deleteTruck(truckId);
             }

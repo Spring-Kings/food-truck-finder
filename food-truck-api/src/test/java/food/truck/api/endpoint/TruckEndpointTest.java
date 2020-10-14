@@ -1,31 +1,38 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.FoodTruckApplication;
 import food.truck.api.truck.Truck;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = FoodTruckApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+import static org.junit.Assert.*;
+
 public class TruckEndpointTest extends AuthenticationEndpointTest {
     @Test
-    public void test() {
-        register();
+    public void createTruck() {
         loginSuccess();
-//        String path = base + "truck/create";
-//        var data = new TruckEndpoint.CreateTruckParams("truck1");
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.set("Authorization", token);
-//        HttpEntity<TruckEndpoint.CreateTruckParams> request = new HttpEntity<>(data, headers);
-//        var response = template.postForEntity(path, request, Truck.class);
-//        System.out.println(response);
+        String path = base + "truck/create";
+        var data = new TruckEndpoint.CreateTruckParams("truck1");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        var request = new HttpEntity<>(data, headers);
+        var response = template.postForEntity(path, request, Truck.class);
+        var truck = response.getBody();
+        assertNotNull(truck);
+        assertEquals(truck.getName(), "truck1");
+    }
+
+    @Test
+    public void deleteTruck() {
+        createTruck();
+        String path = base + "truck/delete/1";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", token);
+        System.out.println(headers);
+        var request = new HttpEntity<>(null, headers);
+        template.delete(path, request);
+        var response = template.getForEntity(base + "truck/1", Truck.class);
+        var truck = response.getBody();
+        assertNull(truck);
     }
 }
