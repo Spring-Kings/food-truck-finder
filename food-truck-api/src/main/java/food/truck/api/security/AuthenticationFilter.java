@@ -33,8 +33,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Value
     public static class AuthenticationInfo {
-        @NonNull String Username;
-        @NonNull String Password;
+        @NonNull String username;
+        @NonNull String password;
     }
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {

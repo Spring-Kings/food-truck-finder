@@ -12,6 +12,7 @@ public class LoginTest extends RegisterTest {
         String path = base + "login";
         var data = new AuthenticationFilter.AuthenticationInfo("testUser", "password");
         ResponseEntity<String> response = template.postForEntity(path, data, String.class);
+        System.out.println(response);
         assertNotNull(response.getHeaders().get("token"));
     }
 
