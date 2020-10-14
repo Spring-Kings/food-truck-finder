@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 
 import UserDashboardComponent from "./react/UserDashboardComponent";
-import mapDispatchToProps from "./redux/UserDashboardD2P";
+import mapDispatchToProps from "../DashboardD2P";
 
 /**
  * Maps the current Redux state into my props, as needed.

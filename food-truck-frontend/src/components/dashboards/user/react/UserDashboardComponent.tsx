@@ -94,9 +94,15 @@ class UserDashboardComponent extends Component<
 
             {/* Go to owner dashboard */}
             {this.props.data.ownedTrucks ? (
-              <Button onClick={this.toOwnerDashboard}>
-                TO OWNER DASHBOARD
-              </Button>
+              <Card>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={this.toOwnerDashboard}
+                >
+                  TO OWNER DASHBOARD
+                </Button>
+              </Card>
             ) : null}
 
             {/* Subscribe list */}
@@ -147,10 +153,7 @@ class UserDashboardComponent extends Component<
             </Card>
           </Grid>
           <Grid item xs>
-            <Button
-              variant="contained"
-              onClick={() => this.viewTruck(sub.id)}
-            >
+            <Button variant="contained" onClick={() => this.viewTruck(sub.id)}>
               View
             </Button>
           </Grid>

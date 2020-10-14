@@ -16,8 +16,6 @@ interface MapState {
   coordinates: LatLngLiteral;
 }
 
-const LOC_PERMISSION_GRANTED: string = "granted_location_permission";
-
 export class GoogleMapComponent extends React.Component<MapProps, MapState> {
   constructor(props: MapProps) {
     super(props);
