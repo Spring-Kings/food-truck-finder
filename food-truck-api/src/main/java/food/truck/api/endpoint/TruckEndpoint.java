@@ -153,4 +153,9 @@ public class TruckEndpoint {
     public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
         return ""; // TODO
     }
+
+    @GetMapping("truck/owner/{userId}")
+    public List<Truck> getTrucksByUser(@AuthenticationPrincipal User u, @PathVariable long userId) {
+        return truckService.findTruck(userId);
+    }
 }
