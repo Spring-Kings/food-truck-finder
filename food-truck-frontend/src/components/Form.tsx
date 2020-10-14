@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, ReactElement} from 'react'
 import {AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
@@ -23,21 +23,23 @@ class Form extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = {
-            formData: {}
-        };
+        this.state = {formData: {}};
+        React.Children.forEach(this.props.children, c => {
+            const child = c as ReactElement;
+            if (typeof (child.props.name) !== 'undefined') {
+                if (typeof (child.props.value) !== 'undefined') {
+                    this.state.formData[child.props.name] = child.props.value;
+                } else if (typeof (child.props.defaultValue) !== 'undefined') {
+                    this.state.formData[child.props.name] = child.props.defaultValue;
+                } else {
+                    this.state.formData[child.props.name] = "";
+                }
+            }
+        });
 
         this.onSubmit = this.onSubmit.bind(this);
         this.onValueChanged = this.onValueChanged.bind(this);
     }
-
-    /*renderFormElement(name: string) {
-        return (
-            <Grid key={name} item>
-                <TextField label={name} variant="outlined" name={name} onChange={this.onValueChanged}/>
-            </Grid>
-        )
-    }*/
 
     render() {
         return (
@@ -45,9 +47,17 @@ class Form extends Component<Props, State> {
                 <Grid container direction="column" alignItems="center" spacing={2}>
                     {/* For each child, shove it in a Grid and add the onChange event callback */}
                     {React.Children.map(this.props.children,
-                        child => <Grid item>
-                            {React.cloneElement(child as React.ReactElement, {onChange: this.onValueChanged})}
-                        </Grid>
+                        child => {
+                            const c = child as ReactElement;
+                            if (typeof (c.props.name) === 'undefined')
+                                return c;
+                            return (<Grid item>
+                                {React.cloneElement(c, {
+                                    onChange: this.onValueChanged,
+                                    value: this.state.formData[c.props.name]
+                                })}
+                            </Grid>);
+                        }
                     )}
                     <Button variant="contained" type="submit">Submit</Button>
                 </Grid>
@@ -92,9 +102,8 @@ class Form extends Component<Props, State> {
                 [name]: value
             }
         }));
-        //console.log(this.state);
     }
-
 }
+
 
 export default Form;

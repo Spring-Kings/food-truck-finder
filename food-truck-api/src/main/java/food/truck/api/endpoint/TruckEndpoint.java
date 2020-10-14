@@ -34,8 +34,8 @@ public class TruckEndpoint {
     }
 
     @GetMapping(path = "/truck/{id}")
-    public String getTruckInfo(@PathVariable long id) {
-        return ""; //TODO
+    public Optional<Truck> getTruckInfo(@PathVariable long id) {
+        return truckService.findTruckById(id);
     }
 
     @GetMapping("/truck/{truckId}/reviews")
@@ -58,71 +58,65 @@ public class TruckEndpoint {
 
     @Value
     private static class CreateTruckParams {
-        @NonNull
-        long userId;
-        @NonNull
-        String token;
         @Nullable
         String truckName;
     }
 
     @PostMapping("/truck/create")
-    public Truck createTruck(@RequestBody CreateTruckParams data) {
-        return truckService.createTruck(data.userId, data.truckName);
+    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
+        return truckService.createTruck(u.getId(), data.truckName);
     }
 
-    @Value
-    private static class DeleteTruckParams {
-        @NonNull
-        long userId;
-        @NonNull
-        String token;
-        @NonNull
-        long truckId;
-    }
-
-    @DeleteMapping("/truck/delete")
-    public void deleteTruck(@RequestBody DeleteTruckParams data) {
-        truckService.deleteTruck(data.truckId);
+    @DeleteMapping("/truck/delete/{truckId}")
+    public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var t = truckService.findTruckById(truckId);
+        t.ifPresent(truck -> {
+            if (truck.getUserId().equals(u.getId())) {
+                truckService.deleteTruck(truckId);
+            }
+        });
     }
 
     @Value
     private static class UpdateTruckParams {
         long truckId;
         @Nullable
-        String newName;
+        String name;
         @Nullable
-        String newDescription;
+        String description;
         @Nullable
-        Long newPriceRating;
+        Long priceRating;
         @Nullable
-        String newFoodCategory;
+        String foodCategory;
         // TODO What about menu/schedule?
         @Nullable
-        byte[] newMenu;
+        byte[] menu;
         @Nullable
-        String newTextMenu;
+        String textMenu;
         @Nullable
-        byte[] newSchedule;
+        byte[] schedule;
     }
 
-    @PutMapping("/truck")
-    public Truck updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
-        var truck = truckService.findTryById(data.truckId);
-        if (truck.isPresent()) {
-            truckService.updateTruck(
-                truck.get(),
-                Optional.ofNullable(data.newName),
-                Optional.ofNullable(data.newMenu),
-                Optional.ofNullable(data.newTextMenu),
-                Optional.ofNullable(data.newPriceRating),
-                Optional.ofNullable(data.newDescription),
-                Optional.ofNullable(data.newSchedule),
-                Optional.ofNullable(data.newFoodCategory)
-            );
-            return truck.get();
+    @PutMapping("/truck/update")
+    public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
+        var t = truckService.findTruckById(data.truckId);
+        if (t.isPresent()) {
+            var truck = t.get();
+            if (!u.getId().equals(truck.getUserId())) {
+                return Optional.empty();
+            }
+            return Optional.of(truckService.updateTruck(
+                truck,
+                Optional.ofNullable(data.name),
+                Optional.ofNullable(data.menu),
+                Optional.ofNullable(data.textMenu),
+                Optional.ofNullable(data.priceRating),
+                Optional.ofNullable(data.description),
+                Optional.ofNullable(data.schedule),
+                Optional.ofNullable(data.foodCategory)
+            ));
         }
-        return null;
+        return Optional.empty();
     }
 
     @GetMapping("/truck/{truckId}/routes")
