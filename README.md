@@ -1,4 +1,4 @@
-# Food Truck Finder
+# Food TruckId Finder
 
 ## Local Environment Setup
 ### food-truck-api: Backend Setup
