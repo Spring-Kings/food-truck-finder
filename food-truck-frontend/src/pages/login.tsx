@@ -19,8 +19,8 @@ class LoginPageComponent extends React.Component<{}, State> {
             <Grid container direction="column" justify="center" xs={4}>
                 <h1>Login</h1>
                 <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-                    <TextField label="Username" variant="outlined" name="Username"/>
-                    <TextField label="Password" variant="outlined" name="Password" type="password"/>
+                    <TextField label="Username" variant="outlined" name="username"/>
+                    <TextField label="Password" variant="outlined" name="password" type="password"/>
                 </Form>
 
                 <p>{this.state.resultText}</p>
