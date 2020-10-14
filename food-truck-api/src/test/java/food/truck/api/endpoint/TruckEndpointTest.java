@@ -4,6 +4,7 @@ import food.truck.api.truck.Truck;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 
 import static org.junit.Assert.*;
 
@@ -29,8 +30,8 @@ public class TruckEndpointTest extends AuthenticationEndpointTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         System.out.println(headers);
-        var request = new HttpEntity<>(null, headers);
-        template.delete(path, request);
+        var request = new HttpEntity<>("", headers);
+        template.exchange(path, HttpMethod.DELETE, request, String.class);
         var response = template.getForEntity(base + "truck/1", Truck.class);
         var truck = response.getBody();
         assertNull(truck);
