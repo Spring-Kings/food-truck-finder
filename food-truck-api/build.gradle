@@ -102,6 +102,7 @@ dependencies {
 //    testImplementation 'org.mockito:mockito-core:2.7.22'
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile group: 'org.apache.httpcomponents', name: 'httpclient'
     compile group: 'com.h2database', name: 'h2'
 
     compileOnly group: 'org.projectlombok', name: 'lombok'
