@@ -1,3 +1,6 @@
+import React from "react";
+import Router from "next/router";
+
 import {
   GridList,
   GridListTile,
@@ -14,11 +17,12 @@ import {
   Container,
   Typography,
   CardActionArea,
+  IconButton,
 } from "@material-ui/core";
-import React from "react";
+import { Edit } from "@material-ui/icons";
 import GoogleMapComponent from "../../map";
 
-import Router from "next/router";
+import TruckListComponent from "../TruckListComponent";
 import { SimpleTruck, UserData } from "../../../redux/user/UserReducer";
 
 interface OwnerDashboardProps {
@@ -107,26 +111,33 @@ class OwnerDashboardComponent extends React.Component<
 
             {/* Return to user dashboard */}
             <Card>
-              <Button variant="contained" color="primary" onClick={this.toUserDashboard}>USER DASHBOARD</Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.toUserDashboard}
+              >
+                USER DASHBOARD
+              </Button>
             </Card>
 
             {/* Subscribe list */}
             <Accordion>
               <AccordionSummary>My Trucks</AccordionSummary>
               <AccordionDetails>
-                <List>
-                  {this.props.data.ownedTrucks.length > 0 ? (
-                    this.props.data.ownedTrucks.flatMap((name) =>
-                      this.createTruckEntry(name)
-                    )
-                  ) : (
-                    <ListItem>
-                      <Card>
-                        <Button onClick={() => Router.replace("/manage-trucks")}>Manage trucks</Button>
-                      </Card>
-                    </ListItem>
-                  )}
-                </List>
+                <TruckListComponent
+                  trucks={this.props.data.ownedTrucks}
+                  tail={
+                    <Card>
+                      <Button
+                        variant="contained"
+                        onClick={() => Router.replace("/manage-trucks")}
+                      >
+                        Manage trucks
+                      </Button>
+                    </Card>
+                  }
+                  handleTruck={this.viewTruck}
+                />
               </AccordionDetails>
             </Accordion>
           </GridListTile>
@@ -140,39 +151,6 @@ class OwnerDashboardComponent extends React.Component<
     );
   }
 
-  /**
-   * Placeholder for listing a subscribed truck
-   * @param name Name of the truck
-   */
-  private createTruckEntry = (sub: SimpleTruck) => {
-    return (
-      <ListItem>
-        <Grid
-          container
-          direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
-          spacing={2}
-        >
-          <Grid item xs>
-            <Card>
-              <CardContent>{sub.name}</CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs>
-            <Button variant="contained" onClick={() => this.viewTruck(sub.id)}>
-              View
-            </Button>
-          </Grid>
-        </Grid>
-      </ListItem>
-    );
-  };
-
-  /**
-   * Placeholder for viewing a truck's info
-   * @param id The TruckID of the truck to view
-   */
   private viewTruck(id: number): void {
     Router.replace(`/truck/${id}`);
   }

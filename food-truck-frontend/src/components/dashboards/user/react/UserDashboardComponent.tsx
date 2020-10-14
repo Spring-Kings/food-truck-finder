@@ -20,6 +20,7 @@ import {
 
 import GoogleMapComponent from "../../../map";
 import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
+import TruckListComponent from "../../TruckListComponent";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -87,11 +88,6 @@ class UserDashboardComponent extends Component<
               />
             </Card>
 
-            {/* Name, for debug */}
-            <Card>
-              <CardContent>Hello {this.props.data.username}!</CardContent>
-            </Card>
-
             {/* Go to owner dashboard */}
             {this.props.data.ownedTrucks ? (
               <Card>
@@ -100,7 +96,7 @@ class UserDashboardComponent extends Component<
                   color="primary"
                   onClick={this.toOwnerDashboard}
                 >
-                  TO OWNER DASHBOARD
+                  OWNER DASHBOARD
                 </Button>
               </Card>
             ) : null}
@@ -109,17 +105,15 @@ class UserDashboardComponent extends Component<
             <Accordion>
               <AccordionSummary>Subscribed Trucks</AccordionSummary>
               <AccordionDetails>
-                <List>
-                  {this.props.data.subscribedTrucks.length > 0 ? (
-                    this.props.data.subscribedTrucks.flatMap((name) =>
-                      this.createTruckEntry(name)
-                    )
-                  ) : (
-                    <ListItem>
-                      <Card>No subscriptions</Card>
-                    </ListItem>
-                  )}
-                </List>
+                <TruckListComponent
+                  trucks={this.props.data.subscribedTrucks}
+                  empty={
+                    <Card>
+                      <Button disabled={true}>No subscriptions</Button>
+                    </Card>
+                  }
+                  handleTruck={this.viewTruck}
+                />
               </AccordionDetails>
             </Accordion>
           </GridListTile>
@@ -133,39 +127,6 @@ class UserDashboardComponent extends Component<
     );
   }
 
-  /**
-   * Placeholder for listing a subscribed truck
-   * @param name Name of the truck
-   */
-  private createTruckEntry = (sub: SimpleTruck) => {
-    return (
-      <ListItem>
-        <Grid
-          container
-          direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
-          spacing={2}
-        >
-          <Grid item xs>
-            <Card>
-              <CardContent>{sub.name}</CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs>
-            <Button variant="contained" onClick={() => this.viewTruck(sub.id)}>
-              View
-            </Button>
-          </Grid>
-        </Grid>
-      </ListItem>
-    );
-  };
-
-  /**
-   * Placeholder for viewing a truck's info
-   * @param id The TruckID of the truck to view
-   */
   private viewTruck(id: number): void {
     Router.replace(`/truck/${id}`);
   }
