@@ -10,17 +10,17 @@ import java.util.List;
 @Service
 public class SubscriptionService {
     @Autowired
-    private SubscriptionRespository subscriptionRespository;
+    private SubscriptionRepository subscriptionRepository;
 
     public List<Subscription> findSubsByUser(User user){
-        return subscriptionRespository.findByUser(user);
+        return subscriptionRepository.findByUser(user);
     }
 
     public List<Subscription> findSubsByTruck(Truck truck){
-        return subscriptionRespository.findByTruck(truck);
+        return subscriptionRepository.findByTruck(truck);
     }
 
     public Subscription saveSubscription(Subscription subscription){
-        return subscriptionRespository.save(subscription);
+        return subscriptionRepository.save(subscription);
     }
 }

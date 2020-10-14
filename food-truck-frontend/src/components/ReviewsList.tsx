@@ -64,12 +64,14 @@ class ReviewsList extends React.Component<ReviewProps, ReviewState>{
     }
 
     renderReviewElement(index: number){
+        const reviewDate  = new Date(this.state.data[index].day_time);
+
         return(
             <tr>
                 <td>{this.state.data[index].truck.name}</td>
                 <td>{this.state.data[index].starRating}</td>
                 <td>{this.state.data[index].costRating}</td>
-                <td>{this.state.data[index].reviewText}<br/>{this.state.data[index].day_time}</td>
+                <td>{this.state.data[index].reviewText}<br/>{reviewDate.toUTCString()}</td>
             </tr>
         );
     }
