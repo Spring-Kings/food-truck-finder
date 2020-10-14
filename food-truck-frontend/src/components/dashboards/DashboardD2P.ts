@@ -19,7 +19,7 @@ async function requestOwnedTrucks(
   id: number
 ): Promise<SimpleTruck[] | undefined> {
   var result: AxiosResponse = await api.request({
-    url: `/user/${id}/trucks`,
+    url: `/truck/owner/${id}`,
     method: "GET",
   });
   return result.data.trucks;
