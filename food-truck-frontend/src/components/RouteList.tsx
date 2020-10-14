@@ -25,8 +25,10 @@ class RouteList extends React.Component<RouteProps, RouteState>{
 
     componentDidMount() {
         api.get(`/truck/${this.props.truckId}`, {}).then(res => {
-
-        }).catch();
+            this.setState({truck : res.data});
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     render() {

@@ -62,31 +62,6 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class PostRouteParams{
-        String routeName;
-    }
-
-    @PostMapping("/truck/{truckId}/create-route")
-    public Route postTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
-        }
-        return routeService.createRoute(truck.get(0), data.routeName); // TODO
-    }
-
-    @GetMapping("/truck/{truckId}/routes")
-    public List<Route> getTruckReviews(@AuthenticationPrincipal User user, @PathVariable long truckId) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
-        }
-        return routeService.findRoutebyTruck(truck.get(0));
-    }
-
-
-
-    @Value
     private static class CreateTruckParams {
         @Nullable
         String truckName;
@@ -146,8 +121,12 @@ public class TruckEndpoint {
     }
 
     @GetMapping("/truck/{truckId}/routes")
-    public String getRoutes(@PathVariable long truckId) {
-        return ""; //TODO
+    public List<Route> getRoutes(@PathVariable long truckId) {
+        List<Truck> truck = truckService.findTruck(truckId);
+        if(truck.isEmpty()){
+            return null;
+        }
+        return routeService.findRoutebyTruck(truck.get(0));
     }
 
     @PostMapping("/truck/{truckId}/routes")
@@ -179,4 +158,19 @@ public class TruckEndpoint {
     public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
         return ""; // TODO
     }
+
+    @Value
+    private static class PostRouteParams{
+        String routeName;
+    }
+
+    @PostMapping("/truck/{truckId}/create-route")
+    public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
+        List<Truck> truck = truckService.findTruck(truckId);
+        if(truck.isEmpty()){
+            return null;
+        }
+        return routeService.createRoute(truck.get(0), data.routeName); // TODO
+    }
+
 }
