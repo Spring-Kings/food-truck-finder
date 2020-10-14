@@ -63,6 +63,7 @@ public class TruckEndpoint {
         String truckName;
     }
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
         return truckService.createTruck(u.getId(), data.truckName);
@@ -81,7 +82,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class UpdateTruckParams {
+    public static class UpdateTruckParams {
         long truckId;
         @Nullable
         String name;
@@ -100,6 +101,7 @@ public class TruckEndpoint {
         byte[] schedule;
     }
 
+    @Secured({"ROLE_USER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var t = truckService.findTruckById(data.truckId);
