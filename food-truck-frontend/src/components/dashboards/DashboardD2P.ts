@@ -22,7 +22,7 @@ async function requestOwnedTrucks(
     url: `/truck/owner/${id}`,
     method: "GET",
   });
-  return result.data.trucks;
+  return result.data;
 }
 
 async function updateUser(

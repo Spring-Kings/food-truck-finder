@@ -130,16 +130,27 @@ class OwnerDashboardComponent extends React.Component<
                     <Card>
                       <Button
                         variant="contained"
-                        onClick={() => Router.replace("/manage-trucks")}
+                        onClick={() => Router.replace("/create-truck")}
                       >
-                        Manage trucks
+                        New...
                       </Button>
                     </Card>
                   }
+                  handleTruckIcon={<Typography>View</Typography>}
                   handleTruck={this.viewTruck}
                 />
               </AccordionDetails>
             </Accordion>
+
+            {/* Open manager page */}
+            <Card>
+              <Button
+                variant="contained"
+                onClick={() => Router.replace("/manage-trucks")}
+              >
+                Manage trucks
+              </Button>
+            </Card>
           </GridListTile>
 
           {/** Where the map would be */}

@@ -112,6 +112,7 @@ class UserDashboardComponent extends Component<
                       <Button disabled={true}>No subscriptions</Button>
                     </Card>
                   }
+                  handleTruckIcon={<Typography>VIEW</Typography>}
                   handleTruck={this.viewTruck}
                 />
               </AccordionDetails>

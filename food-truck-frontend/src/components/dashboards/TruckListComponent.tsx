@@ -9,6 +9,8 @@ export interface TruckListProps {
   trucks: SimpleTruck[];
   empty?: ReactElement;
   tail?: ReactElement;
+
+  handleTruckIcon: ReactElement;
   handleTruck: (id: number) => void;
 }
 
@@ -39,7 +41,7 @@ class TruckListComponent extends React.Component<TruckListProps, any> {
           <CardContent>
             {sub.name}
             <IconButton onClick={() => this.props.handleTruck(sub.id)}>
-              <Edit />
+              {this.props.handleTruckIcon}
             </IconButton>
           </CardContent>
         </Card>
