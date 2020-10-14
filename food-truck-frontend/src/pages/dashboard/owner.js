@@ -1,10 +1,10 @@
 import React from 'react'
 
+import OwnerDashboardComponent from '../../components/dashboards/owner';
+
 function OwnerDashboard(){
     return(
-        <div>
-            <p>Onwer DashBoard Page</p>
-        </div>
+        <OwnerDashboardComponent/>
     )
 }
 
