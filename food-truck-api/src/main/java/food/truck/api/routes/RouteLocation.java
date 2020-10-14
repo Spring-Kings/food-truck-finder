@@ -19,8 +19,11 @@ public class RouteLocation {
     @Column(name="exit_time", nullable = false)
     Timestamp exitTime;
 
-    @Column(name="address", nullable = false)
-    String address;
+    @Column(name="lng", nullable = false)
+    Double lng;
+
+    @Column(name="lat", nullable = false)
+    Double lat;
 
 
 }
