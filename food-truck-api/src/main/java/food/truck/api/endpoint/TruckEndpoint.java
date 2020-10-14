@@ -57,7 +57,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class CreateTruckParams {
+    public static class CreateTruckParams {
         @Nullable
         String truckName;
     }

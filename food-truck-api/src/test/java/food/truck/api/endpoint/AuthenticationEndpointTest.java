@@ -1,11 +1,25 @@
+package food.truck.api.endpoint;
+
 import food.truck.api.security.AuthenticationFilter;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.*;
 
-public class LoginTest extends RegisterTest {
+public class AuthenticationEndpointTest extends EndpointTest {
+    protected String token;
+
+    @Test
+    public void register() {
+        String path = base + "register";
+        var data = new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password");
+        ResponseEntity<String> response = template.postForEntity(path, data, String.class);
+        System.out.println(response);
+        assertThat(response.getBody(), startsWith("Created user"));
+    }
+
     @Test
     public void loginSuccess() {
         register();
@@ -14,6 +28,7 @@ public class LoginTest extends RegisterTest {
         ResponseEntity<String> response = template.postForEntity(path, data, String.class);
         System.out.println(response);
         assertNotNull(response.getHeaders().get("token"));
+        token = response.getHeaders().get("token").get(0);
     }
 
     @Test
