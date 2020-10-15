@@ -73,13 +73,15 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       })
       .then((response) => {
         if (response.data != undefined) {
-          var stopId: number = 1;
+          var nextStopId: number = 1;
 
           // Map backend structure to frontend structure
+          var routePts: RouteStop[] = response.data.map((pt: any) =>
+            backendToFrontend(pt, nextStopId++)
+          );
           this.setState({
-            routePts: response.data.map((pt: any) =>
-              backendToFrontend(pt, stopId++)
-            ),
+            routePts,
+            nextStopId,
           });
         }
       })
@@ -121,11 +123,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
                 onClick={(e) => this.initiateEditPointTimes(pt)}
               />
             ))}
-            <Polyline
-              path={this.state.routePts
-                .filter((pt) => pt.state != RoutePointState.DELETED)
-                .flatMap((pt) => pt.coords)}
-            />
+            <Polyline path={this.state.routePts.flatMap((pt) => pt.coords)} />
           </GoogleMap>
         </LoadScript>
       </Container>
