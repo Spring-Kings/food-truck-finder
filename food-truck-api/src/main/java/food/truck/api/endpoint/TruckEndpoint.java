@@ -211,11 +211,7 @@ public class TruckEndpoint {
     }
 
     @DeleteMapping("/truck/route/locations/{routeId}")
-    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long truckId, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
-        Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck == null || truck.isEmpty()) {
-            return;
-        }
+    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
         routeService.deleteLocations(data.stream()
                 .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
                 .collect(Collectors.toList()))
