@@ -9,17 +9,22 @@ import {
   DialogContent,
   DialogTitle,
 } from "@material-ui/core";
-import { GoogleMap, LoadScript } from "@react-google-maps/api/dist";
+import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api/dist";
+import api from "../../../util/api";
 
 interface RouteStop {
-    coords: LatLngLiteral;
-    arrival: any;
+  stopId: number;
+  coords: LatLngLiteral;
+  arrival: Date;
+  departure: Date;
 }
 
-interface RouteMapProps {}
+interface RouteMapProps {
+  routeId: number;
+}
 interface RouteMapState {
   mapCenter: LatLngLiteral;
-  routePts: RouteStop
+  routePts: RouteStop[];
 }
 
 class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
@@ -31,7 +36,12 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         lat: 0,
         lng: 0,
       },
+      routePts: [],
     };
+
+    // Bind
+    this.addMarker = this.addMarker.bind(this);
+    this.updatePoint = this.updatePoint.bind(this);
   }
 
   componentDidMount() {
@@ -44,6 +54,10 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         },
       });
     });
+
+    // // Load route
+    // api.request({
+    // })
   }
 
   render() {
@@ -59,14 +73,43 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
             zoom={10}
             center={this.state.mapCenter}
             onClick={this.addMarker}
-          />
+          >
+            {this.state.routePts.flatMap((pt) => (
+              <Marker
+                draggable={true}
+                position={pt.coords}
+                onDragEnd={(e: any) => this.updatePoint(pt.stopId, e.latLng)}
+              />
+            ))}
+          </GoogleMap>
         </LoadScript>
       </Container>
     );
   }
 
   private addMarker(e: any) {
-      console.log(e);
+    console.log(e.latLng);
+    this.setState({
+      routePts: this.state.routePts.concat({
+        stopId: e.pixel.x + e.pixel.y,
+        coords: e.latLng,
+        arrival: new Date(),
+        departure: new Date(),
+      }),
+    });
+  }
+
+  private updatePoint(stopId: number, newPos: LatLngLiteral) {
+    this.setState({
+      routePts: this.state.routePts.map((pt) =>
+        pt.stopId === stopId
+          ? pt
+          : {
+              ...pt,
+              latLng: newPos,
+            }
+      ),
+    });
   }
 }
 
