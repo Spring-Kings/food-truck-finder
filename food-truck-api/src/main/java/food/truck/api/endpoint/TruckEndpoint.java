@@ -1,6 +1,7 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteDays;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
@@ -128,20 +129,16 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/routes")
     public List<Route> getRoutes(@PathVariable long truckId) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if(truck == null){
+        if(truck == null || truck.isEmpty()){
             return new LinkedList<Route>();
         }
-        return routeService.findRoutebyTruck(truck.get());
+
+       return routeService.findRoutebyTruck(truck.get());
     }
 
-    @PostMapping("/truck/{truckId}/routes-add")
-    public String addRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String routeName) {
-        return ""; // TODO
-    }
-
-    @DeleteMapping("/truck/{truckId}/routes/{routeId}")
-    public String deleteRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @PathVariable long routeId) {
-        return ""; // TODO
+    @DeleteMapping("/truck/routes-delete/{routeId}")
+    public void deleteRoute(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+        routeService.deleteRoute(routeId);
     }
 
     @Value
@@ -172,11 +169,11 @@ public class TruckEndpoint {
 
     @PostMapping("/truck/{truckId}/create-route")
     public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if(truck == null || truck.isEmpty()){
+            return new Route();
         }
-        return routeService.createRoute(truck.get(0), data.routeName, data.active); // TODO
+        return routeService.createRoute(truck.get(), data.routeName, data.active); // TODO
     }
 
 }

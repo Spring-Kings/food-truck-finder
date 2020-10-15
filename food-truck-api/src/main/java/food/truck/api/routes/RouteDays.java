@@ -4,20 +4,21 @@ import lombok.Data;
 
 import javax.persistence.*;
 
-enum Days{
-    SUNDAY,
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY
-}
 
 @Data
 @Entity
 @Table(name="route_days")
 public class RouteDays {
+
+    public enum Days{
+        SUNDAY,
+        MONDAY,
+        TUESDAY,
+        WEDNESDAY,
+        THURSDAY,
+        FRIDAY,
+        SATURDAY
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +29,6 @@ public class RouteDays {
     Long routeId;
 
     @Column(name="day", nullable = false)
-    Long day;
+    Days day;
 
 }

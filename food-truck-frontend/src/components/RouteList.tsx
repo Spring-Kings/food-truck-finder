@@ -9,6 +9,7 @@ const TruckObject = {
 }
 
 const RouteObject = [{
+    routeId: 0,
     routeName: "",
     active: ""
 }]
@@ -24,10 +25,10 @@ type RouteState = {
         schedule: string,
     }
     routeData: {
+        routeId: number
         routeName: string
         active: string
-    }[],
-    error: {}
+    }[]
 }
 
 
@@ -40,8 +41,7 @@ class RouteList extends React.Component<RouteProps, RouteState>{
         super(props);
         this.state = {
             truck: TruckObject,
-            routeData: RouteObject,
-            error: {}
+            routeData: RouteObject
         }
 
     }
@@ -51,21 +51,43 @@ class RouteList extends React.Component<RouteProps, RouteState>{
             this.setState({truck : res.data});
         }).catch(err => {
             console.log(err);
-            this.setState({error: err})
+            this.setState(err.toString())
         });
 
+        this.fetchRoutes();
+    }
+
+    fetchRoutes(){
         api.get(`/truck/${this.props.truckId}/routes`, {}).then(res => {
             this.setState({routeData : res.data});
         }).catch(err => {
-            console.log(err);
+            console.log(err.toString());
         });
+    }
+
+    renderRouteRow(index: number){
+
+        return(
+            <tr>
+                <td>{this.state.routeData[index].routeName}</td>
+            </tr>
+        )
     }
 
     render() {
         return (
             <div>
-                <p>{JSON.stringify(this.state.truck)}</p>
-                <p>{this.state.routeData[0].routeName}</p>
+                <h1>{this.state.truck.name}</h1>
+                <table>
+                    <tr>
+                       <th>Route Name</th>
+                       <th>Days</th>
+                       <th>Active</th>
+                    </tr>
+
+                    {this.state.routeData.map(((value, index) => this.renderRouteRow(index)))}
+                </table>
+
 
             </div>
         );

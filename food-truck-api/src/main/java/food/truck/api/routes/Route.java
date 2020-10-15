@@ -5,11 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 
-enum ACTIVE{
-    OFF,
-    ON
-}
-
 @Data
 @Entity
 @Table( name = "route")
