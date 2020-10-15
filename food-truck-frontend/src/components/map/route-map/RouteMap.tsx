@@ -24,6 +24,8 @@ export interface RouteStop {
   coords: LatLngLiteral;
   arrival: Date;
   departure: Date;
+
+  readonly [x: string]: number | LatLngLiteral | Date;
 }
 
 interface RouteMapProps {
@@ -32,6 +34,7 @@ interface RouteMapProps {
 interface RouteMapState {
   mapCenter: LatLngLiteral;
   routePts: RouteStop[];
+  nextStopId: number;
 
   currentEdit: RouteStop | undefined;
 }
@@ -46,6 +49,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         lng: 0,
       },
       routePts: [],
+      nextStopId: 1,
       currentEdit: undefined,
     };
 
@@ -53,6 +57,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.addPoint = this.addPoint.bind(this);
     this.editPointLoc = this.editPointLoc.bind(this);
     this.editPointTimes = this.editPointTimes.bind(this);
+    this.delete = this.delete.bind(this);
     this.initiateEditPointTimes = this.initiateEditPointTimes.bind(this);
   }
 
@@ -80,6 +85,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
           routePt={this.state.currentEdit}
           confirm={this.editPointTimes}
           cancel={() => this.setState({ currentEdit: undefined })}
+          delete={this.delete}
         />
         <LoadScript googleMapsApiKey={key as string}>
           <GoogleMap
@@ -108,13 +114,15 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private addPoint(e: any) {
+    var id: number = this.state.nextStopId;
     this.setState({
       routePts: this.state.routePts.concat({
-        stopId: e.pixel.x + e.pixel.y,
+        stopId: id,
         coords: e.latLng,
         arrival: new Date(),
         departure: new Date(),
       }),
+      nextStopId: id + 1,
     });
   }
 
@@ -125,10 +133,9 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         console.log(pt.stopId);
         if (pt.stopId == stopId)
           return {
+            ...pt,
             stopId: stopId,
             coords: newPos,
-            arrival: pt.arrival,
-            departure: pt.departure,
           };
         else return pt;
       }),
@@ -140,14 +147,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       routePts: this.state.routePts.map((pt) => {
         if (pt.stopId == this.state.currentEdit?.stopId)
           return {
-            stopId: pt.stopId,
-            coords: pt.coords,
+            ...pt,
             arrival,
             departure,
           };
         else return pt;
       }),
-      currentEdit: undefined
+      currentEdit: undefined,
     });
   }
 
@@ -155,6 +161,28 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({
       currentEdit: pt,
     });
+  }
+
+  private delete() {
+    // If there is no route stop under edit, then abort
+    const curr = this.state.currentEdit;
+    if (curr == undefined) return;
+
+    // Remove the route stop and re-index
+    var id: number = 1;
+    var result: RouteStop[] = this.state.routePts
+      .filter((pt) => pt.stopId != curr.stopId)
+      .map((pt) => ({
+        ...pt,
+        stopId: id++,
+      }));
+
+    // Update route
+    this.setState({
+        currentEdit: undefined,
+        routePts: result,
+        nextStopId: id
+    })
   }
 }
 
