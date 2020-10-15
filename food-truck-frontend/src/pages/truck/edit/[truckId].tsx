@@ -1,34 +1,38 @@
 import React, { Component } from 'react'
-import {Button, TextField, Typography} from "@material-ui/core";
+import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
 import api from "../../../util/api";
 import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import Form from "../../../components/Form";
 import NotFound from "../../../components/NotFound";
 import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
+import CoolLayout from "../../../components/CoolLayout";
 
 interface EditTruckState {
   message: string;
 }
 
-type State = TruckState & EditTruckState;
+type TruckComponentState = TruckState & EditTruckState;
 
-class EditTruck extends Component<TruckProps, State> {
+class EditTruck extends Component<TruckProps, TruckComponentState> {
   constructor(props: TruckProps) {
     super(props);
     this.state = {
       id: this.props.truckId,
-      userId: 0,
+      userId: -1,
       name: "",
       description: null,
       priceRating: null,
       foodCategory: null,
       textMenu: null,
       message: "",
-    };
+    };;
   }
 
   render() {
+    if (this.state.userId == -1)
+      return <CircularProgress/>
+      
     return (
       <>
         <Typography variant={'h4'}>Edit Truck ID: {this.state.id}</Typography>
@@ -53,8 +57,14 @@ class EditTruck extends Component<TruckProps, State> {
 
   componentDidMount() {
     api.get(`/truck/${this.props.truckId}`, {})
-      .then(res => this.setState(res ? res.data : null))
-      .catch(err => {
+      .then(res => {
+        // If the response indicates they own the truck, show them. Otherwise, kick out.
+        if (res && userCanEditTruck(res.data.userId)) {
+          this.setState(res.data);
+        } else
+          Router.replace("/");
+      }).catch(err => {
+        // If an error, log to console and kick out
         if (err.response) {
           console.log('Got error response code');
         } else if (err.request) {
@@ -62,10 +72,10 @@ class EditTruck extends Component<TruckProps, State> {
         } else {
           console.log(err);
         }
+
+        // Cancel
+        Router.replace("/");
       });
-    if (!userCanEditTruck(this.state.userId)) {
-      Router.replace('/');
-    }
   }
 
   onSubmit = (formData: any, response: AxiosResponse) => {
@@ -96,11 +106,15 @@ function EditTruckPage() {
   if (router.query.truckId) {
     let truckId: number = router.query.truckId as unknown as number;
     return (
-      <EditTruck truckId={truckId}/>
+      <CoolLayout>
+        <EditTruck truckId={truckId}/>
+      </CoolLayout>
     );
   }
   return (
-    <NotFound/>
+    <CoolLayout>
+      <NotFound/>
+    </CoolLayout>
   );
 }
 

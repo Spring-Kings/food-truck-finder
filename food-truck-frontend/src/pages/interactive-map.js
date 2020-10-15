@@ -1,10 +1,11 @@
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 
 function InteractiveMapPage(){
     return(
-        <div>
+        <CoolLayout>
             <p>Interactive Map Page</p>
-        </div>
+        </CoolLayout>
     )
 }
 

@@ -71,20 +71,23 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class CreateTruckParams {
+    public static class CreateTruckParams {
         @Nullable
         String truckName;
     }
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
+    @Secured({"ROLE_USER"})
     @DeleteMapping("/truck/delete/{truckId}")
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
         t.ifPresent(truck -> {
+            System.out.println(truck + " " +  u);
             if (truck.getUserId().equals(u.getId())) {
                 truckService.deleteTruck(truckId);
             }
@@ -92,7 +95,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class UpdateTruckParams {
+    public static class UpdateTruckParams {
         long truckId;
         @Nullable
         String name;
@@ -116,6 +119,7 @@ public class TruckEndpoint {
         return truckService.findTruck(u.getId());
     }
 
+    @Secured({"ROLE_USER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var t = truckService.findTruckById(data.truckId);
@@ -221,5 +225,10 @@ public class TruckEndpoint {
                 .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
                 .collect(Collectors.toList()))
         ;
+    }
+
+    @GetMapping("truck/owner/{userId}")
+    public List<Truck> getTrucksByUser(@AuthenticationPrincipal User u, @PathVariable long userId) {
+        return truckService.findTruck(userId);
     }
 }

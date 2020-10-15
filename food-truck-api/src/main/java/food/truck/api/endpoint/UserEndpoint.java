@@ -41,7 +41,7 @@ public class UserEndpoint {
     }
 
     @Value
-    private static class EditUserParams {
+    public static class EditUserParams {
         @NonNull String password;
         @Nullable
         String newPassword;

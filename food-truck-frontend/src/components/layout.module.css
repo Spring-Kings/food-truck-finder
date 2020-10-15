@@ -1,0 +1,38 @@
+
+.header, .footer {
+    background-color: darkseagreen;
+    padding: 1em;
+    margin: 0;
+}
+
+.header {
+    border-bottom: 1px solid black;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.header > img {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.footer {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.content {
+    background-color: #fafafa;
+    border: 1px solid black;
+    border-radius: 1em;
+    padding: 0 1em 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.outside {
+    margin: 0;
+    width: 100%;
+    background-color: #cec;
+}

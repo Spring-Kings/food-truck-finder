@@ -39,11 +39,12 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    public User createUser(String username, String password, String email) {
+    public User createUser(String username, String password, String email, boolean isOwner) {
         var u = new User();
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(password));
         u.setEmail(email);
+        u.setIsOwner(isOwner);
         u = saveUser(u);
         return u;
     }
