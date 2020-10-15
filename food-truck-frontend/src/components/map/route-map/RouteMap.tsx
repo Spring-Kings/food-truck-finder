@@ -216,22 +216,28 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
   private async save() {
     // Update in backend
-    await api
-      .request({
-        url: `/truck/route/locations/${this.props.routeId}`,
-        data: this.state.routePts,
-        method: "POST",
-      })
-      .catch((err) => console.log(err));
+    if (this.state.routePts.length !== 0)
+      await api
+        .request({
+          url: `/truck/route/locations/${this.props.routeId}`,
+          data: this.mapMultipleFrontendToBackend(this.state.routePts),
+          method: "POST",
+        })
+        .catch((err) => console.log(err));
 
     // Delete in backend
-    await api
-      .request({
-        url: `/truck/route/locations/${this.props.routeId}`,
-        data: this.state.trashedPts,
-        method: "DELETE",
-      })
-      .catch((err) => console.log(err));
+    if (this.state.trashedPts.length !== 0)
+      await api
+        .request({
+          url: `/truck/route/locations/${this.props.routeId}`,
+          data: this.mapMultipleFrontendToBackend(this.state.trashedPts),
+          method: "DELETE",
+        })
+        .catch((err) => console.log(err));
+  }
+
+  private mapMultipleFrontendToBackend(rp: RouteStop[]) {
+    return rp.flatMap((pt) => frontendToBackend(pt, this.props.routeId));
   }
 }
 
