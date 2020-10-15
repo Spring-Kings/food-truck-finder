@@ -11,9 +11,15 @@ import {
 } from "@material-ui/core";
 import { GoogleMap, LoadScript } from "@react-google-maps/api/dist";
 
+interface RouteStop {
+    coords: LatLngLiteral;
+    arrival: any;
+}
+
 interface RouteMapProps {}
 interface RouteMapState {
-  coordinates: LatLngLiteral;
+  mapCenter: LatLngLiteral;
+  routePts: RouteStop
 }
 
 class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
@@ -21,7 +27,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     super(props);
 
     this.state = {
-      coordinates: {
+      mapCenter: {
         lat: 0,
         lng: 0,
       },
@@ -32,7 +38,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     // get location
     navigator.geolocation.getCurrentPosition((location) => {
       this.setState({
-        coordinates: {
+        mapCenter: {
           lat: location.coords.latitude,
           lng: location.coords.longitude,
         },
@@ -51,11 +57,16 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
               width: "100%",
             }}
             zoom={10}
-            center={this.state.coordinates}
+            center={this.state.mapCenter}
+            onClick={this.addMarker}
           />
         </LoadScript>
       </Container>
     );
+  }
+
+  private addMarker(e: any) {
+      console.log(e);
   }
 }
 
