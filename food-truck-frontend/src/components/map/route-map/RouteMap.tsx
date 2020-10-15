@@ -96,6 +96,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       <Container>
         <Button onClick={this.save}>SAVE</Button>
         <EditRouteStopDialogComponent
+          key={this.state.currentEdit && this.state.currentEdit.stopId}
           routePt={this.state.currentEdit}
           confirm={this.editPointTimes}
           cancel={() => this.setState({ currentEdit: undefined })}
@@ -166,13 +167,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   private editPointTimes(arrival: Date, departure: Date) {
     this.setState({
       routePts: this.state.routePts.map((pt) => {
-        if (pt.stopId == this.state.currentEdit?.stopId)
+        if (pt.stopId === this.state.currentEdit?.stopId) {
           return {
             ...pt,
             arrivalTime: arrival,
             exitTime: departure,
           };
-        else return pt;
+        } else return pt;
       }),
       currentEdit: undefined,
     });

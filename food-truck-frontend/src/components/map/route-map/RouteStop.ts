@@ -36,7 +36,7 @@ export const backendToFrontend = (pt: any, stopId: number) => ({
     lng: pt.lng,
   },
   arrivalTime: pt.arrivalTime,
-  departureTime: pt.exitTime,
+  exitTime: pt.exitTime,
   state: RoutePointState.PERSISTED,
 });
 
