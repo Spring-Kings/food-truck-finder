@@ -1,15 +1,8 @@
 import React from "react";
+import Router from "next/router";
 
-import { LatLng, LatLngArray, LatLngLiteral } from "@google/maps";
-import {
-  Button,
-  Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from "@material-ui/core";
+import { LatLngLiteral } from "@google/maps";
+import { Button, Container } from "@material-ui/core";
 import {
   GoogleMap,
   LoadScript,
@@ -18,15 +11,7 @@ import {
 } from "@react-google-maps/api/dist";
 import api from "../../../util/api";
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-
-export interface RouteStop {
-  stopId: number;
-  coords: LatLngLiteral;
-  arrival: Date;
-  departure: Date;
-
-  readonly [x: string]: number | LatLngLiteral | Date;
-}
+import { RouteStop, RoutePointState, backendToFrontend, frontendToBackend } from "./RouteStop";
 
 interface RouteMapProps {
   routeId: number;
@@ -59,6 +44,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.editPointTimes = this.editPointTimes.bind(this);
     this.delete = this.delete.bind(this);
     this.initiateEditPointTimes = this.initiateEditPointTimes.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentDidMount() {
@@ -72,15 +58,36 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       });
     });
 
-    // // Load route
-    // api.request({
-    // })
+    // Load route
+    api
+      .request({
+        url: `/truck/route/locations/${this.props.routeId}`,
+        method: "GET",
+      })
+      .then((response) => {
+        if (response.data != undefined) {
+          var stopId: number = 1;
+
+          // Map backend structure to frontend structure
+          this.setState({
+            routePts: response.data.map((pt: any) =>
+              backendToFrontend(pt, stopId++)
+            ),
+          });
+        }
+      })
+      .catch((err) => {
+        // Temporary measure: kick back to home
+        console.log(err);
+        Router.replace("/");
+      });
   }
 
   render() {
     var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container>
+        <Button onClick={this.save}>SAVE</Button>
         <EditRouteStopDialogComponent
           routePt={this.state.currentEdit}
           confirm={this.editPointTimes}
@@ -106,7 +113,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
                 onClick={(e) => this.initiateEditPointTimes(pt)}
               />
             ))}
-            <Polyline path={this.state.routePts.flatMap((pt) => pt.coords)} />
+            <Polyline
+              path={this.state.routePts
+                .filter((pt) => pt.state != RoutePointState.DELETED)
+                .flatMap((pt) => pt.coords)}
+            />
           </GoogleMap>
         </LoadScript>
       </Container>
@@ -118,9 +129,14 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({
       routePts: this.state.routePts.concat({
         stopId: id,
-        coords: e.latLng,
-        arrival: new Date(),
-        departure: new Date(),
+        routeLocationId: -1,
+        coords: {
+            lat: e.latLng.lat(),
+            lng: e.latLng.lng()
+        },
+        arrivalTime: new Date(),
+        exitTime: new Date(),
+        state: RoutePointState.CREATED,
       }),
       nextStopId: id + 1,
     });
@@ -148,8 +164,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         if (pt.stopId == this.state.currentEdit?.stopId)
           return {
             ...pt,
-            arrival,
-            departure,
+            arrivalTime: arrival,
+            exitTime: departure,
           };
         else return pt;
       }),
@@ -170,19 +186,66 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
     // Remove the route stop and re-index
     var id: number = 1;
-    var result: RouteStop[] = this.state.routePts
-      .filter((pt) => pt.stopId != curr.stopId)
-      .map((pt) => ({
-        ...pt,
-        stopId: id++,
-      }));
+    var result: RouteStop[];
+
+    if (curr.state != RoutePointState.CREATED) {
+      // Since the point is already in the database, need to specify to delete it
+      result = this.state.routePts.map((pt) => {
+        // If after the point, update stopID
+        if (pt.stopId > curr.stopId)
+          return {
+            ...pt,
+            stopId: pt.stopId - 1,
+          };
+        // If the one to delete, set its deleted flag
+        else if (pt.stopId == curr.stopId)
+          return {
+            ...pt,
+            state: RoutePointState.DELETED,
+          };
+        // Otherwise, no change needed
+        else return pt;
+      });
+    } else {
+      // Lucky us! The point isn't in the database yet. Just forget we made it.
+      result = this.state.routePts
+        .filter((pt) => pt.stopId != curr.stopId)
+        .map((pt) => ({
+          ...pt,
+          stopId: id++,
+        }));
+    }
 
     // Update route
     this.setState({
-        currentEdit: undefined,
-        routePts: result,
-        nextStopId: id
-    })
+      currentEdit: undefined,
+      routePts: result,
+      nextStopId: id,
+    });
+  }
+
+  private async save() {
+    var toUpdate: any[] = this.state.routePts
+      .filter((pt) => pt.state !== RoutePointState.DELETED)
+      .flatMap((pt) => frontendToBackend(pt, this.props.routeId));
+    var toDelete: any[] = this.state.routePts
+      .filter((pt) => pt.state === RoutePointState.DELETED)
+      .flatMap((pt) => frontendToBackend(pt, this.props.routeId));
+
+    // Update in backend
+    console.log(this.props.routeId);
+    await api.request({
+      url: `/truck/route/locations/${this.props.routeId}`,
+      data: toUpdate,
+      method: "POST"
+    }).catch(err => console.log(err));
+    
+    // Delete in backend
+    await api.request({
+        url: `/truck/route/locations/${this.props.routeId}`,
+        data: toDelete,
+        method: "DELETE"
+      }).catch(err => console.log(err));
   }
 }
 

@@ -14,7 +14,7 @@ import {
 } from "@material-ui/core";
 import DateFns from "@date-io/date-fns";
 
-import { RouteStop } from "./RouteMap";
+import { RouteStop } from "./RouteStop";
 
 interface ERSDProps {
   routePt: RouteStop | undefined;
