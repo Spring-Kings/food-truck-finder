@@ -1,7 +1,8 @@
-import React from 'react'
+import CoolLayout from '../components/CoolLayout'
 import api from '../util/api'
 import getUserInfo from "../util/token";
 import Form from "../components/Form";
+import React from 'react'
 import {Button, TextField} from '@material-ui/core';
 import {AxiosResponse} from 'axios';
 
@@ -112,7 +113,10 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
 
 function AccountPage() {
     return (
-        <AccountPageComponent/>
+        <CoolLayout>
+            <AccountPageComponent/>
+        </CoolLayout>
+
     )
 }
 

@@ -1,10 +1,11 @@
+import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 
 function RoutesPage(){
     return(
-        <div>
+        <CoolLayout>
             <p>Routes Page</p>
-        </div>
+        </CoolLayout>
     )
 }
 

@@ -15,15 +15,18 @@ public class AuthenticationEndpoint {
     private UserService userService;
 
     @Value
-    static class RegistrationData {
-        @JsonProperty("Username")
+    public static class RegistrationData {
+        @JsonProperty("username")
         @NonNull String username;
 
-        @JsonProperty("Email")
+        @JsonProperty("email")
         @NonNull String email;
 
-        @JsonProperty("Password")
+        @JsonProperty("password")
         @NonNull String password;
+
+        @JsonProperty("isOwner")
+        Boolean isOwner;
     }
 
     @PostMapping("/register")
@@ -37,7 +40,8 @@ public class AuthenticationEndpoint {
         else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
             return "Error: Invalid username";
         } else {
-            var user = userService.createUser(data.username, data.password, data.email);
+            System.out.println(data);
+            var user = userService.createUser(data.username, data.password, data.email, data.isOwner);
             return "Created user with id " + user.getId();
         }
     }

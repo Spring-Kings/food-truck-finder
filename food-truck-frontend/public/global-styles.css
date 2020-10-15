@@ -1,0 +1,35 @@
+body {
+    margin: 0;
+    font-family: Raleway, sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: #454545;
+    line-height: 1.43;
+    text-align: justify
+}
+
+/* Stuff from MaterialUI CssBaseline: */
+
+html {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
+
+strong, b {
+    font-weight: 700;
+}
+
+@media print {
+    body {
+        background-color: #fff;
+    }
+}
+
+body::backdrop {
+    background-color: #fafafa;
+}
