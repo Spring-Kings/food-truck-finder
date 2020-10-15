@@ -5,6 +5,11 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+enum ACTIVE{
+    OFF,
+    ON
+}
+
 @Data
 @Entity
 @Table( name = "route")
@@ -21,4 +26,7 @@ public class Route {
 
     @Column(name = "route_name", nullable = true)
     String routeName;
+
+    @Column(name = "active", nullable = false)
+    char active;
 }

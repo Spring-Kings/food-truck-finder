@@ -163,6 +163,7 @@ public class TruckEndpoint {
     @Value
     private static class PostRouteParams{
         String routeName;
+        char active;
     }
 
     @PostMapping("/truck/{truckId}/create-route")
@@ -171,7 +172,7 @@ public class TruckEndpoint {
         if(truck.isEmpty()){
             return null;
         }
-        return routeService.createRoute(truck.get(0), data.routeName); // TODO
+        return routeService.createRoute(truck.get(0), data.routeName, data.active); // TODO
     }
 
 }

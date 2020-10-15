@@ -21,10 +21,11 @@ public class RouteService {
         return routeRepository.findByTruck(truck);
     }
 
-    public Route createRoute(Truck truck, String routeName){
+    public Route createRoute(Truck truck, String routeName, char active){
         Route route = new Route();
         route.setRouteName(routeName);
         route.setTruck(truck);
+        route.setActive(active);
         return routeRepository.save(route);
     }
 
