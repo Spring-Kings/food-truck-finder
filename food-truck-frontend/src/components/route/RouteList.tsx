@@ -6,6 +6,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import api from "../../util/api";
+import RouteListRow from "../RouteListRows";
 import CreateRouteDialog from "./CreateRouteDialog";
 
 interface RouteListTruck {
@@ -13,7 +14,7 @@ interface RouteListTruck {
   userId: string;
   name: string;
   schedule: string;
-};
+}
 interface RouteListRouteInfo {
   routeId: number;
   routeName: string;
@@ -37,7 +38,7 @@ const RouteObject = [
 
 type RouteState = {
   truck: RouteListTruck | undefined;
-  routeData: [];
+  routeData: RouteListRouteInfo[];
 
   errorMsg: string | undefined;
   createRoute: boolean;
@@ -79,6 +80,17 @@ class RouteList extends React.Component<RouteProps, RouteState> {
       });
   }
 
+  deleteRow(routeId: string) {
+    api
+      .delete(`/truck/routes-delete/${routeId}`)
+      .then(() => {
+        this.fetchRoutes();
+      })
+      .catch((err) => {
+        console.log(err.toString());
+      });
+  }
+
   fetchRoutes() {
     api
       .get(`/truck/${this.props.truckId}/routes`, {})
@@ -90,11 +102,16 @@ class RouteList extends React.Component<RouteProps, RouteState> {
       });
   }
 
-  renderRouteRow(value: any) {
+  renderRouteRow(index: number) {
     return (
-      <tr>
-        <td>{this.state.routeData[index].routeName}</td>
-      </tr>
+      <RouteListRow
+        active={this.state.routeData[index].active}
+        routeId={this.state.routeData[index].routeId}
+        routeName={this.state.routeData[index].routeName}
+        removeRow={() =>
+          this.deleteRow(String(this.state.routeData[index].routeId))
+        }
+      />
     );
   }
 
@@ -111,12 +128,15 @@ class RouteList extends React.Component<RouteProps, RouteState> {
     return (
       <div>
         <CreateRouteDialog
-          truckId={this.props.truckId as unknown as number}
+          truckId={(this.props.truckId as unknown) as number}
           onSuccess={this.createSuccess}
           onFailure={this.createFailure}
           open={this.state.createRoute}
         />
         <h1>{this.state.truck.name}</h1>
+        <Button color="primary" variant="contained" onClick={this.newRoute}>
+          Create Route
+        </Button>
         <table>
           <tr>
             <th>Route Name</th>
@@ -124,13 +144,8 @@ class RouteList extends React.Component<RouteProps, RouteState> {
             <th>Active</th>
           </tr>
 
-          {this.state.routeData.map((value) =>
-            this.renderRouteRow(value)
-          )}
+          {this.state.routeData.map((_, index) => this.renderRouteRow(index))}
         </table>
-        <Button color="primary" variant="contained" onClick={this.newRoute}>
-          New
-        </Button>
       </div>
     );
   }
