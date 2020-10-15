@@ -1,12 +1,13 @@
-import CoolLayout from '../components/CoolLayout'
-import React from 'react'
+import CoolLayout from "../components/CoolLayout";
+import React from "react";
+import RouteMapComponent from "../components/map/route-map/RouteMap";
 
-function RoutesPage(){
-    return(
-        <CoolLayout>
-            <p>Routes Page</p>
-        </CoolLayout>
-    )
+function RoutesPage() {
+  return (
+    <CoolLayout>
+      <RouteMapComponent />
+    </CoolLayout>
+  );
 }
 
 export default RoutesPage;

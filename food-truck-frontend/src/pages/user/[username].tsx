@@ -1,6 +1,5 @@
 import React from 'react';
 import {NextRouter, useRouter} from 'next/router';
-import api from "../../util/api";
 import UserDetails from "../../components/UserDetails";
 
 
