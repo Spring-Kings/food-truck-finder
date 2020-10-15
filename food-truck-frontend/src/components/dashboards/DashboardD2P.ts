@@ -40,8 +40,8 @@ async function updateUser(
       async (response) => {
         // Get trucks
         var trucks: SimpleTruck[] | undefined = undefined;
-        //        if (response.data.isOwner)
-        trucks = await requestOwnedTrucks(id);
+        console.log(response.data);
+        if (response.data.isOwner) trucks = await requestOwnedTrucks(id);
 
         // Dispatch update
         dispatch({

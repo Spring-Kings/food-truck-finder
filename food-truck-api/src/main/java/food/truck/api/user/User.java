@@ -1,6 +1,7 @@
 package food.truck.api.user;
 
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,9 @@ public class User implements UserDetails {
 
     @Column(name = "hashed_password", nullable = false)
     String password;
+
+    @Column(name = "is_owner", nullable = true)
+    Boolean isOwner;
 
     // TODO: These overridden methods may need more functionality
     @Override
