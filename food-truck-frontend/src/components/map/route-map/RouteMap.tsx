@@ -9,7 +9,12 @@ import {
   DialogContent,
   DialogTitle,
 } from "@material-ui/core";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api/dist";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  Polyline,
+} from "@react-google-maps/api/dist";
 import api from "../../../util/api";
 
 interface RouteStop {
@@ -81,6 +86,9 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
                 onDragEnd={(e: any) => this.updatePoint(pt.stopId, e.latLng)}
               />
             ))}
+            <Polyline
+              path={this.state.routePts.flatMap((pt) => pt.coords)}
+            />
           </GoogleMap>
         </LoadScript>
       </Container>
@@ -88,7 +96,6 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private addMarker(e: any) {
-    console.log(e.latLng);
     this.setState({
       routePts: this.state.routePts.concat({
         stopId: e.pixel.x + e.pixel.y,
@@ -100,15 +107,19 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private updatePoint(stopId: number, newPos: LatLngLiteral) {
+    console.log(stopId);
     this.setState({
-      routePts: this.state.routePts.map((pt) =>
-        pt.stopId === stopId
-          ? pt
-          : {
-              ...pt,
-              latLng: newPos,
-            }
-      ),
+      routePts: this.state.routePts.map((pt) => {
+        console.log(pt.stopId);
+        if (pt.stopId == stopId)
+          return {
+            stopId: stopId,
+            coords: newPos,
+            arrival: pt.arrival,
+            departure: pt.departure,
+          };
+        else return pt;
+      }),
     });
   }
 }
