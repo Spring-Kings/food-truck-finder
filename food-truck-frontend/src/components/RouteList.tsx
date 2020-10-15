@@ -89,9 +89,6 @@ class RouteList extends React.Component<RouteProps, RouteState>{
         )
     }
 
-    componentDidUpdate(prevProps: Readonly<RouteProps>, prevState: Readonly<RouteState>, snapshot?: any) {
-
-    }
 
     render() {
 
