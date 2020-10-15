@@ -1,6 +1,10 @@
 import React from "react";
+import Router from "next/router";
 import api from "../util/api";
-import {Button} from "@material-ui/core";
+import {IconButton} from "@material-ui/core";
+
+import EditIcon from "@material-ui/icons/Edit"
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 const RouteDaysObject = [{
     routeDaysId: "",
@@ -55,7 +59,8 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
                 <td>{this.props.routeName}</td>
                 <td>{daysWeek}</td>
                 <td>{this.props.active}</td>
-                <td><Button onClick={this.props.removeRow}>X</Button></td>
+                <td><IconButton onClick={() => Router.replace(`/routes/edit/${this.props.routeId}`)}><EditIcon /></IconButton></td>
+                <td><IconButton onClick={this.props.removeRow}><DeleteForeverIcon /></IconButton></td>
             </tr>
         );
     }

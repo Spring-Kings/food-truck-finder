@@ -33,8 +33,7 @@ class CreateRouteDialog extends React.Component<
             <TextField
               label="Route Name"
               variant="outlined"
-              name="name"
-              defaultValue={""}
+              name="routeName"
             />
           </Form>
         </DialogContent>
