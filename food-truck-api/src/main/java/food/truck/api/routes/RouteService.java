@@ -4,6 +4,7 @@ import food.truck.api.truck.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,13 +38,27 @@ public class RouteService {
         return routeDaysRepository.save(routeDays);
     }
 
+    public RouteLocation createLocation(Long routeId, Double lat, Double lng, Timestamp arrivalTime, Timestamp exitTime){
+        RouteLocation routeLoc = new RouteLocation();
+        routeLoc.setRouteId(routeId);
+        routeLoc.setLat(lat);
+        routeLoc.setLng(lng);
+        routeLoc.setArrivalTime(arrivalTime);
+        routeLoc.setExitTime(exitTime);
+        return routeLocationRepository.save(routeLoc);
+
+    }
+
     public List<RouteDays> findRouteDaysbyRouteId(Long routeId){
         return routeDaysRepository.findByRouteId(routeId);
     }
 
+    public List<RouteLocation> findRouteLocationByRouteId(Long routeId){
+        return routeLocationRepository.findByRouteId(routeId);
+    }
     public void deleteRoute(Long routeId){
         routeDaysRepository.deleteAll(routeDaysRepository.findByRouteId(routeId));
-       // routeLocationRepository.deleteAllByRouteId(routeId);
+        routeLocationRepository.deleteAll(routeLocationRepository.findByRouteId(routeId));
         routeRepository.deleteAll(routeRepository.findByRouteId(routeId));
     }
 
