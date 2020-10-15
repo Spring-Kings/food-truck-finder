@@ -1,37 +1,71 @@
 import React from "react";
 import api from "../util/api";
 
-type RouteState = {
-    truck: {"id": string,
-        userId: string,
-        name: string,
-        menu: string,
-        textMenu: string,
-        priceRating: string,
-        description: string,
-        schedule: string,
-        foodCategory: string}
-
+const TruckObject = {
+        id: "",
+        userId: "",
+        name: "",
+        schedule: "",
 }
 
+const RouteObject = [{
+    routeName: "",
+    active: ""
+}]
+
+
+
+
+type RouteState = {
+    truck: {
+        "id": string,
+        userId: string,
+        name: string,
+        schedule: string,
+    }
+    routeData: {
+        routeName: string
+        active: string
+    }[],
+    error: {}
+}
+
+
 type RouteProps = {
-    truckId: number
+    truckId: string
 }
 
 class RouteList extends React.Component<RouteProps, RouteState>{
     constructor(props: RouteProps) {
         super(props);
+        this.state = {
+            truck: TruckObject,
+            routeData: RouteObject,
+            error: {}
+        }
+
     }
 
-    componentDidMount() {
-        api.get(`/truck/${this.props.truckId}`, {}).then(res => {
+    componentDidMount(){
+        api.get(`/truck/${this.props.truckId}`).then(res => {
+            this.setState({truck : res.data});
+        }).catch(err => {
+            console.log(err);
+            this.setState({error: err})
+        });
 
-        }).catch();
+        api.get(`/truck/${this.props.truckId}/routes`, {}).then(res => {
+            this.setState({routeData : res.data});
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     render() {
         return (
             <div>
+                <p>{JSON.stringify(this.state.truck)}</p>
+                <p>{this.state.routeData[0].routeName}</p>
 
             </div>
         );

@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,31 +61,6 @@ public class TruckEndpoint {
     public String postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
         return ""; // TODO
     }
-
-    @Value
-    private static class PostRouteParams{
-        String routeName;
-    }
-
-    @PostMapping("/truck/{truckId}/create-route")
-    public Route postTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
-        }
-        return routeService.createRoute(truck.get(0), data.routeName); // TODO
-    }
-
-    @GetMapping("/truck/{truckId}/routes")
-    public List<Route> getTruckReviews(@AuthenticationPrincipal User user, @PathVariable long truckId) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
-        }
-        return routeService.findRoutebyTruck(truck.get(0));
-    }
-
-
 
     @Value
     private static class CreateTruckParams {
@@ -146,11 +122,15 @@ public class TruckEndpoint {
     }
 
     @GetMapping("/truck/{truckId}/routes")
-    public String getRoutes(@PathVariable long truckId) {
-        return ""; //TODO
+    public List<Route> getRoutes(@PathVariable long truckId) {
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if(truck == null){
+            return new LinkedList<Route>();
+        }
+        return routeService.findRoutebyTruck(truck.get());
     }
 
-    @PostMapping("/truck/{truckId}/routes")
+    @PostMapping("/truck/{truckId}/routes-add")
     public String addRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String routeName) {
         return ""; // TODO
     }
@@ -169,7 +149,7 @@ public class TruckEndpoint {
         boolean active;
     }
 
-    @PutMapping("/truck/{truckId}/routes")
+    @PutMapping("/truck/{truckId}/routes-put")
     public String updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
         return ""; // TODO
     }
@@ -179,4 +159,20 @@ public class TruckEndpoint {
     public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
         return ""; // TODO
     }
+
+    @Value
+    private static class PostRouteParams{
+        String routeName;
+        char active;
+    }
+
+    @PostMapping("/truck/{truckId}/create-route")
+    public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
+        List<Truck> truck = truckService.findTruck(truckId);
+        if(truck.isEmpty()){
+            return null;
+        }
+        return routeService.createRoute(truck.get(0), data.routeName, data.active); // TODO
+    }
+
 }
