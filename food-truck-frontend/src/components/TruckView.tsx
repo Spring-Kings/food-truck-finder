@@ -4,11 +4,23 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
+import getUserInfo from "../util/token";
 
-interface TruckState {
-  notFound: boolean | null;
+export const userCanEditTruck = (truckOwnerId: number): boolean => {
+  const user = getUserInfo();
+  if (user) {
+    if (truckOwnerId !== user.userID) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+  return false;
+}
+
+export interface TruckState {
   id: number;
-  userId: number | null;
+  userId: number;
   name: string;
   description: string | null;
   priceRating: number | null;
@@ -18,18 +30,24 @@ interface TruckState {
   // schedule: string | null;
 }
 
-interface TruckProps {
+interface TruckViewState {
+  notFound: boolean | null;
+}
+
+export interface TruckProps {
     truckId: number;
 }
 
-class TruckView extends Component<TruckProps, TruckState> {
+type State = TruckState & TruckViewState;
+
+class TruckView extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
     super(props);
 
     this.state = {
       notFound: null,
       id: 0,
-      userId: null,
+      userId: 0,
       name: "",
       description: null,
       priceRating: null,
@@ -83,11 +101,13 @@ class TruckView extends Component<TruckProps, TruckState> {
             Text Menu: {this.state.textMenu}
           </ListItem>
         </List>
-        <Button variant="outlined"
-                color="primary"
-                onClick={this.editTruck}>
-          Edit
-        </Button>
+        {userCanEditTruck(this.state.userId) &&
+          <Button variant="outlined"
+                  color="primary"
+                  onClick={this.editTruck}>
+            Edit
+          </Button>
+        }
       </>
     );
   }
