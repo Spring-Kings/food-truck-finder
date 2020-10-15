@@ -8,4 +8,5 @@ import java.util.List;
 public interface RouteRepository extends JpaRepository<Route, Long> {
     List<Route> findByRouteId(Long id);
     List<Route> findByTruck(Truck truck);
+    void deleteByRouteId(Long routeId);
 }
