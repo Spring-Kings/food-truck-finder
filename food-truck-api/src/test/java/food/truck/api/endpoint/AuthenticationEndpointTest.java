@@ -16,7 +16,7 @@ public class AuthenticationEndpointTest extends EndpointTest {
     @Test
     public void register() {
         String path = base + "register";
-        var data = new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password");
+        var data = new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password", true);
         ResponseEntity<String> response = template.postForEntity(path, data, String.class);
         System.out.println(response);
         assertThat(response.getBody(), startsWith("Created user"));
