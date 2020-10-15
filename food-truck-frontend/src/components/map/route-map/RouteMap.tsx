@@ -11,7 +11,12 @@ import {
 } from "@react-google-maps/api/dist";
 import api from "../../../util/api";
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import { RouteStop, RoutePointState, backendToFrontend, frontendToBackend } from "./RouteStop";
+import {
+  RouteStop,
+  RoutePointState,
+  backendToFrontend,
+  frontendToBackend,
+} from "./RouteStop";
 
 interface RouteMapProps {
   routeId: number;
@@ -19,6 +24,7 @@ interface RouteMapProps {
 interface RouteMapState {
   mapCenter: LatLngLiteral;
   routePts: RouteStop[];
+  trashedPts: RouteStop[];
   nextStopId: number;
 
   currentEdit: RouteStop | undefined;
@@ -34,6 +40,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         lng: 0,
       },
       routePts: [],
+      trashedPts: [],
       nextStopId: 1,
       currentEdit: undefined,
     };
@@ -131,8 +138,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         stopId: id,
         routeLocationId: -1,
         coords: {
-            lat: e.latLng.lat(),
-            lng: e.latLng.lng()
+          lat: e.latLng.lat(),
+          lng: e.latLng.lng(),
         },
         arrivalTime: new Date(),
         exitTime: new Date(),
@@ -143,10 +150,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private editPointLoc(stopId: number, newPos: LatLngLiteral) {
-    console.log(stopId);
     this.setState({
       routePts: this.state.routePts.map((pt) => {
-        console.log(pt.stopId);
         if (pt.stopId == stopId)
           return {
             ...pt,
@@ -187,65 +192,46 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     // Remove the route stop and re-index
     var id: number = 1;
     var result: RouteStop[];
+    var trash: RouteStop[] = this.state.trashedPts;
 
-    if (curr.state != RoutePointState.CREATED) {
-      // Since the point is already in the database, need to specify to delete it
-      result = this.state.routePts.map((pt) => {
-        // If after the point, update stopID
-        if (pt.stopId > curr.stopId)
-          return {
-            ...pt,
-            stopId: pt.stopId - 1,
-          };
-        // If the one to delete, set its deleted flag
-        else if (pt.stopId == curr.stopId)
-          return {
-            ...pt,
-            state: RoutePointState.DELETED,
-          };
-        // Otherwise, no change needed
-        else return pt;
-      });
-    } else {
-      // Lucky us! The point isn't in the database yet. Just forget we made it.
-      result = this.state.routePts
-        .filter((pt) => pt.stopId != curr.stopId)
-        .map((pt) => ({
-          ...pt,
-          stopId: id++,
-        }));
-    }
+    // If the point is in the DB, save it for deletion
+    if (curr.state != RoutePointState.CREATED) trash = trash.concat(curr);
+
+    // Remove from the results array
+    result = this.state.routePts
+      .filter((pt) => pt.stopId != curr.stopId)
+      .map((pt) => ({
+        ...pt,
+        stopId: id++,
+      }));
 
     // Update route
     this.setState({
       currentEdit: undefined,
       routePts: result,
+      trashedPts: trash,
       nextStopId: id,
     });
   }
 
   private async save() {
-    var toUpdate: any[] = this.state.routePts
-      .filter((pt) => pt.state !== RoutePointState.DELETED)
-      .flatMap((pt) => frontendToBackend(pt, this.props.routeId));
-    var toDelete: any[] = this.state.routePts
-      .filter((pt) => pt.state === RoutePointState.DELETED)
-      .flatMap((pt) => frontendToBackend(pt, this.props.routeId));
-
     // Update in backend
-    console.log(this.props.routeId);
-    await api.request({
-      url: `/truck/route/locations/${this.props.routeId}`,
-      data: toUpdate,
-      method: "POST"
-    }).catch(err => console.log(err));
-    
-    // Delete in backend
-    await api.request({
+    await api
+      .request({
         url: `/truck/route/locations/${this.props.routeId}`,
-        data: toDelete,
-        method: "DELETE"
-      }).catch(err => console.log(err));
+        data: this.state.routePts,
+        method: "POST",
+      })
+      .catch((err) => console.log(err));
+
+    // Delete in backend
+    await api
+      .request({
+        url: `/truck/route/locations/${this.props.routeId}`,
+        data: this.state.trashedPts,
+        method: "DELETE",
+      })
+      .catch((err) => console.log(err));
   }
 }
 
