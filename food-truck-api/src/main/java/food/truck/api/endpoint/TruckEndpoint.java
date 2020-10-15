@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,14 +123,14 @@ public class TruckEndpoint {
 
     @GetMapping("/truck/{truckId}/routes")
     public List<Route> getRoutes(@PathVariable long truckId) {
-        List<Truck> truck = truckService.findTruck(truckId);
-        if(truck.isEmpty()){
-            return null;
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if(truck == null){
+            return new LinkedList<Route>();
         }
-        return routeService.findRoutebyTruck(truck.get(0));
+        return routeService.findRoutebyTruck(truck.get());
     }
 
-    @PostMapping("/truck/{truckId}/routes")
+    @PostMapping("/truck/{truckId}/routes-add")
     public String addRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String routeName) {
         return ""; // TODO
     }
@@ -148,7 +149,7 @@ public class TruckEndpoint {
         boolean active;
     }
 
-    @PutMapping("/truck/{truckId}/routes")
+    @PutMapping("/truck/{truckId}/routes-put")
     public String updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
         return ""; // TODO
     }
