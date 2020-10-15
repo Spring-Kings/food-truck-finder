@@ -1,5 +1,6 @@
 package food.truck.api.routes;
 
+import food.truck.api.endpoint.TruckEndpoint;
 import food.truck.api.truck.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,14 @@ public class RouteService {
         routeLoc.setArrivalTime(arrivalTime);
         routeLoc.setExitTime(exitTime);
         return routeLocationRepository.save(routeLoc);
+    }
 
+    public void updateLocations(List<RouteLocation> locs) {
+        routeLocationRepository.saveAll(locs);
+    }
+
+    public void deleteLocations(List<RouteLocation> locs) {
+        routeLocationRepository.deleteAll(locs);
     }
 
     public List<RouteDays> findRouteDaysbyRouteId(Long routeId){
@@ -61,7 +69,4 @@ public class RouteService {
         routeLocationRepository.deleteAll(routeLocationRepository.findByRouteId(routeId));
         routeRepository.deleteAll(routeRepository.findByRouteId(routeId));
     }
-
-
-
 }

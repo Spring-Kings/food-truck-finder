@@ -2,6 +2,7 @@ package food.truck.api.endpoint;
 
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteDays;
+import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
@@ -11,12 +12,18 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Column;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -113,14 +120,14 @@ public class TruckEndpoint {
                 return Optional.empty();
             }
             return Optional.of(truckService.updateTruck(
-                truck,
-                Optional.ofNullable(data.name),
-                Optional.ofNullable(data.menu),
-                Optional.ofNullable(data.textMenu),
-                Optional.ofNullable(data.priceRating),
-                Optional.ofNullable(data.description),
-                Optional.ofNullable(data.schedule),
-                Optional.ofNullable(data.foodCategory)
+                    truck,
+                    Optional.ofNullable(data.name),
+                    Optional.ofNullable(data.menu),
+                    Optional.ofNullable(data.textMenu),
+                    Optional.ofNullable(data.priceRating),
+                    Optional.ofNullable(data.description),
+                    Optional.ofNullable(data.schedule),
+                    Optional.ofNullable(data.foodCategory)
             ));
         }
         return Optional.empty();
@@ -129,11 +136,11 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/routes")
     public List<Route> getRoutes(@PathVariable long truckId) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if(truck == null || truck.isEmpty()){
+        if (truck == null || truck.isEmpty()) {
             return new LinkedList<Route>();
         }
 
-       return routeService.findRoutebyTruck(truck.get());
+        return routeService.findRoutebyTruck(truck.get());
     }
 
     @DeleteMapping("/truck/routes-delete/{routeId}")
@@ -162,7 +169,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class PostRouteParams{
+    private static class PostRouteParams {
         String routeName;
         char active;
     }
@@ -170,10 +177,48 @@ public class TruckEndpoint {
     @PostMapping("/truck/{truckId}/create-route")
     public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if(truck == null || truck.isEmpty()){
+        if (truck == null || truck.isEmpty()) {
             return new Route();
         }
         return routeService.createRoute(truck.get(), data.routeName, data.active); // TODO
     }
 
+    @Value
+    private static class UpdateRouteLocationParams {
+        long routeLocationId;
+        long routeId;
+        @Nullable
+        Timestamp arrivalTime;
+        @Nullable
+        Timestamp exitTime;
+        @Nullable
+        Double lng;
+        @Nullable
+        Double lat;
+    }
+
+    @GetMapping("/truck/route/locations/{routeId}")
+    public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
+        return routeService.findRouteLocationByRouteId(routeId);
+    }
+
+    @PostMapping("/truck/route/locations/{routeId}")
+    public void updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
+        routeService.updateLocations(data.stream()
+                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
+                .collect(Collectors.toList()))
+        ;
+    }
+
+    @DeleteMapping("/truck/route/locations/{routeId}")
+    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long truckId, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if (truck == null || truck.isEmpty()) {
+            return;
+        }
+        routeService.deleteLocations(data.stream()
+                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
+                .collect(Collectors.toList()))
+        ;
+    }
 }

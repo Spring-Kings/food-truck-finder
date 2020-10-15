@@ -1,12 +1,16 @@
 package food.truck.api.routes;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "route_location")
 public class RouteLocation {
@@ -30,6 +34,4 @@ public class RouteLocation {
 
     @Column(name="lat", nullable = false)
     Double lat;
-
-
 }
