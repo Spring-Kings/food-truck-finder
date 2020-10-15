@@ -111,6 +111,11 @@ public class TruckEndpoint {
         byte[] schedule;
     }
 
+    @GetMapping("/truck/owner")
+    public List<Truck> getTruckByUser(@AuthenticationPrincipal User u) {
+        return truckService.findTruck(u.getId());
+    }
+
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var t = truckService.findTruckById(data.truckId);

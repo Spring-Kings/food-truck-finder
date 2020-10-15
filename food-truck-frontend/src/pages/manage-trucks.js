@@ -1,10 +1,10 @@
 import React from 'react'
 
+import ManageTrucksComponent from "../components/manage-trucks/ManageTrucksComponent"
+
 function ManageTrucksPage(){
     return(
-        <div>
-            <p>Manage Trucks Page</p>
-        </div>
+        <ManageTrucksComponent />
     )
 }
 
