@@ -157,7 +157,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
             stopId: stopId,
             coords: {
               lat: e.latLng.lat(),
-              lng: e.latLng.lng()
+              lng: e.latLng.lng(),
             },
           };
         else return pt;
@@ -217,41 +217,44 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private async save() {
-    var canCont: boolean = true;
-    // Update in backend
-    if (this.state.routePts.length !== 0)
-      await api
-        .request({
+    // Update in backend. If fails, aborts the function.
+    if (this.state.routePts.length !== 0) {
+      try {
+        await api.request({
           url: `/truck/route/locations/${this.props.routeId}`,
           data: this.mapMultipleFrontendToBackend(this.state.routePts),
           method: "POST",
-        })
-        .catch((err) => {
-          alert(
-            "There was an error saving your changes. Please try again later."
-          );
-          console.log(err);
-          canCont = false;
         });
+      } catch (err: any) {
+        // Error: log, and don't attempt to save part 2.
+        alert(
+          "There was an error saving your changes. Please try again later."
+        );
+        console.log(err);
+        return;
+      }
+    }
 
     // Delete in backend
-    if (canCont && this.state.trashedPts.length !== 0)
-      await api
-        .request({
+    if (this.state.trashedPts.length !== 0)
+      try {
+        await api.request({
           url: `/truck/route/locations/${this.props.routeId}`,
           data: this.mapMultipleFrontendToBackend(this.state.trashedPts),
           method: "DELETE",
-        })
-        .catch((err) => {
-          alert(
-            `There was an error saving route point deletions. ${
-              this.state.routePts.length > 0
-                ? "Your new route points have been saved."
-                : ""
-            } Please try again later.`
-          );
-          console.log(err);
         });
+        this.setState({ trashedPts: [] });
+      } catch (err: any) {
+        // Error in deletion
+        alert(
+          `There was an error saving route point deletions. ${
+            this.state.routePts.length > 0
+              ? "Your new route points have been saved."
+              : ""
+          } Please try again later.`
+        );
+        console.log(err);
+      }
   }
 
   private mapMultipleFrontendToBackend(rp: RouteStop[]) {
