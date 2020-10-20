@@ -1,27 +1,24 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.user.UserView;
-import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.Assert.*;
-
-public class UserEndpointTest extends AuthenticationEndpointTest {
+public class UserEndpointTest extends EndpointTest {
     @Test
     public void viewUser() {
-        loginSuccess();
-        var response = template.getForEntity(base + "user/1", UserView.class);
-        var userView = response.getBody();
-        assertNotNull(userView);
-        assertEquals(1, userView.getId());
-        assertEquals("test@example.com", userView.getEmail());
+        long id = userService.findUserByUsername("standardUser").get().getId();
+        UserView result = guestClient.get()
+                .uri("/user/{id}", id)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserView.class).returnResult().getResponseBody();
+
+        assertEquals("aaa@aaa", result.getEmail());
     }
 
+    /*
     @Test
     public void updateUser() {
         loginSuccess();
@@ -51,5 +48,5 @@ public class UserEndpointTest extends AuthenticationEndpointTest {
         String userView = viewResp.getBody();
         assertNotNull(userView);
         assertTrue(userView.contains("1"));
-    }
+    }*/
 }
