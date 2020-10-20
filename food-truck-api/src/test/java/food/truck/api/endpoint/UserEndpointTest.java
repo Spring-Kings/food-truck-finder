@@ -4,6 +4,7 @@ import food.truck.api.user.UserView;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class UserEndpointTest extends EndpointTest {
     @Test
@@ -18,35 +19,26 @@ public class UserEndpointTest extends EndpointTest {
         assertEquals("aaa@aaa", result.getEmail());
     }
 
-    /*
+
     @Test
     public void updateUser() {
-        loginSuccess();
-        String path = base + "user";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var body = new UserEndpoint.EditUserParams("password", "newPassword", "coolEmail@email.com");
-        var request = new HttpEntity<>(body, headers);
-        var response = template.exchange(path, HttpMethod.PUT, request, Boolean.class);
-        var success = response.getBody();
-        assertNotNull(success);
-        assertTrue(success);
-
-        var viewResp = template.getForEntity(base + "user/1", UserView.class);
-        var userView = viewResp.getBody();
-        assertNotNull(userView);
-        assertEquals("coolEmail@email.com", userView.getEmail());
+        standardUserClient.put()
+                .uri("/user")
+                .bodyValue(new UserEndpoint.EditUserParams("password", "newPass", "coolEmail@aaa"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Boolean.class).isEqualTo(true);
+        var user = userService.findUserById(standardUser.getId()).get();
+        assertEquals(user.getEmail(), "coolEmail@aaa");
+        assertTrue(userService.passwordMatches(user, "newPass"));
     }
 
     @Test
     public void searchUser() {
-        loginSuccess();
-        var params = new HashMap<String, String>();
-        params.put("username", "testUser");
-        // For some reason i can't deserialize into a List<UserView>
-        var viewResp = template.getForEntity(base + "search-usernames", String.class, params);
-        String userView = viewResp.getBody();
-        assertNotNull(userView);
-        assertTrue(userView.contains("1"));
-    }*/
+        guestClient.get()
+                .uri("/search-usernames?username={x}", "standardUser")
+                .exchange()
+                .expectBodyList(UserView.class)
+                .contains(UserView.of(standardUser));
+    }
 }

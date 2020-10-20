@@ -1,14 +1,32 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.truck.Truck;
+import food.truck.api.truck.TruckService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TruckEndpointTest extends EndpointTest {
+    @Autowired
+    private TruckService truckService;
+
+    private void ensureNoTestTruck() {
+        truckService.findTruck("truck1")
+                .forEach(t -> truckService.deleteTruck(t.getId()));
+    }
+
+    private Truck ensureTestTruck() {
+        var list = truckService.findTruck("truck1");
+        if (list.size() == 1)
+            return list.get(0);
+        else
+            return truckService.createTruck(owner.getId(), "truck1");
+    }
+
     @Test
     public void createTruck() {
+        ensureNoTestTruck();
         Truck result = ownerClient.post()
                 .uri("/truck/create")
                 .bodyValue(new TruckEndpoint.CreateTruckParams("truck1"))
@@ -20,50 +38,48 @@ public class TruckEndpointTest extends EndpointTest {
         assertNotNull(result);
         assertEquals(result.getName(), "truck1");
     }
-/*
+
     @Test
     public void deleteTruck() {
-        createTruck();
-        String path = base + "truck/delete/1";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var request = new HttpEntity<>("", headers);
-        template.exchange(path, HttpMethod.DELETE, request, String.class);
-        var response = template.getForEntity(base + "truck/1", Truck.class);
-        var truck = response.getBody();
-        assertNull(truck);
+        var truck = ensureTestTruck();
+        ownerClient.delete()
+                .uri("/truck/delete/{id}", truck.getId())
+                .exchange()
+                .expectStatus().isOk();
+
+        assertEquals(truckService.findTruck("truck1").size(), 0);
     }
 
     @Test
     public void updateTruck() {
-        createTruck();
-        String path = base + "truck/update";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var body = new TruckEndpoint.UpdateTruckParams(1, "new name", "desc", (long)5, null, null, null, null);
-        var request = new HttpEntity<>(body, headers);
-        var response = template.exchange(path, HttpMethod.PUT, request, Truck.class);
-        var truck = response.getBody();
-        assertNotNull(truck);
-        assertEquals(body.getName(), truck.getName());
-        assertEquals(body.getDescription(), truck.getDescription());
-        assertEquals(body.getPriceRating(), truck.getPriceRating());
-        assertNull(truck.getFoodCategory());
-        assertNull(truck.getMenu());
-        assertNull(truck.getTextMenu());
-        assertNull(truck.getSchedule());
+        var truck = ensureTestTruck();
+        var result = ownerClient.put()
+                .uri("/truck/update")
+                .bodyValue(new TruckEndpoint.UpdateTruckParams(truck.getId(), "truck1337", "a cool truck",
+                        3L, null, null, null, null))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Truck.class)
+                .returnResult().getResponseBody();
+        assertEquals(result.getName(), "truck1337");
+        assertEquals(result.getDescription(), "a cool truck");
+        assertEquals(result.getPriceRating(), 3L);
+        assertNull(result.getFoodCategory());
+        assertNull(result.getMenu());
+        assertNull(result.getTextMenu());
+        assertNull(result.getSchedule());
+
+        truck = truckService.findTruck("truck1337").get(0);
+        assertEquals(truck, result);
     }
 
     @Test
     public void getTruck() {
-        createTruck();
-        var response = template.getForEntity(base + "truck/1", Truck.class);
-        var truck = response.getBody();
-        assertNotNull(truck);
-        response = template.getForEntity(base + "truck/2", Truck.class);
-        truck = response.getBody();
-        assertNull(truck);
+        var truck = ensureTestTruck();
+        guestClient.get()
+                .uri("/truck/{id}", truck.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Truck.class);
     }
-
- */
 }
