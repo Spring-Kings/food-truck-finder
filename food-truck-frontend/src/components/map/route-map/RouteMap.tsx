@@ -94,7 +94,6 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   render() {
-    var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container>
         <Button onClick={this.save}>SAVE</Button>
