@@ -1,7 +1,6 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.routes.Route;
-import food.truck.api.routes.RouteDays;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
@@ -16,14 +15,10 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -72,7 +67,7 @@ public class TruckEndpoint {
 
     @Value
     public static class CreateTruckParams {
-        @Nullable
+        @NonNull
         String truckName;
     }
 
@@ -149,7 +144,7 @@ public class TruckEndpoint {
             return new LinkedList<Route>();
         }
 
-        return routeService.findRoutebyTruck(truck.get());
+        return routeService.findRouteByTruck(truck.get());
     }
 
     @DeleteMapping("/truck/routes-delete/{routeId}")
@@ -179,52 +174,54 @@ public class TruckEndpoint {
 
     @Value
     private static class PostRouteParams {
-        String routeName;
+        @NonNull String routeName;
         char active;
     }
 
     @PostMapping("/truck/{truckId}/create-route")
     public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck == null || truck.isEmpty()) {
+        if (truck.isEmpty()) {
             return new Route();
         }
         return routeService.createRoute(truck.get(), data.routeName, data.active); // TODO
     }
 
-    @Value
-    private static class UpdateRouteLocationParams {
-        long routeLocationId;
-        long routeId;
-        @Nullable
-        Timestamp arrivalTime;
-        @Nullable
-        Timestamp exitTime;
-        @Nullable
-        Double lng;
-        @Nullable
-        Double lat;
-    }
 
     @GetMapping("/truck/route/locations/{routeId}")
     public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
         return routeService.findRouteLocationByRouteId(routeId);
     }
 
-    @PostMapping("/truck/route/locations/{routeId}")
-    public void updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
-        routeService.updateLocations(data.stream()
-                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
-                .collect(Collectors.toList()))
-        ;
+    @Value
+    private static class UpdateRouteLocationParams {
+        long routeLocationId;
+        long routeId;
+        @NonNull
+        Instant arrivalTime;
+        @NonNull
+        Instant exitTime;
+        double lng;
+        double lat;
     }
 
-    @DeleteMapping("/truck/route/locations/{routeId}")
-    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
-        routeService.deleteLocations(data.stream()
-                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
-                .collect(Collectors.toList()))
-        ;
+    @PostMapping("/truck/route/locations/{routeId}")
+    public boolean updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
+        // TODO check permissions
+        boolean good = true;
+        for (var d : data) {
+            if (!routeService.updateLocation(d.routeId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+                good = false;
+        }
+        return good;
+    }
+
+    @DeleteMapping("/truck/route/locations")
+    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @RequestBody @NonNull List<Long> locationIds) {
+        // TODO check permissions
+        for (long l : locationIds) {
+            routeService.deleteLocation(l);
+        }
     }
 
     @GetMapping("truck/owner/{userId}")
