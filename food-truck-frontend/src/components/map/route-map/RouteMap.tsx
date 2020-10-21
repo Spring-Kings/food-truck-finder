@@ -17,6 +17,7 @@ import {
   backendToFrontend,
   frontendToBackend,
 } from "./RouteStop";
+import TruckRouteMapComponent from "..";
 
 interface RouteMapProps {
   routeId: number;
@@ -104,28 +105,16 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
           cancel={() => this.setState({ currentEdit: undefined })}
           delete={this.delete}
         />
-        <LoadScript googleMapsApiKey={key as string}>
-          <GoogleMap
-            mapContainerStyle={{
-              height: "100vh",
-              width: "100%",
-            }}
-            zoom={10}
-            center={this.state.mapCenter}
-            onClick={this.addPoint}
-          >
-            {this.state.routePts.flatMap((pt) => (
-              <Marker
-                key={pt.stopId}
-                draggable={true}
-                position={pt.coords}
-                onDragEnd={(e: any) => this.editPointLoc(pt.stopId, e.latLng)}
-                onClick={(e) => this.initiateEditPointTimes(pt)}
-              />
-            ))}
-            <Polyline path={this.state.routePts.flatMap((pt) => pt.coords)} />
-          </GoogleMap>
-        </LoadScript>
+        <TruckRouteMapComponent
+          routePts={this.state.routePts}
+          onDrag={(pt: RouteStop, e: any) =>
+            this.editPointLoc(pt.stopId, e.latLng)
+          }
+          onMarkerClick={(pt: RouteStop, e: any) =>
+            this.initiateEditPointTimes(pt)
+          }
+          onMapClick={(e: any) => this.addPoint(e)}
+        />
       </Container>
     );
   }
