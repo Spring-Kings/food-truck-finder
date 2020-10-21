@@ -196,7 +196,7 @@ public class TruckEndpoint {
 
     @Value
     private static class UpdateRouteLocationParams {
-        long routeLocationId;
+        Long routeLocationId;
         long routeId;
         @NonNull
         Instant arrivalTime;
@@ -211,7 +211,7 @@ public class TruckEndpoint {
         // TODO check permissions
         boolean good = true;
         for (var d : data) {
-            if (!routeService.updateLocation(d.routeId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+            if (!routeService.updateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
                 good = false;
         }
         return good;

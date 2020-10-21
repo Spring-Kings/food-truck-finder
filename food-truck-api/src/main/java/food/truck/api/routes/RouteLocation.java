@@ -1,5 +1,6 @@
 package food.truck.api.routes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class RouteLocation {
 
     @ManyToOne // many locations to one route
     @JoinColumn(name = "route_id", nullable = false)
+    @JsonIgnoreProperties("locations")
     Route route;
 
     @Column(name = "arrival_time", nullable = false)

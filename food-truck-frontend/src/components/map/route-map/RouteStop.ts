@@ -42,7 +42,7 @@ export const backendToFrontend = (pt: any, stopId: number) => ({
 
 export const frontendToBackend = (pt: RouteStop, routeId: number) => ({
   routeId: routeId,
-  routeLocationId: pt.routeLocationId,
+  routeLocationId: pt.routeLocationId > 0? pt.routeLocationId : null,
   arrivalTime: pt.arrivalTime,
   exitTime: pt.exitTime,
   lng: pt.coords.lng,

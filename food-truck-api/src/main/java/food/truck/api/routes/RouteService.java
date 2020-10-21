@@ -68,7 +68,14 @@ public class RouteService {
         return routeLocationRepository.save(routeLoc);
     }
 
-    public boolean updateLocation(long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public boolean updateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+        // If the location doesn't exist, make a new one
+        if (locId == null) {
+            createLocation(routeId, lat, lng, arrivalTime, exitTime);
+            return true;
+        }
+
+        // Otherwise, update the old one
         var l = routeLocationRepository.findById(locId);
         if (l.isEmpty())
             return false;

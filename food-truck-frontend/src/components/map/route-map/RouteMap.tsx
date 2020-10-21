@@ -56,41 +56,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   componentDidMount() {
-    // get location
-    navigator.geolocation.getCurrentPosition((location) => {
-      this.setState({
-        mapCenter: {
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        },
-      });
-    });
-
-    // Load route
-    api
-      .request({
-        url: `/truck/route/locations/${this.props.routeId}`,
-        method: "GET",
-      })
-      .then((response) => {
-        if (response.data != undefined) {
-          var nextStopId: number = 1;
-
-          // Map backend structure to frontend structure
-          var routePts: RouteStop[] = response.data.map((pt: any) =>
-            backendToFrontend(pt, nextStopId++)
-          );
-          this.setState({
-            routePts,
-            nextStopId,
-          });
-        }
-      })
-      .catch((err) => {
-        // Temporary measure: kick back to home
-        console.log(err);
-        Router.replace("/");
-      });
+    this.loadRoute();
   }
 
   render() {
@@ -116,6 +82,45 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         />
       </Container>
     );
+  }
+
+  private loadRoute() {
+    // get location
+    navigator.geolocation.getCurrentPosition((location) => {
+      this.setState({
+        mapCenter: {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        },
+      });
+    });
+
+    // Load route
+    api
+      .request({
+        url: `/truck/route/locations/${this.props.routeId}`,
+        method: "GET",
+      })
+      .then((response) => {
+        if (response.data != undefined) {
+          var nextStopId: number = 1;
+
+          // Map backend structure to frontend structure
+          console.log(response.data);
+          var routePts: RouteStop[] = response.data.map((pt: any) =>
+            backendToFrontend(pt, nextStopId++)
+          );
+          this.setState({
+            routePts,
+            nextStopId,
+          });
+        }
+      })
+      .catch((err) => {
+        // Temporary measure: kick back to home
+        console.log(err);
+        Router.replace("/");
+      });
   }
 
   private addPoint(e: any) {
@@ -221,6 +226,9 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
           method: "DELETE",
         })
         .catch((err) => console.log(err));
+
+    // Reload from backend
+    this.loadRoute();
   }
 
   private mapMultipleFrontendToBackend(rp: RouteStop[]) {

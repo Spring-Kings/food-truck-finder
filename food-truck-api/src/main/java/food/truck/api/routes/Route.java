@@ -1,5 +1,6 @@
 package food.truck.api.routes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import food.truck.api.truck.Truck;
 import lombok.Data;
 
@@ -29,6 +30,7 @@ public class Route {
     boolean active;
 
     @OneToMany(mappedBy = "route")
+    @JsonIgnoreProperties("route")
     List<RouteLocation> locations;
 
     @ElementCollection
