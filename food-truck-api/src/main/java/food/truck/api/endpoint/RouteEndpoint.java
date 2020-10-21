@@ -2,7 +2,6 @@ package food.truck.api.endpoint;
 
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
-import food.truck.api.routes.WeekDay;
 import food.truck.api.user.User;
 import lombok.NonNull;
 import lombok.Value;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +22,7 @@ public class RouteEndpoint {
     private RouteService routeService;
 
     @GetMapping("/route/{routeId}/days")
-    public Set<WeekDay> getRouteDays(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+    public Set<DayOfWeek> getRouteDays(@AuthenticationPrincipal User u, @PathVariable long routeId) {
         return routeService.findRouteDaysByRouteId(routeId);
     }
 
@@ -39,9 +39,9 @@ public class RouteEndpoint {
 
     @PostMapping("/route/add-day")
     public boolean addDayToRoute(@AuthenticationPrincipal User u, @RequestBody AddRouteDayParams rd) {
-        WeekDay w;
+        DayOfWeek w;
         try {
-            w = WeekDay.valueOf(rd.day_name);
+            w = DayOfWeek.valueOf(rd.day_name);
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -56,9 +56,9 @@ public class RouteEndpoint {
 
     @PostMapping("/route/remove-day")
     public boolean removeDayFromRoute(@AuthenticationPrincipal User u, @RequestBody RemoveRouteDayParams rd) {
-        WeekDay w;
+        DayOfWeek w;
         try {
-            w = WeekDay.valueOf(rd.day_name);
+            w = DayOfWeek.valueOf(rd.day_name);
         } catch (IllegalArgumentException e) {
             return false;
         }

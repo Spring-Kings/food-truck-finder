@@ -4,6 +4,7 @@ import food.truck.api.truck.Truck;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.DayOfWeek;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +26,11 @@ public class Route {
     String routeName;
 
     @Column(name = "active", nullable = false)
-    char active;
+    boolean active;
 
     @OneToMany(mappedBy = "route")
     List<RouteLocation> locations;
 
     @ElementCollection
-    Set<WeekDay> days = EnumSet.noneOf(WeekDay.class);
+    Set<DayOfWeek> days = EnumSet.noneOf(DayOfWeek.class);
 }

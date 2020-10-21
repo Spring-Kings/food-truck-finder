@@ -4,6 +4,7 @@ import food.truck.api.truck.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class RouteService {
         return routeRepository.findOneByRouteId(id);
     }
 
-    public Route createRoute(Truck truck, String routeName, char active) {
+    public Route createRoute(Truck truck, String routeName, boolean active) {
         Route route = new Route();
         route.setRouteName(routeName);
         route.setTruck(truck);
@@ -33,7 +34,7 @@ public class RouteService {
         return routeRepository.save(route);
     }
 
-    public boolean addDayToRoute(long routeId, WeekDay w) {
+    public boolean addDayToRoute(long routeId, DayOfWeek w) {
         var r = findRouteById(routeId);
         if (r.isEmpty())
             return false;
@@ -45,7 +46,7 @@ public class RouteService {
         return true;
     }
 
-    public boolean removeDayFromRoute(long routeId, WeekDay w) {
+    public boolean removeDayFromRoute(long routeId, DayOfWeek w) {
         var r = findRouteById(routeId);
         if (r.isEmpty())
             return false;
@@ -84,7 +85,7 @@ public class RouteService {
         routeLocationRepository.deleteById(locId);
     }
 
-    public Set<WeekDay> findRouteDaysByRouteId(long routeId) {
+    public Set<DayOfWeek> findRouteDaysByRouteId(long routeId) {
         return findRouteById(routeId)
                 .map(Route::getDays)
                 .orElse(null); // TODO: what to do if not found?

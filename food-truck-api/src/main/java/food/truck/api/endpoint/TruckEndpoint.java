@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -184,7 +185,7 @@ public class TruckEndpoint {
         if (truck.isEmpty()) {
             return new Route();
         }
-        return routeService.createRoute(truck.get(), data.routeName, data.active); // TODO
+        return routeService.createRoute(truck.get(), data.routeName, Character.toUpperCase(data.active) == 'Y'); // TODO
     }
 
 
@@ -227,5 +228,10 @@ public class TruckEndpoint {
     @GetMapping("truck/owner/{userId}")
     public List<Truck> getTrucksByUser(@AuthenticationPrincipal User u, @PathVariable long userId) {
         return truckService.findTruck(userId);
+    }
+
+    @GetMapping("/truck/{truckId}/active-route")
+    public Route getTodaysRoute(@PathVariable long truckId) {
+        return truckService.getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
     }
 }

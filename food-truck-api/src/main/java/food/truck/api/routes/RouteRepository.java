@@ -8,8 +8,7 @@ import java.util.Optional;
 
 public interface RouteRepository extends JpaRepository<Route, Long> {
     Optional<Route> findOneByRouteId(Long id);
-
     List<Route> findByTruck(Truck truck);
 
-    void deleteByRouteId(long routeId);
+    List<Route> findByTruckId(long truckId);
 }

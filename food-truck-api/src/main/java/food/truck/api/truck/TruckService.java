@@ -1,9 +1,12 @@
 package food.truck.api.truck;
 
+import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteRepository;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +14,8 @@ import java.util.Optional;
 public class TruckService {
     @Autowired
     private TruckRepository truckRepository;
+    @Autowired
+    private RouteRepository routeRepository;
 
     public List<Truck> findTruck(String name) {
         return truckRepository.findByName(name);
@@ -60,5 +65,12 @@ public class TruckService {
         truck.setSchedule(schedule.orElse(null));
         truck.setFoodCategory(foodCategory.orElse(null));
         return saveTruck(truck);
+    }
+
+    public Route getActiveRoute(long truckId, DayOfWeek w) {
+        return routeRepository.findByTruckId(truckId).stream()
+                .filter(r -> r.isActive() && r.getDays().contains(w))
+                .findFirst()
+                .orElse(null);
     }
 }
