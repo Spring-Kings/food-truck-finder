@@ -40,7 +40,7 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
     componentDidMount() {
         api.get(`/route/${this.props.routeId}/days`)
             .then(res => {
-                this.setState({daysData: res.data});
+                this.setState({daysData: res.data? res.data : []});
             })
             .catch(err => {
                 console.log(err.toString());

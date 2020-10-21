@@ -217,7 +217,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       await api
         .request({
           url: `/truck/route/locations/${this.props.routeId}`,
-          data: this.mapMultipleFrontendToBackend(this.state.trashedPts),
+          data: this.state.trashedPts.flatMap(pt => pt.routeLocationId),
           method: "DELETE",
         })
         .catch((err) => console.log(err));
