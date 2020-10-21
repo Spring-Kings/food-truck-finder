@@ -20,7 +20,7 @@ import {
   IconButton,
 } from "@material-ui/core";
 import { Edit } from "@material-ui/icons";
-import GoogleMapComponent from "../../map";
+import TruckRouteMapComponent from "../../map";
 
 import TruckListComponent from "../TruckListComponent";
 import { SimpleTruck, UserData } from "../../../redux/user/UserReducer";
@@ -155,7 +155,7 @@ class OwnerDashboardComponent extends React.Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <GoogleMapComponent />
+            <TruckRouteMapComponent routePts={[]} />
           </GridListTile>
         </GridList>
       </React.Fragment>

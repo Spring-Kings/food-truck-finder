@@ -1,2 +1,2 @@
-import { GoogleMapComponent } from "./truck_location_map/TruckLocationMap";
-export default GoogleMapComponent;
+import { TruckRouteMapComponent } from "./truck_location_map/TruckRouteMapComponent";
+export default TruckRouteMapComponent;

@@ -1,10 +1,19 @@
-import React, { Component } from 'react'
-import {Button, Container, List, ListItem, Typography} from "@material-ui/core";
+import React, { Component } from "react";
+import {
+  Button,
+  Container,
+  Grid,
+  List,
+  ListItem,
+  Typography,
+} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
 import getUserInfo from "../util/token";
+import TruckRouteMapComponent from "./map";
+import { RouteStop } from "./map/route-map/RouteStop";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -16,7 +25,7 @@ export const userCanEditTruck = (truckOwnerId: number): boolean => {
     }
   }
   return false;
-}
+};
 
 export interface TruckState {
   id: number;
@@ -35,10 +44,12 @@ interface TruckViewState {
 }
 
 export interface TruckProps {
-    truckId: number;
+  truckId: number;
 }
 
-type State = TruckState & TruckViewState;
+type State = TruckState & TruckViewState & {
+  routePts: RouteStop[]
+};
 
 class TruckView extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
@@ -53,17 +64,19 @@ class TruckView extends Component<TruckProps, State> {
       priceRating: null,
       foodCategory: null,
       textMenu: null,
+      routePts: []
     };
   }
 
   componentDidMount() {
-    api.get(`/truck/${this.props.truckId}`, {})
-      .then(res => this.setState(res ? res.data : null))
-      .catch(err => {
+    api
+      .get(`/truck/${this.props.truckId}`, {})
+      .then((res) => this.setState(res ? res.data : null))
+      .catch((err) => {
         if (err.response) {
-          console.log('Got error response code');
+          console.log("Got error response code");
         } else if (err.request) {
-          console.log('Did not receive Truck response');
+          console.log("Did not receive Truck response");
         } else {
           console.log(err);
         }
@@ -73,19 +86,18 @@ class TruckView extends Component<TruckProps, State> {
 
   render() {
     if (!this.state) {
-      return (
-        <NotFound/>
-      );
+      return <NotFound />;
     } else if (this.state.id < 1) {
       return (
         <Container>
-          <CircularProgress/>
+          <CircularProgress />
         </Container>
       );
     }
 
     return (
-      <>
+      <Grid container direction="row">
+        <Grid item xs>
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
           <ListItem>
@@ -107,14 +119,17 @@ class TruckView extends Component<TruckProps, State> {
                   onClick={this.editTruck}>
             Edit
           </Button>
-        }
-      </>
+        }        </Grid>
+        <Grid item xs>
+          <TruckRouteMapComponent routePts={[]} />
+        </Grid>
+      </Grid>
     );
   }
 
   editTruck = () => {
     Router.replace(`/truck/edit/${this.state.id}`);
-  }
+  };
 }
 
 export default TruckView;
