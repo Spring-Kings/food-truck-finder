@@ -8,6 +8,7 @@ import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
   loadRouteLocations,
+  updateRouteDays,
   updateRouteLocations,
 } from "../../../api/RouteLocation";
 import {
@@ -30,6 +31,7 @@ interface RouteMapState {
   trashedPts: RouteLocation[];
   nextStopId: number;
   days: DayOfWeek[];
+  trashedDays: DayOfWeek[];
   currentEdit: RouteLocation | undefined;
   canSave: boolean;
 
@@ -49,6 +51,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       nextStopId: 1,
       currentEdit: undefined,
       days: [],
+      trashedDays: [],
       canSave: true
 
     };
@@ -67,8 +70,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.loadRoute();
   }
 
-  saveDays(d: DayOfWeek[]){
-    this.setState({days: d});
+  saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]){
+    this.setState({days, trashedDays});
   }
 
   render() {
@@ -207,12 +210,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({canSave: false});
 
     // Update in backend
-    this.state.days.forEach(v => {
-        api.post(`/route/add-day`,{
-          routeId: this.props.routeId,
-          day_name: v
-        }).catch((err) => console.log(err));
-    });
+    updateRouteDays(this.props.routeId, this.state.days, this.state.trashedDays);
 
     if (this.state.routePts.length !== 0)
       await updateRouteLocations(

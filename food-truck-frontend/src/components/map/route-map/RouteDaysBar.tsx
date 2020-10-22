@@ -6,13 +6,14 @@ import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
 
 type RouteDaysBarProps = {
     routeId: number
-    func: (days: DayOfWeek[]) => void
+    func: (days: DayOfWeek[], discarded: DayOfWeek[]) => void
 }
 
 
 
 type RouteDaysBarState = {
     days: DayOfWeek[];
+    discarded: DayOfWeek[];
 }
 
 class RouteDaysBar extends React.Component<RouteDaysBarProps, RouteDaysBarState>{
@@ -21,7 +22,8 @@ class RouteDaysBar extends React.Component<RouteDaysBarProps, RouteDaysBarState>
         super(props);
 
         this.state = {
-            days: []
+            days: [],
+            discarded: []
         }
     }
 
@@ -43,19 +45,33 @@ class RouteDaysBar extends React.Component<RouteDaysBarProps, RouteDaysBarState>
         )
     }
 
-    private getDayBox = (name: DayOfWeek) => (
-        <FormControlLabel
-                    checked={this.state.days.find(day => day === name) != undefined}
-                    control={<Checkbox onChange={(event) => {
-                        this.setState({
-                            days: event.target.checked?
-                                this.state.days.concat(name) : this.state.days.filter(day => day != name)
-                        });
-                        this.props.func(this.state.days);
-                    }} />}
-                    label={name}
-                />
-    )
+    private getDayBox = (name: DayOfWeek) => {
+        const findDay = (day: DayOfWeek) => day === name;
+        return (<FormControlLabel
+            checked={this.state.days.findIndex(findDay) != -1}
+            control={<Checkbox onChange={(event) => {
+                let newDays: DayOfWeek[] = this.state.days;
+                let discarded: DayOfWeek[] = this.state.discarded;
+
+                // Create new state lists
+                if (event.target.checked) {
+                    discarded = discarded.filter(findDay);
+                    newDays = newDays.concat(name);
+                } else {
+                    newDays = newDays.filter(day => !findDay(day));
+                    discarded = discarded.concat(name);
+                }
+
+                // Update state
+                this.setState({
+                    days: newDays,
+                    discarded: discarded
+                });
+                this.props.func(newDays, discarded);
+            }} />}
+            label={name}
+        />)
+    }
 }
 
 export default RouteDaysBar;

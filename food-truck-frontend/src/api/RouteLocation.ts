@@ -4,6 +4,7 @@ import {
   frontendToBackend,
   RouteLocation,
 } from "../components/map/route-map/RouteLocation";
+import DayOfWeek from "../components/map/route-map/DayOfWeek";
 
 export const loadTodaysRoute = async (
   truckId: number,
@@ -80,4 +81,39 @@ export const deleteRouteLocations = async (
     })
     .then(onSuccess)
     .catch(onFail);
+};
+
+export const updateRouteDays = async (
+  routeId: number,
+  days: DayOfWeek[],
+  trashedDays: DayOfWeek[],
+  onSuccess?: (res: any) => void,
+  onFail?: (res: any) => void
+) => {
+  await updateDayList(routeId, days, `/route/add-day`, onSuccess, onFail);
+  await updateDayList(
+    routeId,
+    trashedDays,
+    `/route/remove-day`,
+    onSuccess,
+    onFail
+  );
+};
+
+const updateDayList = async (
+  routeId: number,
+  days: DayOfWeek[],
+  url: string,
+  onSuccess?: (res: any) => void,
+  onFail?: (res: any) => void
+) => {
+  days.forEach(async (v) => {
+    await api
+      .post(url, {
+        routeId: routeId,
+        day_name: v,
+      })
+      .then(onSuccess)
+      .catch(onFail);
+  });
 };
