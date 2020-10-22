@@ -15,6 +15,9 @@ import getUserInfo from "../util/token";
 import TruckRouteMapComponent from "./map";
 import { RouteStop } from "./map/route-map/RouteStop";
 
+import { DEFAULT_ERR_RESP } from "../api/DefaultResponses";
+import { loadTodaysRoute } from "../api/RouteLocation";
+
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
   if (user) {
@@ -68,7 +71,7 @@ class TruckView extends Component<TruckProps, State> {
     };
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     api
       .get(`/truck/${this.props.truckId}`, {})
       .then((res) => this.setState(res ? res.data : null))
@@ -82,6 +85,9 @@ class TruckView extends Component<TruckProps, State> {
         }
         this.setState(null);
       });
+
+    // Load today's route
+    this.setState({ routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP) });
   }
 
   render() {
@@ -121,7 +127,7 @@ class TruckView extends Component<TruckProps, State> {
           </Button>
         }        </Grid>
         <Grid item xs>
-          <TruckRouteMapComponent routePts={[]} />
+          <TruckRouteMapComponent routePts={this.state.routePts} />
         </Grid>
       </Grid>
     );

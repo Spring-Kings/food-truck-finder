@@ -5,6 +5,28 @@ import {
   RouteStop,
 } from "../components/map/route-map/RouteStop";
 
+export const loadTodaysRoute = async (
+  truckId: number,
+  onFail?: (res: any) => void
+) => {
+  var routePts: RouteStop[] = [];
+  var nextStopId: number = 1;
+
+  await api
+    .request({
+      url: `/truck/${truckId}/active-route`,
+      method: "GET",
+    })
+    .then((response) => {
+      if (response.data)
+        routePts = response.data.map((pt: any) =>
+          backendToFrontend(pt, nextStopId++)
+        );
+    })
+    .catch(onFail);
+  return routePts;
+};
+
 export const loadRouteLocations = async (
   routeId: number,
   onFail?: (res: any) => void
@@ -18,9 +40,6 @@ export const loadRouteLocations = async (
     .then((response: any) => {
       if (response.data != undefined) {
         var nextStopId: number = 1;
-
-        // Map backend structure to frontend structure
-        console.log(response.data);
         routePts = response.data.map((pt: any) =>
           backendToFrontend(pt, nextStopId++)
         );
