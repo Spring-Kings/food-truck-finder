@@ -90,12 +90,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         />
         <TruckRouteMapComponent
           routePts={this.state.routePts}
-          onDrag={(pt: RouteLocation, e: any) =>
-            this.editPointLoc(pt.stopId, e.latLng)
-          }
-          onMarkerClick={(pt: RouteLocation, e: any) =>
-            this.initiateEditPointTimes(pt)
-          }
+          onDrag={this.editPointLoc}
+          onMarkerClick={this.initiateEditPointTimes}
           onMapClick={(e: any) => this.addPoint(e)}
         />
       </Container>
@@ -141,13 +137,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
   }
 
-  private editPointLoc(stopId: number, newPos: LatLngLiteral) {
+  private editPointLoc(edit_pt: RouteLocation, newPos: LatLngLiteral) {
     this.setState({
       routePts: this.state.routePts.map((pt) => {
-        if (pt.stopId == stopId)
+        if (pt.stopId == edit_pt.stopId)
           return {
             ...pt,
-            stopId: stopId,
+            stopId: edit_pt.stopId,
             coords: newPos,
           };
         else return pt;
@@ -170,7 +166,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
   }
 
-  private initiateEditPointTimes(pt: RouteLocation) {
+  private initiateEditPointTimes(pt: RouteLocation, _: LatLngLiteral) {
     this.setState({
       currentEdit: pt,
     });

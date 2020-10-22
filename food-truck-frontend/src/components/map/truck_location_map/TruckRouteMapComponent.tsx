@@ -10,15 +10,11 @@ import {
 } from "@react-google-maps/api/dist";
 import { RouteLocation } from "../route-map/RouteLocation";
 
-interface MapMouseEvent {
-  latLng: LatLng;
-}
-
 interface MapProps {
   routePts: RouteLocation[];
-  onDrag?: (pt: RouteLocation, e: MapMouseEvent) => void;
-  onMarkerClick?: (pt: RouteLocation, e: MapMouseEvent) => void;
-  onMapClick?: (e: MapMouseEvent) => void;
+  onDrag?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
+  onMarkerClick?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
+  onMapClick?: (latLng: LatLngLiteral) => void;
 }
 interface MapState {
   coordinates: LatLngLiteral;
@@ -82,6 +78,6 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
   }
 
   private trigger(toTrigger: ((pt: RouteLocation, e: any) => any) | undefined, pt: RouteLocation, e: any) {
-    if (toTrigger) toTrigger(pt, e);
+    if (toTrigger) toTrigger(pt, { lat: e.latLng.lat(), lng: e.latLng.lng() });
   }
 }
