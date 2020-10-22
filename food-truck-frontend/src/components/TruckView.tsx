@@ -40,6 +40,7 @@ export interface TruckState {
   // menu: string | null;
   textMenu: string | null;
   // schedule: string | null;
+  routePts: RouteLocation[];
 }
 
 interface TruckViewState {
@@ -50,9 +51,7 @@ export interface TruckProps {
   truckId: number;
 }
 
-type State = TruckState & TruckViewState & {
-  routePts: RouteLocation[]
-};
+type State = TruckState & TruckViewState;
 
 class TruckView extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
@@ -72,7 +71,7 @@ class TruckView extends Component<TruckProps, State> {
   }
 
   async componentDidMount() {
-    api
+    await api
       .get(`/truck/${this.props.truckId}`, {})
       .then((res) => this.setState(res ? res.data : null))
       .catch((err) => {

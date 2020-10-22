@@ -19,7 +19,7 @@ export const loadTodaysRoute = async (
     })
     .then((response) => {
       if (response.data)
-        routePts = response.data.map((pt: any) =>
+        routePts = response.data.locations.map((pt: any) =>
           backendToFrontend(pt, nextStopId++)
         );
     })
