@@ -2,6 +2,7 @@ package food.truck.api.truck;
 
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteRepository;
+import food.truck.api.routes.RouteService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import java.util.Optional;
 public class TruckService {
     @Autowired
     private TruckRepository truckRepository;
+    @Autowired
+    private RouteService routeService;
     @Autowired
     private RouteRepository routeRepository;
 
@@ -40,20 +43,24 @@ public class TruckService {
         return saveTruck(t);
     }
 
-    public void deleteTruck(Long truckId) {
-        truckRepository
-            .findById(truckId)
-            .ifPresent(truckRepository::delete);
+    public void deleteTruck(long truckId) {
+        var t = truckRepository.findById(truckId);
+        if (t.isEmpty())
+            return;
+        Truck truck = t.get();
+        routeService.findRouteByTruck(truck)
+                .forEach(r -> routeService.deleteRoute(r.getRouteId()));
+        truckRepository.delete(truck);
     }
 
     public Truck updateTruck(
-        @NonNull
-        Truck truck,
-        Optional<String> name,
-        Optional<byte[]> menu,
-        Optional<String> textMenu,
-        Optional<Long> priceRating,
-        Optional<String> description,
+            @NonNull
+                    Truck truck,
+            Optional<String> name,
+            Optional<byte[]> menu,
+            Optional<String> textMenu,
+            Optional<Long> priceRating,
+            Optional<String> description,
         Optional<byte[]> schedule,
         Optional<String> foodCategory
     ) {
