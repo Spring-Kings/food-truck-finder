@@ -1,6 +1,8 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.FoodTruckApplication;
+import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteService;
 import food.truck.api.security.SecurityMethods;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
@@ -34,7 +36,9 @@ public class EndpointTest {
     @Autowired
     protected TruckService truckService;
     @Autowired
-    DataSource dataSource;
+    protected RouteService routeService;
+    @Autowired
+    private DataSource dataSource;
     @LocalServerPort
     private int port;
 
@@ -46,6 +50,7 @@ public class EndpointTest {
     protected User owner;
     protected User standardUser;
     protected Truck testTruck;
+    protected Route testRoute;
 
     @BeforeEach
     public void setup() {
@@ -78,6 +83,7 @@ public class EndpointTest {
         standardUser = userService.createUser("standardUser", "password", "aaa@aaa", false);
         owner = userService.createUser("owner", "password", "bbb@bbb", true);
         testTruck = truckService.createTruck(owner.getId(), "testTruck");
+        testRoute = routeService.createRoute(testTruck, "testRoute", 'Y');
     }
 
     @AfterEach

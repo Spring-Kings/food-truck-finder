@@ -1,11 +1,21 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.routes.Route;
 import food.truck.api.truck.Truck;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TruckEndpointTest extends EndpointTest {
+    @Test
+    public void getTruck() {
+        guestClient.get()
+                .uri("/truck/{id}", testTruck.getId())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Truck.class);
+    }
+
     @Test
     public void createTruck() {
         Truck result = ownerClient.post()
@@ -20,6 +30,17 @@ public class TruckEndpointTest extends EndpointTest {
         assertEquals(result.getName(), "truck1");
     }
 
+    // TODO: Deny or promote to truck owner?
+    @Test
+    public void createTruckAsStandardUser() {
+        standardUserClient.post()
+                .uri("/truck/create")
+                .bodyValue(new TruckEndpoint.CreateTruckParams("truck1"))
+                .exchange()
+                .expectStatus().isForbidden();
+        assertTrue(truckService.findTruck("truck1").isEmpty());
+    }
+
     @Test
     public void deleteTruck() {
         ownerClient.delete()
@@ -28,6 +49,32 @@ public class TruckEndpointTest extends EndpointTest {
                 .expectStatus().isOk();
 
         assertEquals(0, truckService.findTruck(testTruck.getName()).size());
+    }
+
+    @Test
+    public void deleteTruckUnowned() {
+        standardUserClient.delete()
+                .uri("/truck/delete/{id}", testTruck.getId())
+                .exchange()
+                .expectStatus().isForbidden();
+        assertEquals(1, truckService.findTruck(testTruck.getName()).size());
+    }
+
+    @Test
+    public void getOwnTruck() {
+        ownerClient.get()
+                .uri("/truck/owner")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(Truck.class).contains(testTruck);
+    }
+
+    @Test
+    public void getOwnTruckStandardUser() {
+        standardUserClient.get()
+                .uri("/truck/owner")
+                .exchange()
+                .expectStatus().isForbidden();
     }
 
     @Test
@@ -53,11 +100,22 @@ public class TruckEndpointTest extends EndpointTest {
     }
 
     @Test
-    public void getTruck() {
+    public void updateTruckUnowned() {
+        standardUserClient.put()
+                .uri("/truck/update")
+                .bodyValue(new TruckEndpoint.UpdateTruckParams(testTruck.getId(), "truck1337", "a cool truck",
+                        3L, null, null, null, null))
+                .exchange()
+                .expectStatus().isForbidden();
+    }
+
+    @Test
+    public void getRoutes() {
         guestClient.get()
-                .uri("/truck/{id}", testTruck.getId())
+                .uri("/truck/{id}/routes", testTruck.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Truck.class);
+                .expectBodyList(Route.class).contains(testRoute);
     }
+
 }
