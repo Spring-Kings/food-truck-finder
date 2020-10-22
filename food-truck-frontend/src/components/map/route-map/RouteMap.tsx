@@ -18,6 +18,7 @@ import {
 } from "../../../api/DefaultResponses";
 import RouteDaysBar from "./RouteDaysBar";
 import api from "../../../util/api";
+import DayOfWeek from "./DayOfWeek";
 
 
 interface RouteMapProps {
@@ -28,7 +29,7 @@ interface RouteMapState {
   routePts: RouteLocation[];
   trashedPts: RouteLocation[];
   nextStopId: number;
-  days: string[];
+  days: DayOfWeek[];
   currentEdit: RouteLocation | undefined;
   canSave: boolean;
 
@@ -66,7 +67,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.loadRoute();
   }
 
-  saveDays(d: string[]){
+  saveDays(d: DayOfWeek[]){
     this.setState({days: d});
   }
 
@@ -74,7 +75,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     return (
       <Container>
         <Button disabled={!this.state.canSave} onClick={this.save}>SAVE</Button>
-        <RouteDaysBar func={this.saveDays}/>
+        <RouteDaysBar routeId={this.props.routeId} func={this.saveDays}/>
 
 
         <EditRouteStopDialogComponent
@@ -207,13 +208,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
     // Update in backend
     this.state.days.forEach(v => {
-      if(this.state.days.length != 0){
         api.post(`/route/add-day`,{
           routeId: this.props.routeId,
           day_name: v
         }).catch((err) => console.log(err));
-      }
-    })
+    });
 
     if (this.state.routePts.length !== 0)
       await updateRouteLocations(
