@@ -1,33 +1,40 @@
 import React from "react";
-import Router from "next/router";
 
 import { LatLngLiteral } from "@google/maps";
 import { Button, Container } from "@material-ui/core";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  Polyline,
-} from "@react-google-maps/api/dist";
-import api from "../../../util/api";
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
+import { RouteLocation, RouteLocationState } from "./RouteLocation";
+import TruckRouteMapComponent from "..";
 import {
-  RouteStop,
-  RoutePointState,
-  backendToFrontend,
-  frontendToBackend,
-} from "./RouteStop";
+  deleteRouteLocations,
+  loadRouteLocations,
+  updateRouteDays,
+  updateRouteLocations,
+} from "../../../api/RouteLocation";
+import {
+
+  DEFAULT_ERR_KICK,
+  DEFAULT_ERR_RESP,
+  DEFAULT_OK_RESP as DEFAULT_NOOP,
+} from "../../../api/DefaultResponses";
+import RouteDaysBar from "./RouteDaysBar";
+import api from "../../../util/api";
+import DayOfWeek from "./DayOfWeek";
+
 
 interface RouteMapProps {
   routeId: number;
 }
 interface RouteMapState {
   mapCenter: LatLngLiteral;
-  routePts: RouteStop[];
-  trashedPts: RouteStop[];
+  routePts: RouteLocation[];
+  trashedPts: RouteLocation[];
   nextStopId: number;
+  days: DayOfWeek[];
+  trashedDays: DayOfWeek[];
+  currentEdit: RouteLocation | undefined;
+  canSave: boolean;
 
-  currentEdit: RouteStop | undefined;
 }
 
 class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
@@ -43,6 +50,10 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       trashedPts: [],
       nextStopId: 1,
       currentEdit: undefined,
+      days: [],
+      trashedDays: [],
+      canSave: true
+
     };
 
     // Bind
@@ -52,51 +63,24 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.delete = this.delete.bind(this);
     this.initiateEditPointTimes = this.initiateEditPointTimes.bind(this);
     this.save = this.save.bind(this);
+    this.saveDays = this.saveDays.bind(this);
   }
 
   componentDidMount() {
-    // get location
-    navigator.geolocation.getCurrentPosition((location) => {
-      this.setState({
-        mapCenter: {
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        },
-      });
-    });
+    this.loadRoute();
+  }
 
-    // Load route
-    api
-      .request({
-        url: `/truck/route/locations/${this.props.routeId}`,
-        method: "GET",
-      })
-      .then((response) => {
-        if (response.data != undefined) {
-          var nextStopId: number = 1;
-
-          // Map backend structure to frontend structure
-          var routePts: RouteStop[] = response.data.map((pt: any) =>
-            backendToFrontend(pt, nextStopId++)
-          );
-          this.setState({
-            routePts,
-            nextStopId,
-          });
-        }
-      })
-      .catch((err) => {
-        // Temporary measure: kick back to home
-        console.log(err);
-        Router.replace("/");
-      });
+  saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]){
+    this.setState({days, trashedDays});
   }
 
   render() {
-    var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container>
-        <Button onClick={this.save}>SAVE</Button>
+        <Button disabled={!this.state.canSave} onClick={this.save}>SAVE</Button>
+        <RouteDaysBar routeId={this.props.routeId} func={this.saveDays}/>
+
+
         <EditRouteStopDialogComponent
           key={this.state.currentEdit && this.state.currentEdit.stopId}
           routePt={this.state.currentEdit}
@@ -104,30 +88,35 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
           cancel={() => this.setState({ currentEdit: undefined })}
           delete={this.delete}
         />
-        <LoadScript googleMapsApiKey={key as string}>
-          <GoogleMap
-            mapContainerStyle={{
-              height: "100vh",
-              width: "100%",
-            }}
-            zoom={10}
-            center={this.state.mapCenter}
-            onClick={this.addPoint}
-          >
-            {this.state.routePts.flatMap((pt) => (
-              <Marker
-                key={pt.stopId}
-                draggable={true}
-                position={pt.coords}
-                onDragEnd={(e: any) => this.editPointLoc(pt.stopId, e.latLng)}
-                onClick={(e) => this.initiateEditPointTimes(pt)}
-              />
-            ))}
-            <Polyline path={this.state.routePts.flatMap((pt) => pt.coords)} />
-          </GoogleMap>
-        </LoadScript>
+        <TruckRouteMapComponent
+          routePts={this.state.routePts}
+          onDrag={this.editPointLoc}
+          onMarkerClick={this.initiateEditPointTimes}
+          onMapClick={(e: any) => this.addPoint(e)}
+        />
       </Container>
     );
+  }
+
+  private async loadRoute() {
+    // get location
+    var mapCenter: LatLngLiteral = {
+      lat: 0,
+      lng: 0
+    };
+    navigator.geolocation.getCurrentPosition((location) => {
+      mapCenter = {
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
+      };
+    });
+
+    // Load route
+    var routePts: RouteLocation[] = await loadRouteLocations(
+      this.props.routeId,
+      DEFAULT_ERR_KICK
+    );
+    this.setState({ mapCenter, routePts, nextStopId: routePts.length + 1 });
   }
 
   private addPoint(e: any) {
@@ -142,19 +131,19 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         },
         arrivalTime: new Date(),
         exitTime: new Date(),
-        state: RoutePointState.CREATED,
+        state: RouteLocationState.CREATED,
       }),
       nextStopId: id + 1,
     });
   }
 
-  private editPointLoc(stopId: number, newPos: LatLngLiteral) {
+  private editPointLoc(edit_pt: RouteLocation, newPos: LatLngLiteral) {
     this.setState({
       routePts: this.state.routePts.map((pt) => {
-        if (pt.stopId == stopId)
+        if (pt.stopId == edit_pt.stopId)
           return {
             ...pt,
-            stopId: stopId,
+            stopId: edit_pt.stopId,
             coords: newPos,
           };
         else return pt;
@@ -177,7 +166,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
   }
 
-  private initiateEditPointTimes(pt: RouteStop) {
+  private initiateEditPointTimes(pt: RouteLocation, _: LatLngLiteral) {
     this.setState({
       currentEdit: pt,
     });
@@ -190,11 +179,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
     // Remove the route stop and re-index
     var id: number = 1;
-    var result: RouteStop[];
-    var trash: RouteStop[] = this.state.trashedPts;
+    var result: RouteLocation[];
+    var trash: RouteLocation[] = this.state.trashedPts;
 
     // If the point is in the DB, save it for deletion
-    if (curr.state != RoutePointState.CREATED) trash = trash.concat(curr);
+    if (curr.state != RouteLocationState.CREATED) trash = trash.concat(curr);
 
     // Remove from the results array
     result = this.state.routePts
@@ -214,29 +203,31 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private async save() {
+    this.setState({canSave: false});
+
     // Update in backend
+    updateRouteDays(this.props.routeId, this.state.days, this.state.trashedDays);
+
     if (this.state.routePts.length !== 0)
-      await api
-        .request({
-          url: `/truck/route/locations/${this.props.routeId}`,
-          data: this.mapMultipleFrontendToBackend(this.state.routePts),
-          method: "POST",
-        })
-        .catch((err) => console.log(err));
+      await updateRouteLocations(
+        this.props.routeId,
+        this.state.routePts,
+        DEFAULT_NOOP,
+        DEFAULT_ERR_RESP
+      );
 
     // Delete in backend
     if (this.state.trashedPts.length !== 0)
-      await api
-        .request({
-          url: `/truck/route/locations/${this.props.routeId}`,
-          data: this.mapMultipleFrontendToBackend(this.state.trashedPts),
-          method: "DELETE",
-        })
-        .catch((err) => console.log(err));
-  }
+      await deleteRouteLocations(
+        this.props.routeId,
+        this.state.trashedPts,
+        DEFAULT_NOOP,
+        DEFAULT_ERR_RESP
+      );
 
-  private mapMultipleFrontendToBackend(rp: RouteStop[]) {
-    return rp.flatMap((pt) => frontendToBackend(pt, this.props.routeId));
+    // Reload from backend
+    await this.loadRoute();
+    this.setState({canSave: true});
   }
 }
 

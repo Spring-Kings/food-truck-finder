@@ -5,7 +5,9 @@ import {
   Typography,
 } from "@material-ui/core";
 import React from "react";
+import { DEFAULT_ERR_RESP } from "../../api/DefaultResponses";
 import api from "../../util/api";
+import DayOfWeek from "../map/route-map/DayOfWeek";
 import RouteListRow from "../RouteListRows";
 import CreateRouteDialog from "./CreateRouteDialog";
 
@@ -18,7 +20,8 @@ interface RouteListTruck {
 interface RouteListRouteInfo {
   routeId: number;
   routeName: string;
-  active: string;
+  active: boolean;
+  days: DayOfWeek[];
 }
 
 const TruckObject = {
@@ -32,7 +35,8 @@ const RouteObject = [
   {
     routeId: 0,
     routeName: "",
-    active: "",
+    active: false,
+    days: []
   },
 ];
 
@@ -61,6 +65,7 @@ class RouteList extends React.Component<RouteProps, RouteState> {
     this.newRoute = this.newRoute.bind(this);
     this.createSuccess = this.createSuccess.bind(this);
     this.createFailure = this.createFailure.bind(this);
+    this.toggleActive = this.toggleActive.bind(this);
   }
 
   componentDidMount() {
@@ -102,15 +107,34 @@ class RouteList extends React.Component<RouteProps, RouteState> {
       });
   }
 
+  private toggleActive(routeId: number, active: boolean) {
+    console.log(`toggle ${routeId} to ${active}`)
+    api
+      .request({
+        url: `/truck/${this.props.truckId}/update-route`,
+        method: "PUT",
+        data: { routeId: routeId, newActive: active }
+      }).then(r => {
+        this.setState({
+          routeData: this.state.routeData.map(r => r.routeId === routeId? {
+            ...r,
+            active: active
+          } : r)
+        });
+      }).catch(DEFAULT_ERR_RESP);
+  }
+
   renderRouteRow(index: number) {
     return (
       <RouteListRow
         active={this.state.routeData[index].active}
         routeId={this.state.routeData[index].routeId}
         routeName={this.state.routeData[index].routeName}
+        days={this.state.routeData[index].days}
         removeRow={() =>
           this.deleteRow(String(this.state.routeData[index].routeId))
         }
+        toggleActive={this.toggleActive}
       />
     );
   }
@@ -138,13 +162,17 @@ class RouteList extends React.Component<RouteProps, RouteState> {
           Create Route
         </Button>
         <table>
-          <tr>
-            <th>Route Name</th>
-            <th>Days</th>
-            <th>Active</th>
-          </tr>
+          <thead>
+            <tr>
+              <th>Route Name</th>
+              <th>Days</th>
+              <th>Active</th>
+            </tr>
+          </thead>
 
-          {this.state.routeData.map((_, index) => this.renderRouteRow(index))}
+          <tbody>
+            {this.state.routeData.map((_, index) => this.renderRouteRow(index))}
+          </tbody>
         </table>
       </div>
     );
