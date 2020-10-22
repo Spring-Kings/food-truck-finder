@@ -5,7 +5,7 @@ import { LatLngLiteral } from "@google/maps";
  * PERSISTED: Loaded from backend
  * DELETED: PERSISTED and deleted in the frontend
  */
-export enum RoutePointState {
+export enum RouteLocationState {
   CREATED,
   PERSISTED,
   DELETED,
@@ -16,16 +16,16 @@ export enum RoutePointState {
 // / Lat/Lng => LatLngLiteral
 // + Added stopId
 // + Added state
-export interface RouteStop {
+export interface RouteLocation {
   routeLocationId: number;
   arrivalTime: Date;
   exitTime: Date;
 
   stopId: number;
   coords: LatLngLiteral;
-  state: RoutePointState;
+  state: RouteLocationState;
 
-  readonly [x: string]: number | LatLngLiteral | Date | RoutePointState;
+  readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
 }
 
 export const backendToFrontend = (pt: any, stopId: number) => ({
@@ -37,10 +37,10 @@ export const backendToFrontend = (pt: any, stopId: number) => ({
   },
   arrivalTime: pt.arrivalTime,
   exitTime: pt.exitTime,
-  state: RoutePointState.PERSISTED,
+  state: RouteLocationState.PERSISTED,
 });
 
-export const frontendToBackend = (pt: RouteStop, routeId: number) => ({
+export const frontendToBackend = (pt: RouteLocation, routeId: number) => ({
   routeId: routeId,
   routeLocationId: pt.routeLocationId > 0? pt.routeLocationId : null,
   arrivalTime: pt.arrivalTime,

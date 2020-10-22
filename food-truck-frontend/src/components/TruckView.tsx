@@ -13,7 +13,7 @@ import api from "../util/api";
 import Router from "next/router";
 import getUserInfo from "../util/token";
 import TruckRouteMapComponent from "./map";
-import { RouteStop } from "./map/route-map/RouteStop";
+import { RouteLocation } from "./map/route-map/RouteLocation";
 
 import { DEFAULT_ERR_RESP } from "../api/DefaultResponses";
 import { loadTodaysRoute } from "../api/RouteLocation";
@@ -51,7 +51,7 @@ export interface TruckProps {
 }
 
 type State = TruckState & TruckViewState & {
-  routePts: RouteStop[]
+  routePts: RouteLocation[]
 };
 
 class TruckView extends Component<TruckProps, State> {

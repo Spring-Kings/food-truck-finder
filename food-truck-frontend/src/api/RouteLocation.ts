@@ -2,14 +2,14 @@ import api from "../util/api";
 import {
   backendToFrontend,
   frontendToBackend,
-  RouteStop,
-} from "../components/map/route-map/RouteStop";
+  RouteLocation,
+} from "../components/map/route-map/RouteLocation";
 
 export const loadTodaysRoute = async (
   truckId: number,
   onFail?: (res: any) => void
 ) => {
-  var routePts: RouteStop[] = [];
+  var routePts: RouteLocation[] = [];
   var nextStopId: number = 1;
 
   await api
@@ -31,7 +31,7 @@ export const loadRouteLocations = async (
   routeId: number,
   onFail?: (res: any) => void
 ) => {
-  var routePts: RouteStop[] = [];
+  var routePts: RouteLocation[] = [];
   await api
     .request({
       url: `/truck/route/locations/${routeId}`,
@@ -52,7 +52,7 @@ export const loadRouteLocations = async (
 
 export const updateRouteLocations = async (
   routeId: number,
-  routePts: RouteStop[],
+  routePts: RouteLocation[],
   onSuccess?: (res: any) => void,
   onFail?: (res: any) => void
 ) => {
@@ -68,7 +68,7 @@ export const updateRouteLocations = async (
 
 export const deleteRouteLocations = async (
   routeId: number,
-  trashedPts: RouteStop[],
+  trashedPts: RouteLocation[],
   onSuccess?: (res: any) => void,
   onFail?: (res: any) => void
 ) => {

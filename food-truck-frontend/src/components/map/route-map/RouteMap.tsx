@@ -3,7 +3,7 @@ import React from "react";
 import { LatLngLiteral } from "@google/maps";
 import { Button, Container } from "@material-ui/core";
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import { RouteStop, RoutePointState } from "./RouteStop";
+import { RouteLocation, RouteLocationState } from "./RouteLocation";
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
@@ -21,11 +21,11 @@ interface RouteMapProps {
 }
 interface RouteMapState {
   mapCenter: LatLngLiteral;
-  routePts: RouteStop[];
-  trashedPts: RouteStop[];
+  routePts: RouteLocation[];
+  trashedPts: RouteLocation[];
   nextStopId: number;
 
-  currentEdit: RouteStop | undefined;
+  currentEdit: RouteLocation | undefined;
   canSave: boolean;
 }
 
@@ -71,10 +71,10 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         />
         <TruckRouteMapComponent
           routePts={this.state.routePts}
-          onDrag={(pt: RouteStop, e: any) =>
+          onDrag={(pt: RouteLocation, e: any) =>
             this.editPointLoc(pt.stopId, e.latLng)
           }
-          onMarkerClick={(pt: RouteStop, e: any) =>
+          onMarkerClick={(pt: RouteLocation, e: any) =>
             this.initiateEditPointTimes(pt)
           }
           onMapClick={(e: any) => this.addPoint(e)}
@@ -97,7 +97,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
 
     // Load route
-    var routePts: RouteStop[] = await loadRouteLocations(
+    var routePts: RouteLocation[] = await loadRouteLocations(
       this.props.routeId,
       DEFAULT_ERR_KICK
     );
@@ -116,7 +116,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         },
         arrivalTime: new Date(),
         exitTime: new Date(),
-        state: RoutePointState.CREATED,
+        state: RouteLocationState.CREATED,
       }),
       nextStopId: id + 1,
     });
@@ -151,7 +151,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
   }
 
-  private initiateEditPointTimes(pt: RouteStop) {
+  private initiateEditPointTimes(pt: RouteLocation) {
     this.setState({
       currentEdit: pt,
     });
@@ -164,11 +164,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
     // Remove the route stop and re-index
     var id: number = 1;
-    var result: RouteStop[];
-    var trash: RouteStop[] = this.state.trashedPts;
+    var result: RouteLocation[];
+    var trash: RouteLocation[] = this.state.trashedPts;
 
     // If the point is in the DB, save it for deletion
-    if (curr.state != RoutePointState.CREATED) trash = trash.concat(curr);
+    if (curr.state != RouteLocationState.CREATED) trash = trash.concat(curr);
 
     // Remove from the results array
     result = this.state.routePts

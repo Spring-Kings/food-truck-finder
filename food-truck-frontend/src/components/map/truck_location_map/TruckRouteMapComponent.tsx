@@ -8,16 +8,16 @@ import {
   Marker,
   Polyline,
 } from "@react-google-maps/api/dist";
-import { RouteStop } from "../route-map/RouteStop";
+import { RouteLocation } from "../route-map/RouteLocation";
 
 interface MapMouseEvent {
   latLng: LatLng;
 }
 
 interface MapProps {
-  routePts: RouteStop[];
-  onDrag?: (pt: RouteStop, e: MapMouseEvent) => void;
-  onMarkerClick?: (pt: RouteStop, e: MapMouseEvent) => void;
+  routePts: RouteLocation[];
+  onDrag?: (pt: RouteLocation, e: MapMouseEvent) => void;
+  onMarkerClick?: (pt: RouteLocation, e: MapMouseEvent) => void;
   onMapClick?: (e: MapMouseEvent) => void;
 }
 interface MapState {
@@ -81,7 +81,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
     );
   }
 
-  private trigger(toTrigger: ((pt: RouteStop, e: any) => any) | undefined, pt: RouteStop, e: any) {
+  private trigger(toTrigger: ((pt: RouteLocation, e: any) => any) | undefined, pt: RouteLocation, e: any) {
     if (toTrigger) toTrigger(pt, e);
   }
 }
