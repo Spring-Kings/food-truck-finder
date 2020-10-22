@@ -1,13 +1,13 @@
-import React from 'react'
+import CoolLayout from "../components/CoolLayout";
+import React from "react";
 import RouteMapComponent from "../components/map/route-map/RouteMap";
 
-function RoutesPage(){
-    return(
-        <div>
-            <p>Routes Page</p>
-            <RouteMapComponent />
-        </div>
-    )
+function RoutesPage() {
+  return (
+    <CoolLayout>
+      <RouteMapComponent />
+    </CoolLayout>
+  );
 }
 
 export default RoutesPage;

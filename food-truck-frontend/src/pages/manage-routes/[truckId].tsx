@@ -1,6 +1,7 @@
 import React from 'react';
 import {NextRouter, useRouter} from "next/router";
 import RouteList from "../../components/route/RouteList";
+import CoolLayout from "../../components/CoolLayout";
 
 function ManageRoutes(){
     const router: NextRouter = useRouter();
@@ -16,9 +17,9 @@ function ManageRoutes(){
     }
 
     return(
-        <div>
+        <CoolLayout>
             <RouteList truckId={truckId}/>
-        </div>
+        </CoolLayout>
     )
 
 }

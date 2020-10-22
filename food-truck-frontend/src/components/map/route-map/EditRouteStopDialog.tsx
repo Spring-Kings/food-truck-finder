@@ -36,12 +36,24 @@ class EditRouteStopDialogComponent extends React.Component<
 > {
   constructor(props: ERSDProps) {
     super(props);
+
+    // Copy from props
+    const arrival: Date | undefined = this.props.routePt?.arrivalTime;
+    const departure: Date | undefined = this.props.routePt?.exitTime;
+    if (arrival == undefined || departure == undefined) {
+      this.state = {
+        arrival: new Date(),
+        departure: new Date(),
+      };
+    } else this.state = { arrival: new Date(arrival), departure: new Date(departure) };
   }
+
+  componentDidUpdate() {}
 
   render() {
     return (
       <>
-        <Dialog open={this.props.routePt != undefined}>
+        <Dialog open={this.props.routePt !== undefined}>
           <DialogTitle>
             Edit times for Stop #{this.props.routePt?.stopId}
           </DialogTitle>
@@ -97,10 +109,12 @@ class EditRouteStopDialogComponent extends React.Component<
     return (
       <KeyboardTimePicker
         label={propName.toLocaleUpperCase()}
-        value={this.props.routePt?.[propName]}
+        value={this.state[propName]}
         onChange={(date) => {
           if (date != null) {
-            this.setState({ [propName]: new Date(date.getTime()) });
+            var dateTwo: Date = this.state[propName];
+            dateTwo.setTime(date.getTime());
+            this.setState({ [propName]: dateTwo });
           }
         }}
       />

@@ -73,13 +73,15 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       })
       .then((response) => {
         if (response.data != undefined) {
-          var stopId: number = 1;
+          var nextStopId: number = 1;
 
           // Map backend structure to frontend structure
+          var routePts: RouteStop[] = response.data.map((pt: any) =>
+            backendToFrontend(pt, nextStopId++)
+          );
           this.setState({
-            routePts: response.data.map((pt: any) =>
-              backendToFrontend(pt, stopId++)
-            ),
+            routePts,
+            nextStopId,
           });
         }
       })
@@ -96,6 +98,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       <Container>
         <Button onClick={this.save}>SAVE</Button>
         <EditRouteStopDialogComponent
+          key={this.state.currentEdit && this.state.currentEdit.stopId}
           routePt={this.state.currentEdit}
           confirm={this.editPointTimes}
           cancel={() => this.setState({ currentEdit: undefined })}
@@ -120,11 +123,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
                 onClick={(e) => this.initiateEditPointTimes(pt)}
               />
             ))}
-            <Polyline
-              path={this.state.routePts
-                .filter((pt) => pt.state != RoutePointState.DELETED)
-                .flatMap((pt) => pt.coords)}
-            />
+            <Polyline path={this.state.routePts.flatMap((pt) => pt.coords)} />
           </GoogleMap>
         </LoadScript>
       </Container>
@@ -166,13 +165,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   private editPointTimes(arrival: Date, departure: Date) {
     this.setState({
       routePts: this.state.routePts.map((pt) => {
-        if (pt.stopId == this.state.currentEdit?.stopId)
+        if (pt.stopId === this.state.currentEdit?.stopId) {
           return {
             ...pt,
             arrivalTime: arrival,
             exitTime: departure,
           };
-        else return pt;
+        } else return pt;
       }),
       currentEdit: undefined,
     });

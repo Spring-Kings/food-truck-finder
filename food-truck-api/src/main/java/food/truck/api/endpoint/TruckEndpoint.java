@@ -1,7 +1,6 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.routes.Route;
-import food.truck.api.routes.RouteDays;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
@@ -16,9 +15,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,16 +67,18 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class CreateTruckParams {
+    public static class CreateTruckParams {
         @Nullable
         String truckName;
     }
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
+    @Secured({"ROLE_USER"})
     @DeleteMapping("/truck/delete/{truckId}")
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
@@ -92,7 +90,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class UpdateTruckParams {
+    public static class UpdateTruckParams {
         long truckId;
         @Nullable
         String name;
@@ -116,6 +114,7 @@ public class TruckEndpoint {
         return truckService.findTruck(u.getId());
     }
 
+    @Secured({"ROLE_USER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var t = truckService.findTruckById(data.truckId);
@@ -221,5 +220,10 @@ public class TruckEndpoint {
                 .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
                 .collect(Collectors.toList()))
         ;
+    }
+
+    @GetMapping("truck/owner/{userId}")
+    public List<Truck> getTrucksByUser(@AuthenticationPrincipal User u, @PathVariable long userId) {
+        return truckService.findTruck(userId);
     }
 }
