@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import GoogleMapComponent from "../../../map";
+import TruckRouteMapComponent from "../../../map";
 import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
 
@@ -121,7 +121,7 @@ class UserDashboardComponent extends Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <GoogleMapComponent />
+            <TruckRouteMapComponent routePts={[]} />
           </GridListTile>
         </GridList>
       </React.Fragment>
