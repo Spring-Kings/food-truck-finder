@@ -48,6 +48,7 @@ class RouteDaysBar extends React.Component<RouteDaysBarProps, RouteDaysBarState>
     private getDayBox = (name: DayOfWeek) => {
         const findDay = (day: DayOfWeek) => day === name;
         return (<FormControlLabel
+            key={name}
             checked={this.state.days.findIndex(findDay) != -1}
             control={<Checkbox onChange={(event) => {
                 let newDays: DayOfWeek[] = this.state.days;

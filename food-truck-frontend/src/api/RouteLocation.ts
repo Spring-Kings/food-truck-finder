@@ -73,9 +73,10 @@ export const deleteRouteLocations = async (
   onSuccess?: (res: any) => void,
   onFail?: (res: any) => void
 ) => {
+  trashedPts.forEach(pt => console.log(pt))
   await api
     .request({
-      url: `/truck/route/locations/${routeId}`,
+      url: `/truck/route/locations`,
       data: trashedPts.flatMap((pt) => pt.routeLocationId),
       method: "DELETE",
     })
