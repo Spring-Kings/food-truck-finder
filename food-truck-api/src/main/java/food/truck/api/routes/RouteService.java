@@ -48,6 +48,7 @@ public class RouteService {
         var route = r.get();
         newName.ifPresent(route::setRouteName);
         newActive.ifPresent(route::setActive);
+        routeRepository.save(route);
         return true;
     }
 
