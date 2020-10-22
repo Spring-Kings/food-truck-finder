@@ -1,7 +1,6 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.routes.Route;
-import food.truck.api.routes.RouteDays;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
@@ -16,9 +15,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.ForeignKey;
-import javax.persistence.JoinColumn;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
@@ -87,7 +83,6 @@ public class TruckEndpoint {
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
         t.ifPresent(truck -> {
-            System.out.println(truck + " " +  u);
             if (truck.getUserId().equals(u.getId())) {
                 truckService.deleteTruck(truckId);
             }
