@@ -2,7 +2,7 @@ import React from "react";
 import Router from "next/router";
 
 import { LatLngLiteral } from "@google/maps";
-import { Button, Container } from "@material-ui/core";
+import {Button, Checkbox, Container, FormControlLabel, FormGroup} from "@material-ui/core";
 import {
   GoogleMap,
   LoadScript,
@@ -17,6 +17,7 @@ import {
   backendToFrontend,
   frontendToBackend,
 } from "./RouteStop";
+import RouteDaysBar from "./RouteDaysBar";
 
 interface RouteMapProps {
   routeId: number;
@@ -28,6 +29,8 @@ interface RouteMapState {
   nextStopId: number;
 
   currentEdit: RouteStop | undefined;
+  days: string[]
+
 }
 
 class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
@@ -43,6 +46,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       trashedPts: [],
       nextStopId: 1,
       currentEdit: undefined,
+      days: []
     };
 
     // Bind
@@ -52,6 +56,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.delete = this.delete.bind(this);
     this.initiateEditPointTimes = this.initiateEditPointTimes.bind(this);
     this.save = this.save.bind(this);
+    this.saveDays = this.saveDays.bind(this);
   }
 
   componentDidMount() {
@@ -92,11 +97,17 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       });
   }
 
+  saveDays(d: string[]){
+    this.setState({days: d});
+  }
+
   render() {
     var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container>
         <Button onClick={this.save}>SAVE</Button>
+        <RouteDaysBar func={this.saveDays}/>
+        <p>{this.state.days.toString()}</p>
         <EditRouteStopDialogComponent
           key={this.state.currentEdit && this.state.currentEdit.stopId}
           routePt={this.state.currentEdit}
@@ -215,6 +226,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
   private async save() {
     // Update in backend
+    if(this.state.days.length != 0){
+      api.post(`/route/save-days`,{
+        routeId: this.props.routeId,
+        day_name: this.state.days
+      }).catch((err) => console.log(err));
+    }
+
     if (this.state.routePts.length !== 0)
       await api
         .request({

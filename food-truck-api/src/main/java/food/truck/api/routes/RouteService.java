@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,11 +33,17 @@ public class RouteService {
         return routeRepository.save(route);
     }
 
-    public RouteDays createRouteDays(Long routeId, RouteDays.Days day){
-        RouteDays routeDays = new RouteDays();
-        routeDays.setDay(day);
-        routeDays.setRouteId(routeId);
-        return routeDaysRepository.save(routeDays);
+    public List<RouteDays>saveRouteDays(Long routeId, String[] dayNames){
+        routeDaysRepository.deleteAll(routeDaysRepository.findByRouteId(routeId));
+
+        List<RouteDays> routeDays = new ArrayList<RouteDays>();
+        for(String day : dayNames) {
+            RouteDays routeDay = new RouteDays();
+            routeDay.setDay(RouteDays.Days.valueOf(day));
+            routeDay.setRouteId(routeId);
+            routeDays.add(routeDaysRepository.save(routeDay));
+        }
+        return routeDays;
     }
 
     public RouteLocation createLocation(Long routeId, Double lat, Double lng, Timestamp arrivalTime, Timestamp exitTime){

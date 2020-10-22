@@ -32,12 +32,12 @@ public class RouteEndpoint {
     @Value
     public static class PostRouteDaysParams{
         Long routeId;
-        String day_name;
+        String[] day_name;
     }
 
-    @PostMapping("/route/create-days")
-    public RouteDays createRouteDays(@AuthenticationPrincipal User u,@RequestBody PostRouteDaysParams rd){
-        return routeService.createRouteDays(rd.routeId, RouteDays.Days.valueOf(rd.day_name));
+    @PostMapping("/route/save-days")
+    public List<RouteDays> saveRouteDays(@AuthenticationPrincipal User u,@RequestBody PostRouteDaysParams rd){
+        return routeService.saveRouteDays(rd.routeId, rd.day_name);
     }
 
     @Value

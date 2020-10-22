@@ -7,4 +7,5 @@ import java.util.List;
 public interface RouteDaysRepository extends JpaRepository<RouteDays, Long> {
     List<RouteDays> findByRouteId(Long id);
     void deleteAllByRouteId(Long routeId);
+    List<RouteDays> findByRouteIdAndDay(Long routeId, RouteDays.Days day);
 }
