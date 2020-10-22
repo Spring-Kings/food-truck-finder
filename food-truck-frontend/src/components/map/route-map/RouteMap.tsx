@@ -101,7 +101,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       this.props.routeId,
       DEFAULT_ERR_KICK
     );
-    this.setState({ mapCenter, routePts, nextStopId: routePts.length });
+    this.setState({ mapCenter, routePts, nextStopId: routePts.length + 1 });
   }
 
   private addPoint(e: any) {
