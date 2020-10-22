@@ -3,6 +3,7 @@ package food.truck.api.routes;
 import food.truck.api.truck.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.DayOfWeek;
@@ -36,6 +37,7 @@ public class RouteService {
         return routeRepository.save(route);
     }
 
+    @Transactional
     public void deleteRoute(long routeId) {
         routeLocationRepository.deleteAllByRoute_routeId(routeId);
         routeRepository.deleteById(routeId);
