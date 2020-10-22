@@ -4,7 +4,7 @@ import food.truck.api.reviews_and_subscriptions.Subscription;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 @Data
 @Entity
@@ -23,5 +23,5 @@ public class Notification {
     String message;
 
     @Column(name = "time", nullable = false)
-    Timestamp time;
+    Instant time;
 }
