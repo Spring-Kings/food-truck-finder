@@ -40,7 +40,6 @@ export interface TruckState {
   // menu: string | null;
   textMenu: string | null;
   // schedule: string | null;
-  routePts: RouteLocation[];
 }
 
 interface TruckViewState {
@@ -51,7 +50,9 @@ export interface TruckProps {
   truckId: number;
 }
 
-type State = TruckState & TruckViewState;
+type State = TruckState & TruckViewState & {
+  routePts: RouteLocation[];
+};
 
 class TruckView extends Component<TruckProps, State> {
   constructor(props: TruckProps) {
