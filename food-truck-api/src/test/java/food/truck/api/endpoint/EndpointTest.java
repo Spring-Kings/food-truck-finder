@@ -2,37 +2,42 @@ package food.truck.api.endpoint;
 
 import food.truck.api.FoodTruckApplication;
 import food.truck.api.security.SecurityMethods;
+import food.truck.api.truck.Truck;
+import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import reactor.core.publisher.Mono;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.function.Function;
 
 @SpringBootTest(classes = FoodTruckApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Log4j2
 public class EndpointTest {
     @Autowired
     protected UserService userService;
-
+    @Autowired
+    protected TruckService truckService;
+    @Autowired
+    DataSource dataSource;
     @LocalServerPort
     private int port;
+
 
     protected WebTestClient standardUserClient;
     protected WebTestClient ownerClient;
@@ -40,6 +45,7 @@ public class EndpointTest {
 
     protected User owner;
     protected User standardUser;
+    protected Truck testTruck;
 
     @BeforeEach
     public void setup() {
@@ -51,7 +57,7 @@ public class EndpointTest {
             // so use ofRequestProcessor to copy the request and add the auth header
             return ExchangeFilterFunction.ofRequestProcessor(req -> Mono.just(
                     ClientRequest.from(req)
-                            .header("Authorization", getToken(user))
+                            .header("Authorization", SecurityMethods.makeTokenForUser(user))
                             .build()
             ));
         };
@@ -71,9 +77,14 @@ public class EndpointTest {
     protected void initDb() {
         standardUser = userService.createUser("standardUser", "password", "aaa@aaa", false);
         owner = userService.createUser("owner", "password", "bbb@bbb", true);
+        testTruck = truckService.createTruck(owner.getId(), "testTruck");
     }
 
-    protected String getToken(User u) {
-        return SecurityMethods.makeTokenForUser(u);
+    @AfterEach
+    public void cleanup() throws SQLException {
+        dataSource.getConnection().prepareStatement(
+                "DELETE FROM route_days; DELETE FROM route_location; DELETE FROM route;" +
+                        "DELETE FROM review; DELETE FROM subscription; DELETE FROM truck; DELETE FROM user;"
+        ).execute();
     }
 }

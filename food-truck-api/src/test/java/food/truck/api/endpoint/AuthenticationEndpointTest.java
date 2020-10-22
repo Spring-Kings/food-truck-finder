@@ -8,19 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j2
 public class AuthenticationEndpointTest extends EndpointTest {
-    protected void ensureNoTestUser() {
-        userService.findUserByUsername("testUser")
-                .ifPresent(u -> userService.deleteUser(u.getId()));
-    }
-
-    protected void ensureTestUser() {
-        if (!userService.usernameIsTaken("testUser"))
-            userService.createUser("testUser", "password", "test@test", false);
-    }
-
     @Test
     public void registerSuccess() {
-        ensureNoTestUser();
         guestClient.post()
                 .uri("/register")
                 .bodyValue(new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password", false))
@@ -32,10 +21,9 @@ public class AuthenticationEndpointTest extends EndpointTest {
 
     @Test
     public void loginSuccess() {
-        ensureTestUser();
         guestClient.post()
                 .uri("/login")
-                .bodyValue(new AuthenticationFilter.AuthenticationInfo("testUser", "password"))
+                .bodyValue(new AuthenticationFilter.AuthenticationInfo("standardUser", "password"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().exists("token");
@@ -43,10 +31,9 @@ public class AuthenticationEndpointTest extends EndpointTest {
 
     @Test
     public void loginFail() {
-        ensureTestUser();
         guestClient.post()
                 .uri("/login")
-                .bodyValue(new AuthenticationFilter.AuthenticationInfo("testUser", "badpassword"))
+                .bodyValue(new AuthenticationFilter.AuthenticationInfo("standardUser", "badpassword"))
                 .exchange()
                 .expectStatus().isUnauthorized()
                 .expectHeader().doesNotExist("token");
