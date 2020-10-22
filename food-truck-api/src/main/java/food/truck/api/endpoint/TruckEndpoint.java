@@ -1,5 +1,9 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteDays;
+import food.truck.api.routes.RouteLocation;
+import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
@@ -12,14 +16,23 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Column;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
 public class TruckEndpoint {
     @Autowired
     private TruckService truckService;
+
+    @Autowired
+    private RouteService routeService;
 
     @GetMapping("/nearby-trucks")
     public String getNearbyTrucks(@RequestParam String location) {
@@ -101,6 +114,11 @@ public class TruckEndpoint {
         byte[] schedule;
     }
 
+    @GetMapping("/truck/owner")
+    public List<Truck> getTruckByUser(@AuthenticationPrincipal User u) {
+        return truckService.findTruck(u.getId());
+    }
+
     @Secured({"ROLE_USER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
@@ -111,32 +129,32 @@ public class TruckEndpoint {
                 return Optional.empty();
             }
             return Optional.of(truckService.updateTruck(
-                truck,
-                Optional.ofNullable(data.name),
-                Optional.ofNullable(data.menu),
-                Optional.ofNullable(data.textMenu),
-                Optional.ofNullable(data.priceRating),
-                Optional.ofNullable(data.description),
-                Optional.ofNullable(data.schedule),
-                Optional.ofNullable(data.foodCategory)
+                    truck,
+                    Optional.ofNullable(data.name),
+                    Optional.ofNullable(data.menu),
+                    Optional.ofNullable(data.textMenu),
+                    Optional.ofNullable(data.priceRating),
+                    Optional.ofNullable(data.description),
+                    Optional.ofNullable(data.schedule),
+                    Optional.ofNullable(data.foodCategory)
             ));
         }
         return Optional.empty();
     }
 
     @GetMapping("/truck/{truckId}/routes")
-    public String getRoutes(@PathVariable long truckId) {
-        return ""; //TODO
+    public List<Route> getRoutes(@PathVariable long truckId) {
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if (truck == null || truck.isEmpty()) {
+            return new LinkedList<Route>();
+        }
+
+        return routeService.findRoutebyTruck(truck.get());
     }
 
-    @PostMapping("/truck/{truckId}/routes")
-    public String addRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String routeName) {
-        return ""; // TODO
-    }
-
-    @DeleteMapping("/truck/{truckId}/routes/{routeId}")
-    public String deleteRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @PathVariable long routeId) {
-        return ""; // TODO
+    @DeleteMapping("/truck/routes-delete/{routeId}")
+    public void deleteRoute(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+        routeService.deleteRoute(routeId);
     }
 
     @Value
@@ -148,7 +166,7 @@ public class TruckEndpoint {
         boolean active;
     }
 
-    @PutMapping("/truck/{truckId}/routes")
+    @PutMapping("/truck/{truckId}/routes-put")
     public String updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
         return ""; // TODO
     }
@@ -157,6 +175,56 @@ public class TruckEndpoint {
     @PutMapping("/truck/{truckId}/schedule")
     public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
         return ""; // TODO
+    }
+
+    @Value
+    private static class PostRouteParams {
+        String routeName;
+        char active;
+    }
+
+    @PostMapping("/truck/{truckId}/create-route")
+    public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if (truck == null || truck.isEmpty()) {
+            return new Route();
+        }
+        return routeService.createRoute(truck.get(), data.routeName, data.active); // TODO
+    }
+
+    @Value
+    private static class UpdateRouteLocationParams {
+        long routeLocationId;
+        long routeId;
+        @Nullable
+        Timestamp arrivalTime;
+        @Nullable
+        Timestamp exitTime;
+        @Nullable
+        Double lng;
+        @Nullable
+        Double lat;
+    }
+
+    @GetMapping("/truck/route/locations/{routeId}")
+    public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
+        return routeService.findRouteLocationByRouteId(routeId);
+    }
+
+    @PostMapping("/truck/route/locations/{routeId}")
+    public void updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
+        routeService.updateLocations(data.stream()
+                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
+                .collect(Collectors.toList()))
+        ;
+    }
+
+    @DeleteMapping("/truck/route/locations/{routeId}")
+    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
+        routeService.deleteLocations(data.stream()
+                .map(e -> new RouteLocation(e.routeLocationId, e.routeId, e.arrivalTime, e.exitTime, e.lng, e.lat))
+                .collect(Collectors.toList()))
+        ;
     }
 
     @GetMapping("truck/owner/{userId}")

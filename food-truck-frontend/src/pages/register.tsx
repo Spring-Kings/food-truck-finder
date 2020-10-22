@@ -35,6 +35,8 @@ class RegisterPageComponent extends React.Component<{}, State> {
             variant="outlined"
           />
           <TextField label="Email" name="email" variant="outlined" />
+          <br/>
+          <Typography>Owner Account?</Typography>
           <Switch value={this.state.isOwner} onChange={this.toggleOwner} name="isOwner" />
         </Form>
 

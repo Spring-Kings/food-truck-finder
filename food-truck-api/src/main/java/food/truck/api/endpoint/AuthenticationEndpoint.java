@@ -40,7 +40,6 @@ public class AuthenticationEndpoint {
         else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
             return "Error: Invalid username";
         } else {
-            System.out.println(data);
             var user = userService.createUser(data.username, data.password, data.email, data.isOwner);
             return "Created user with id " + user.getId();
         }
