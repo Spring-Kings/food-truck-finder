@@ -156,21 +156,13 @@ public class TruckEndpoint {
     @Value
     private static class UpdateRouteParams {
         long routeId;
-        @Nullable
-        String newRouteName;
-        @NonNull List<String> locations; // TODO: This isn't strings
-        boolean active;
+        Optional<String> newName;
+        Optional<Boolean> newActive;
     }
 
-    @PutMapping("/truck/{truckId}/routes-put")
-    public String updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
-        return ""; // TODO
-    }
-
-    // TODO: How to represent data?
-    @PutMapping("/truck/{truckId}/schedule")
-    public String updateSchedule(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody String data) {
-        return ""; // TODO
+    @PutMapping("/truck/{truckId}/update-route")
+    public boolean updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
+        return routeService.updateRoute(data.routeId, data.newName, data.newActive);
     }
 
     @Value

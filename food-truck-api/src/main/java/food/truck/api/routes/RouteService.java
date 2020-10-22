@@ -23,7 +23,7 @@ public class RouteService {
     }
 
     public Optional<Route> findRouteById(long id) {
-        return routeRepository.findOneByRouteId(id);
+        return routeRepository.findById(id);
     }
 
     public Route createRoute(Truck truck, String routeName, boolean active) {
@@ -32,6 +32,21 @@ public class RouteService {
         route.setTruck(truck);
         route.setActive(active);
         return routeRepository.save(route);
+    }
+
+    public void deleteRoute(long routeId) {
+        routeLocationRepository.deleteAllByRoute_routeId(routeId);
+        routeRepository.deleteById(routeId);
+    }
+
+    public boolean updateRoute(long routeId, Optional<String> newName, Optional<Boolean> newActive) {
+        var r = routeRepository.findById(routeId);
+        if (r.isEmpty())
+            return false;
+        var route = r.get();
+        newName.ifPresent(route::setRouteName);
+        newActive.ifPresent(route::setActive);
+        return true;
     }
 
     public boolean addDayToRoute(long routeId, DayOfWeek w) {
@@ -102,8 +117,5 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
-    public void deleteRoute(long routeId) {
-        routeLocationRepository.deleteAllByRoute_routeId(routeId);
-        routeRepository.deleteById(routeId);
-    }
+
 }
