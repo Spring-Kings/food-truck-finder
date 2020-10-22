@@ -206,12 +206,14 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({canSave: false});
 
     // Update in backend
-    if(this.state.days.length != 0){
-      api.post(`/route/save-days`,{
-        routeId: this.props.routeId,
-        day_name: this.state.days
-      }).catch((err) => console.log(err));
-    }
+    this.state.days.forEach(v => {
+      if(this.state.days.length != 0){
+        api.post(`/route/add-day`,{
+          routeId: this.props.routeId,
+          day_name: v
+        }).catch((err) => console.log(err));
+      }
+    })
 
     if (this.state.routePts.length !== 0)
       await updateRouteLocations(

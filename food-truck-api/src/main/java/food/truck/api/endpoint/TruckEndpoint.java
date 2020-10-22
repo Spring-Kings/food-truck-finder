@@ -15,12 +15,9 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-<<<<<<< HEAD
-import java.sql.Timestamp;
-=======
 import java.time.Instant;
 import java.time.LocalDateTime;
->>>>>>> route-days
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
