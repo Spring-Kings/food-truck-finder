@@ -119,9 +119,9 @@ public class UserEndpoint {
     }
 
     @Secured({"ROLE_USER"})
-    @PostMapping("/delete-review")
-    public String deleteReview(@AuthenticationPrincipal User u, @RequestBody long reviewId) {
-        return ""; // TODO
+    @DeleteMapping("/user/reviews")
+    public boolean deleteReview(@AuthenticationPrincipal User u, @RequestBody long reviewId) {
+        return reviewService.deleteReviewByUser(u, reviewId);
     }
 
 
