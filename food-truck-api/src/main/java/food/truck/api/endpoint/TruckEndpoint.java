@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -154,7 +153,7 @@ public class TruckEndpoint {
     }
 
     @Value
-    private static class UpdateRouteParams {
+    public static class UpdateRouteParams {
         long routeId;
         Optional<String> newName;
         Optional<Boolean> newActive;

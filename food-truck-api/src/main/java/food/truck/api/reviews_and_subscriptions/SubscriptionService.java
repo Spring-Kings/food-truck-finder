@@ -4,10 +4,12 @@ import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class SubscriptionService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;

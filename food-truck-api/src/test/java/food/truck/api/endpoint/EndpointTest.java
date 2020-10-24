@@ -24,6 +24,8 @@ import reactor.core.publisher.Mono;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 @SpringBootTest(classes = FoodTruckApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,16 +46,22 @@ public class EndpointTest {
 
 
     protected WebTestClient standardUserClient;
-    protected WebTestClient ownerClient;
+    protected WebTestClient ownerAClient;
+    protected WebTestClient ownerBClient;
     protected WebTestClient guestClient;
 
-    protected User owner;
+    protected User ownerA;
+    protected Truck testTruckA;
+    protected Route testRouteA;
+
+    protected User ownerB;
+    protected Truck testTruckB;
+
     protected User standardUser;
-    protected Truck testTruck;
-    protected Route testRoute;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws SQLException {
+        cleanup(); // Why doesn't it work without this, just with @aftereach?
         initDb();
 
         // Great, a function that returns a function
@@ -74,16 +82,26 @@ public class EndpointTest {
         standardUserClient = guestClient.mutate()
                 .filter(makeFilterThatAddsTokenFor.apply(standardUser))
                 .build();
-        ownerClient = guestClient.mutate()
-                .filter(makeFilterThatAddsTokenFor.apply(owner))
+        ownerAClient = guestClient.mutate()
+                .filter(makeFilterThatAddsTokenFor.apply(ownerA))
+                .build();
+        ownerBClient = guestClient.mutate()
+                .filter(makeFilterThatAddsTokenFor.apply(ownerB))
                 .build();
     }
 
     protected void initDb() {
         standardUser = userService.createUser("standardUser", "password", "aaa@aaa", false);
-        owner = userService.createUser("owner", "password", "bbb@bbb", true);
-        testTruck = truckService.createTruck(owner.getId(), "testTruck");
-        testRoute = routeService.createRoute(testTruck, "testRoute", 'Y');
+
+        ownerA = userService.createUser("owner", "password", "bbb@bbb", true);
+        testTruckA = truckService.createTruck(ownerA.getId(), "testTruckA");
+        testRouteA = routeService.createRoute(testTruckA, "testRouteA", true);
+        routeService.addDayToRoute(testRouteA.getRouteId(), LocalDateTime.now().getDayOfWeek());
+        routeService.createLocation(testRouteA.getRouteId(), 1.23, 1.23, Instant.now(), Instant.now().plusSeconds(1000));
+        testRouteA = routeService.findRouteById(testRouteA.getRouteId()).get(); // Save above two changes
+
+        ownerB = userService.createUser("ownerB", "password", "yeetarino", true);
+        testTruckB = truckService.createTruck(ownerB.getId(), "testTruckB");
     }
 
     @AfterEach
