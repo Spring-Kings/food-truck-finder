@@ -1,5 +1,7 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.reviews_and_subscriptions.Review;
+import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
@@ -12,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +33,9 @@ public class TruckEndpoint {
 
     @Autowired
     private RouteService routeService;
+
+    @Autowired
+    private ReviewService reviewService;
 
     @GetMapping("/nearby-trucks")
     public String getNearbyTrucks(@RequestParam String location) {
@@ -50,21 +56,32 @@ public class TruckEndpoint {
     }
 
     @GetMapping("/truck/{truckId}/reviews")
-    public String getTruckReviews(@PathVariable long truckId) {
-        return ""; // TODO
+    public List<Review> getTruckReviews(@PathVariable long truckId) {
+        return reviewService.findReviewByTruckId(truckId);
     }
 
     @Value
     private static class PostReviewParams {
+        Long userId;
         int score;
         int costRating;
         @Nullable
         String reviewText;
     }
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/truck/{truckId}/reviews")
-    public String postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
-        return ""; // TODO
+    public Review postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
+        if (!user.getId().equals(data.userId))
+            return null; // TODO make return a 403
+
+        // Ensure truck exists
+        Optional<Truck> truck = truckService.findTruckById(truckId);
+        if (truck.isEmpty())
+            return null; // TODO make it alert that the truck DNE
+
+        // Save review
+        return reviewService.saveReview(data.userId, truck.get(), data.score, data.costRating, data.reviewText);
     }
 
     @Value
