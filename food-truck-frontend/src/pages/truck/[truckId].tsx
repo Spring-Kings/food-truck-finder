@@ -3,6 +3,7 @@ import {useRouter} from "next/router";
 import TruckView from "../../components/TruckView";
 import NotFound from "../../components/NotFound";
 import CoolLayout from "../../components/CoolLayout";
+import RouterSelectableComponent from '../../components/util/RouterSelectableComponent';
 
 function TruckPage() {
   const router = useRouter();
@@ -21,4 +22,4 @@ function TruckPage() {
   );
 }
 
-export default TruckPage;
+export default RouterSelectableComponent<number>((truckId: number) => (<TruckView truckId={truckId}/>), "truckId");

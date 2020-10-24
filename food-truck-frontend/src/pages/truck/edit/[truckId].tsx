@@ -2,11 +2,10 @@ import React, { Component } from 'react'
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
 import api from "../../../util/api";
 import {AxiosResponse} from "axios";
-import Router, {useRouter} from "next/router";
+import Router from "next/router";
 import Form from "../../../components/Form";
-import NotFound from "../../../components/NotFound";
 import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
-import CoolLayout from "../../../components/CoolLayout";
+import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 
 interface EditTruckState {
   message: string;
@@ -101,21 +100,4 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
   }
 }
 
-function EditTruckPage() {
-  const router = useRouter();
-  if (router.query.truckId) {
-    let truckId: number = router.query.truckId as unknown as number;
-    return (
-      <CoolLayout>
-        <EditTruck truckId={truckId}/>
-      </CoolLayout>
-    );
-  }
-  return (
-    <CoolLayout>
-      <NotFound/>
-    </CoolLayout>
-  );
-}
-
-export default EditTruckPage;
+export default RouterSelectable<number>((truckId: number) => <EditTruck truckId={truckId}/>, "truckId");
