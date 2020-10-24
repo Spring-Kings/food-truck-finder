@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface RouteRepository extends JpaRepository<Route, Long> {
-    List<Route> findByRouteId(Long id);
     List<Route> findByTruck(Truck truck);
-    void deleteByRouteId(Long routeId);
+    List<Route> findByTruckId(long truckId);
 }

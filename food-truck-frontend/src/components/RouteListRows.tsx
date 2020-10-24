@@ -1,15 +1,16 @@
 import React from "react";
 import Router from "next/router";
 import api from "../util/api";
-import {IconButton} from "@material-ui/core";
+import {FormControlLabel, IconButton, Slider, Switch} from "@material-ui/core";
 
 import EditIcon from "@material-ui/icons/Edit"
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DayOfWeek from "./map/route-map/DayOfWeek";
 
 const RouteDaysObject = [{
     routeDaysId: "",
     routeId: "",
-    day: ""
+    day: "",
 }]
 
 type RouteRowState = {
@@ -17,14 +18,16 @@ type RouteRowState = {
         routeDaysId: string,
         routeId: string,
         day: string
-    }[]
+    }[],
 }
 
 type RouteRowProps = {
     routeId: number,
     routeName: string,
-    active: string
-    removeRow: () => void
+    active: boolean,
+    days: DayOfWeek[],
+    removeRow: () => void,
+    toggleActive: (routeId: number, active: boolean) => void
 }
 
 
@@ -33,14 +36,14 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
     constructor(props: RouteRowProps) {
         super(props);
         this.state = {
-            daysData: RouteDaysObject
+            daysData: RouteDaysObject,
         }
     }
 
     componentDidMount() {
         api.get(`/route/${this.props.routeId}/days`)
             .then(res => {
-                this.setState({daysData: res.data});
+                this.setState({daysData: res.data? res.data : []});
             })
             .catch(err => {
                 console.log(err.toString());
@@ -48,23 +51,27 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
     }
 
     render() {
-        let daysWeek: string = "";
-
-        this.state.daysData.forEach(days => {
-            daysWeek += days.day.toLowerCase() + ","
-        })
+        let daysWeek: string = this.props.days[0];
+        for (let i = 1; i < this.props.days.length; i++)
+            daysWeek = `${daysWeek}, ${this.props.days[i]}`;
 
         return (
             <tr>
                 <td>{this.props.routeName}</td>
                 <td>{daysWeek}</td>
-                <td>{this.props.active}</td>
+                <td>
+                    <FormControlLabel
+                        label="Active"
+                        control={<Switch checked={this.props.active}
+                                    onChange={(_, checked) => this.props.toggleActive(this.props.routeId, checked)} />
+                        }
+                    />
+                </td>
                 <td><IconButton onClick={() => Router.replace(`/routes/edit/${this.props.routeId}`)}><EditIcon /></IconButton></td>
                 <td><IconButton onClick={this.props.removeRow}><DeleteForeverIcon /></IconButton></td>
             </tr>
         );
     }
-
 }
 
 export default RouteListRow;

@@ -1,11 +1,12 @@
 package food.truck.api.routes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 
 @Data
@@ -14,24 +15,25 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "route_location")
 public class RouteLocation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_location_id", nullable = false)
-    Long routeLocationId;
+    long routeLocationId;
 
-    @JoinColumn(foreignKey = @ForeignKey(name = "route_id"), nullable = false)
-    Long routeId;
+    @ManyToOne // many locations to one route
+    @JoinColumn(name = "route_id", nullable = false)
+    @JsonIgnoreProperties("locations")
+    Route route;
 
-    @Column(name="arrival_time", nullable = false)
-    Timestamp arrivalTime;
+    @Column(name = "arrival_time", nullable = false)
+    Instant arrivalTime;
 
-    @Column(name="exit_time", nullable = false)
-    Timestamp exitTime;
+    @Column(name = "exit_time", nullable = false)
+    Instant exitTime;
 
-    @Column(name="lng", nullable = false)
-    Double lng;
+    @Column(name = "lng", nullable = false)
+    double lng;
 
-    @Column(name="lat", nullable = false)
-    Double lat;
+    @Column(name = "lat", nullable = false)
+    double lat;
 }
