@@ -28,7 +28,7 @@ public class UserEndpointTest extends EndpointTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Boolean.class).isEqualTo(true);
-        var user = userService.findUserById(standardUser.getId()).get();
+        var user = userService.findUserById(data.standardUser.getId()).get();
         assertEquals(user.getEmail(), "coolEmail@aaa");
         assertTrue(userService.passwordMatches(user, "newPass"));
     }
@@ -39,6 +39,6 @@ public class UserEndpointTest extends EndpointTest {
                 .uri("/search-usernames?username={x}", "standardUser")
                 .exchange()
                 .expectBodyList(UserView.class)
-                .contains(UserView.of(standardUser));
+                .contains(UserView.of(data.standardUser));
     }
 }

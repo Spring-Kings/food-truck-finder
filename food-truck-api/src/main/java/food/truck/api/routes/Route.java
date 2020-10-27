@@ -35,4 +35,14 @@ public class Route {
 
     @ElementCollection
     Set<DayOfWeek> days = EnumSet.noneOf(DayOfWeek.class);
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "routeId=" + routeId +
+                ", truck=" + truck +
+                ", routeName='" + routeName + '\'' +
+                ", active=" + active +
+                '}';
+    }
 }

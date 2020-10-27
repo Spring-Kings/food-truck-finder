@@ -12,7 +12,7 @@ public class TruckEndpointTest extends EndpointTest {
     @Test
     public void getTruck() {
         guestClient.get()
-                .uri("/truck/{id}", testTruckA.getId())
+                .uri("/truck/{id}", data.testTruckA.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(Truck.class);
@@ -46,29 +46,29 @@ public class TruckEndpointTest extends EndpointTest {
     @Test
     public void deleteTruck() {
         ownerAClient.delete()
-                .uri("/truck/delete/{id}", testTruckA.getId())
+                .uri("/truck/delete/{id}", data.testTruckA.getId())
                 .exchange()
                 .expectStatus().isOk();
 
-        assertEquals(0, truckService.findTruck(testTruckA.getName()).size());
+        assertEquals(0, truckService.findTruck(data.testTruckA.getName()).size());
     }
 
     @Test
     public void deleteTruckStandardUserFail() {
         standardUserClient.delete()
-                .uri("/truck/delete/{id}", testTruckA.getId())
+                .uri("/truck/delete/{id}", data.testTruckA.getId())
                 .exchange()
                 .expectStatus().is4xxClientError();
-        assertEquals(1, truckService.findTruck(testTruckA.getName()).size());
+        assertEquals(1, truckService.findTruck(data.testTruckA.getName()).size());
     }
 
     @Test
     public void deleteDifferentOwnersTruckFail() {
         ownerBClient.delete()
-                .uri("/truck/delete/{id}", testTruckA.getId())
+                .uri("/truck/delete/{id}", data.testTruckA.getId())
                 .exchange()
                 .expectStatus().is4xxClientError();
-        assertEquals(1, truckService.findTruck(testTruckA.getName()).size());
+        assertEquals(1, truckService.findTruck(data.testTruckA.getName()).size());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class TruckEndpointTest extends EndpointTest {
                 .uri("/truck/owner")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Truck.class).contains(testTruckA);
+                .expectBodyList(Truck.class).contains(data.testTruckA);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateTruck() {
         var result = ownerAClient.put()
                 .uri("/truck/update")
-                .bodyValue(new TruckEndpoint.UpdateTruckParams(testTruckA.getId(), "truck1337", "a cool truck",
+                .bodyValue(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
                         3L, null, null, null, null))
                 .exchange()
                 .expectStatus().isOk()
@@ -114,7 +114,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateOtherOwnersTruckFail() {
         ownerBClient.put()
                 .uri("/truck/update")
-                .bodyValue(new TruckEndpoint.UpdateTruckParams(testTruckA.getId(), "truck1337", "a cool truck",
+                .bodyValue(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
                         3L, null, null, null, null))
                 .exchange()
                 .expectStatus().is4xxClientError();
@@ -123,10 +123,10 @@ public class TruckEndpointTest extends EndpointTest {
     @Test
     public void getRoutes() {
         guestClient.get()
-                .uri("/truck/{id}/routes", testTruckA.getId())
+                .uri("/truck/{id}/routes", data.testTruckA.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Route.class).contains(testRouteA);
+                .expectBodyList(Route.class).contains(data.testRouteA);
     }
 
     @Test
@@ -140,32 +140,33 @@ public class TruckEndpointTest extends EndpointTest {
     @Test
     public void deleteRoute() {
         ownerAClient.delete()
-                .uri("/truck/routes-delete/{rId}", testRouteA.getRouteId())
+                .uri("/truck/routes-delete/{rId}", data.testRouteA.getRouteId())
                 .exchange()
                 .expectStatus().isOk();
-        assertTrue(routeService.findRouteById(testRouteA.getRouteId()).isEmpty());
+        assertTrue(routeService.findRouteById(data.testRouteA.getRouteId()).isEmpty());
     }
 
     @Test
     public void deleteOtherOwnersRouteFail() {
         ownerBClient.delete()
-                .uri("/truck/routes-delete/{rId}", testRouteA.getRouteId())
+                .uri("/truck/routes-delete/{rId}", data.testRouteA.getRouteId())
                 .exchange()
                 .expectStatus().is4xxClientError();
-        assertTrue(routeService.findRouteById(testRouteA.getRouteId()).isPresent());
+        assertTrue(routeService.findRouteById(data.testRouteA.getRouteId()).isPresent());
     }
 
     @Test
     public void updateRoute() {
         ownerAClient.put()
-                .uri("/truck/{tId}/update-route", testTruckA.getId())
-                .bodyValue(new TruckEndpoint.UpdateRouteParams(testRouteA.getRouteId(), Optional.of("newName"), Optional.empty()))
+                .uri("/truck/{tId}/update-route", data.testTruckA.getId())
+                .bodyValue(new TruckEndpoint.UpdateRouteParams(data.testRouteA.getRouteId(), Optional.of("newName"), Optional.empty()))
                 .exchange()
                 .expectStatus().isOk();
-        var r = routeService.findRouteById(testRouteA.getRouteId());
+        data.flushAllChanges();
+        var r = routeService.findRouteById(data.testRouteA.getRouteId());
         assertTrue(r.isPresent());
         assertEquals("newName", r.get().getRouteName());
-        assertEquals(testRouteA.isActive(), r.get().isActive());
+        assertEquals(data.testRouteA.isActive(), r.get().isActive());
     }
 
 }
