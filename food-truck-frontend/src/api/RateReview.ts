@@ -64,19 +64,20 @@ export const loadReviewsByTruck = async (
     // If we got a good response, then create frontend representation
     if (resp.data !== null)
       // Map all backend reviews to frontend reviews
-      reviews = resp.data.map(async (r: any) => {
+      // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
+      reviews = await Promise.all(resp.data.map(async (r: any) => {
         // Fetch username
         let name: any = await api.request({
           url: `/user/${r.userId}`,
           method: "GET",
         });
-
+        
         // Create frontend representation for 1 review, with either the username or a blank string
         return backendToFrontend(
           r,
           name.data !== null ? name.data.username : ""
         );
-      });
+      }));
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
     if (onFail) onFail(e);

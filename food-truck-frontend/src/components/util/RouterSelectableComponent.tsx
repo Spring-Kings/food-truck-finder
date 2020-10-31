@@ -11,7 +11,6 @@ function RouterSelectableComponent<T>(
   return () => {
     const router = useRouter();
     var result: any = router.query[routerAttribute];
-    console.log(result);
 
     // If the router has the requested attribute, use the provided factory method to pass it to the new component
     // Otherwise, just store a NotFound component

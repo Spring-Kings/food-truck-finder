@@ -32,7 +32,7 @@ export function backendToFrontend(obj: any, username: string): Review {
     truckId: obj.truckId,
     starRating: obj.starRating,
     costRating: obj.costRating,
-    review: obj.review,
+    review: obj.reviewText,
     timestamp: obj.timestamp,
     username,
   };

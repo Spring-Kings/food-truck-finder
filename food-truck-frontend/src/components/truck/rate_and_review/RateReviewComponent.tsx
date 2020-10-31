@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Box,
   Button,
   Container,
   FormControlLabel,
@@ -9,7 +10,9 @@ import {
   Switch,
   TextField,
   Typography,
+  withStyles,
 } from "@material-ui/core";
+import MoneyIcon from "@material-ui/icons/AttachMoney";
 import { Rating } from "@material-ui/lab";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Review, { emptyReview } from "../../../domain/truck/Review";
@@ -28,6 +31,19 @@ export interface RateState {
   extended: boolean;
 }
 
+/** Number of rows for the review field */
+const NUM_ROWS = 5;
+
+// Learned from: https://material-ui.com/components/rating/
+const MoneyRating = withStyles({
+  iconFilled: {
+    color: "#00AA00",
+  },
+  iconHover: {
+    color: "#00AA00",
+  },
+})(Rating);
+
 class RateReviewComponent extends Component<RateProps, RateState> {
   constructor(props: RateProps) {
     super(props);
@@ -37,6 +53,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
       user: undefined,
       extended: false,
     };
+    this.switchExtended = this.switchExtended.bind(this);
+    this.changeRating = this.changeRating.bind(this);
   }
 
   componentDidMount() {
@@ -45,10 +63,10 @@ class RateReviewComponent extends Component<RateProps, RateState> {
       this.setState({
         review: {
           ...this.state.review,
-          userId: user.userID
+          userId: user.userID,
         },
-        user
-      })
+        user,
+      });
     } else
       this.setState({
         user: getUserInfo(),
@@ -67,24 +85,60 @@ class RateReviewComponent extends Component<RateProps, RateState> {
 
     // Generate actual UI
     return (
-      <>
+      <Container>
         <Typography variant="h4">Create Review</Typography>
-        <TextField disabled label="Posting As" variant="outlined" defaultValue={this.state.user.username} />
-        <FormControlLabel label="Leave Extended Review" control={<Switch value={this.state.extended} />} />
+        <TextField
+          disabled
+          label="Posting As"
+          variant="outlined"
+          defaultValue={this.state.user.username}
+        />
+        <FormControlLabel
+          label="Leave Extended Review"
+          control={
+            <Switch
+              value={this.state.extended}
+              onChange={this.switchExtended}
+            />
+          }
+        />
         <HiddenAttributeForm
           submitUrl={getSaveReviewUrl(this.props.truckId)}
           hiddenAttrs={[
-            { key: "userId", value: this.state.user.userID },
-            { key: "truckId", value: this.props.truckId },
-          ]}
-        >
-          <Rating />
+            { name: "userId", defaultValue: this.state.user.userID },
+          ]}>
+          <Rating name="score" onChange={(_: any, value: number | null) => this.changeRating(value, "starRating")} />
+          <MoneyRating name="costRating" icon={<MoneyIcon />} onChange={(_: any, value: number | null) => this.changeRating(value, "costRating")} />
           {this.state.extended ? (
-            <TextField label="Review" variant="outlined" name="truckName" value={this.state.review.review} />
+            <TextField
+              label="Review"
+              variant="outlined"
+              name="reviewText"
+              multiline
+              fullWidth
+              rows={NUM_ROWS}
+              value={this.state.review.review}
+            />
           ) : null}
         </HiddenAttributeForm>
-      </>
+      </Container>
     );
+  }
+
+  private changeRating(providedRating: number | null, which: string) {
+    let newRating: number = 0;
+    if (providedRating !== null) newRating = providedRating;
+
+    this.setState({
+      ...this.state,
+      [which]: newRating
+    });
+  }
+
+  private switchExtended(_: any, checked: boolean) {
+    this.setState({
+      extended: checked,
+    });
   }
 }
 

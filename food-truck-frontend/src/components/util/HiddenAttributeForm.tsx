@@ -3,16 +3,16 @@ import React from "react";
 import Form, { Props as FormProps } from "../Form";
 
 export interface HiddenEntry {
-  key: string;
-  value: any;
+  name: string;
+  defaultValue: any;
 }
 
 export interface HiddenAttributeFormProps {
   hiddenAttrs: HiddenEntry[];
 }
 
-class HiddenField extends React.Component<any> {
-  constructor(props: any) {
+class HiddenField extends React.Component<HiddenEntry> {
+  constructor(props: HiddenEntry) {
     super(props);
   }
   render() {
@@ -23,12 +23,9 @@ class HiddenField extends React.Component<any> {
 function HiddenAttributeForm(props: HiddenAttributeFormProps & FormProps) {
   return (
     <Form {...props}>
+      {React.Children.map(props.children, c => c)}
       {props.hiddenAttrs.map((tpl) => (
-        <HiddenField
-          key={`hidden${tpl.key}`}
-          name={tpl.key}
-          defaultValue={tpl.value}
-        />
+        <HiddenField key={`hidden${tpl.name}`} {...tpl} />
       ))}
     </Form>
   );
