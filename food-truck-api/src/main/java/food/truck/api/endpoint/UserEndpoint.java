@@ -28,9 +28,6 @@ public class UserEndpoint {
     private UserService userService;
 
     @Autowired
-    private ReviewService reviewService;
-
-    @Autowired
     private SubscriptionService subscriptionService;
 
     @GetMapping("/user/{id}")
@@ -103,26 +100,4 @@ public class UserEndpoint {
     public String unsubscribe(@AuthenticationPrincipal User u, @RequestBody long subscriptionId) {
         return ""; // TODO
     }
-
-    @GetMapping("/user/{userId}/reviews")
-    public List<Review> getUserReviews(@PathVariable long userId) {
-        return reviewService.findReviewsByUserId(userId);
-    }
-
-    @GetMapping("/user/reviews")
-    public List<Review> getUserReviews(@RequestParam String username) {
-        User user = userService.loadUserByUsername(username);
-        if(user == null){
-            return new LinkedList<Review>();
-        }
-        return reviewService.findReviewsByUserId(user.getId());
-    }
-
-    @Secured({"ROLE_USER"})
-    @DeleteMapping("/user/reviews")
-    public boolean deleteReview(@AuthenticationPrincipal User u, @RequestBody long reviewId) {
-        return reviewService.deleteReviewByUser(u, reviewId);
-    }
-
-
 }

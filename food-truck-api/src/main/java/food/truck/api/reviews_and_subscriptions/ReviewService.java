@@ -31,6 +31,10 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
+    public Review findReviewById(long reviewId) {
+        Optional<Review> r = reviewRepository.findById(reviewId);
+        return r.orElse(null);
+    }
 
     public Review saveReview(Long userId, Truck t, int score, int costRating, String reviewText) {
         // Get the current review, if it exists, or create a new one
@@ -47,8 +51,8 @@ public class ReviewService {
         return reviewRepository.save(r);
     }
 
-    public boolean deleteReviewByUser(User u, long reviewId) {
-        Review r = reviewRepository.findById(reviewId).orElse(null);
+    public boolean deleteReviewByUser(User u, long truckId) {
+        Review r = reviewRepository.findByUserIdAndTruckId(u.getId(), truckId).stream().findFirst().orElse(null);
         if (r == null)
             return false; // TODO make return a 404
         else if (!r.getUserId().equals(u.getId()))
