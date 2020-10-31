@@ -3,7 +3,7 @@ import {AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
 
-type Props = {
+export type Props = {
     submitUrl: string,
     submitMethod?: "POST" | "PUT" | "DELETE",
     onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,

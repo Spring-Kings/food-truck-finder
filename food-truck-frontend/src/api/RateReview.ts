@@ -87,6 +87,12 @@ export const loadReviewsByTruck = async (
 };
 
 /**
+ * Generate the URL for leaving a truck review. Allows use of the Form component
+ * @param truckId ID of the truck to review
+ */
+export const getSaveReviewUrl = (truckId: number) => `/reviews/truck/${truckId}`;
+
+/**
  * Create a new review/update an old review for a truck.
  * @param review The frontend representation of the review to post
  * @param onSuccess An optional response to the API request succeeding
