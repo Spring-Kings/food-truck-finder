@@ -8,75 +8,54 @@ import {
   Typography,
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review from "../../../domain/truck/Review";
+import Review, { emptyReview } from "../../../domain/truck/Review";
+import { loadReviewsByTruck } from "../../../api/RateReview";
+import { DEFAULT_ERR_KICK } from "../../../api/DefaultResponses";
+import NotFound from "../../NotFound";
+import getUserInfo, { UserInfo } from "../../../util/token"
+import Form from "../../Form";
 
 interface RateProps {
-    truckId: number;
+  truckId: number;
 }
 
-interface RateState {
-    review: Review;
+export interface RateState {
+  review: Review;
+  user: UserInfo | null | undefined;
 }
 
 class RateReviewComponent extends Component<RateProps, RateState> {
+
   constructor(props: RateProps) {
     super(props);
 
     this.state = {
-        review: 
+      review: emptyReview(-1, this.props.truckId),
+      userInfo: undefined;
     };
+    this.setState = this.setState.bind(this);
   }
 
   async componentDidMount() {
-    //
+    this.setState({
+      user: getUserInfo()
+    });
   }
 
   render() {
-    if (!this.state) {
-      return <NotFound />;
-    } else if (this.state.id < 1) {
+    // Error-handling
+    if (this.state.user === undefined)
       return (
         <Container>
           <CircularProgress />
         </Container>
       );
-    }
+    else if (this.state.user === null)
+      return (<NotFound />);
 
-    return (
-      <Grid container direction="row">
-        <Grid item xs>
-        <Typography variant="h4">{this.state.name}</Typography>
-        <List>
-          <ListItem>
-            Truck Description: {this.state.description}
-          </ListItem>
-          <ListItem>
-            Price Rating: {this.state.priceRating}
-          </ListItem>
-          <ListItem>
-            Food Category: {this.state.foodCategory}
-          </ListItem>
-          <ListItem>
-            Text Menu: {this.state.textMenu}
-          </ListItem>
-        </List>
-        {userCanEditTruck(this.state.userId) &&
-          <Button variant="outlined"
-                  color="primary"
-                  onClick={this.editTruck}>
-            Edit
-          </Button>
-        }        </Grid>
-        <Grid item xs>
-          <TruckRouteMapComponent routePts={this.state.routePts} />
-        </Grid>
-      </Grid>
-    );
+    // Generate actual UI
+    return <Form></Form>;
   }
-
-  editTruck = () => {
-    Router.replace(`/truck/edit/${this.state.id}`);
-  };
 }
 
 export default RateReviewComponent;
