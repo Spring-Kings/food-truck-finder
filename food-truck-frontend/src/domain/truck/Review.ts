@@ -1,31 +1,53 @@
-import { frontendToBackend } from "../../components/map/route-map/RouteLocation";
-
 interface Review {
-    reviewId: number;
-    userId: number;
-    truckId: number;
-    starRating: number;
-    costRating: number;
-    review: string;
-    timestamp: Date;
+  // Administrative stuff
+  reviewId: number;
+  userId: number;
+  truckId: number;
+
+  // Information of interest to users
+  username: string;
+  starRating: number;
+  costRating: number;
+  review: string;
+  timestamp: Date;
 }
 
-export function emptyReview(): Review {
-    return {
-        reviewId: 0,
-        userId: 0,
-        truckId: 0,
-        starRating: 0,
-        costRating: 0,
-        review: "",
-        timestamp: new Date()
-    };
-};
+export function emptyReview(userId: number, truckId: number): Review {
+  return {
+    reviewId: -1,
+    userId,
+    truckId,
+    username: "",
+    starRating: 0,
+    costRating: 0,
+    review: "",
+    timestamp: new Date(),
+  };
+}
 
-export function backendToFrontend(obj: any): Review {
-    return {
-        
-    };
+export function backendToFrontend(obj: any, username: string): Review {
+  return {
+    reviewId: obj.reviewId,
+    userId: obj.userId,
+    truckId: obj.truckId,
+    starRating: obj.starRating,
+    costRating: obj.costRating,
+    review: obj.review,
+    timestamp: obj.timestamp,
+    username,
+  };
+}
+
+export function frontendToBackend(review: Review): any {
+  return {
+    reviewId: review.reviewId,
+    userId: review.userId,
+    truckId: review.truckId,
+    starRating: review.starRating,
+    costRating: review.costRating,
+    review: review.review,
+    timestamp: review.timestamp,
+  };
 }
 
 export default Review;
