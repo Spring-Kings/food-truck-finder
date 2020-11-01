@@ -109,6 +109,8 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    compile 'com.maxmind.geoip2:geoip2:2.15.0'
 }
 
 configurations.all {

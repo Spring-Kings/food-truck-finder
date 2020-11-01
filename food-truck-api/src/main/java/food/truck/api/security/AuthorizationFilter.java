@@ -1,10 +1,14 @@
 package food.truck.api.security;
 
+import food.truck.api.Location;
+import food.truck.api.LocationService;
+import food.truck.api.user.Guest;
 import food.truck.api.user.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 // This filter is used on every request to check for a header called SecurityConstants.HEADER_NAME
 // and it parses/verifies the token stored there, loads the User object, and sets the User as
@@ -22,6 +27,8 @@ import java.io.IOException;
 @Log4j2
 public class AuthorizationFilter extends BasicAuthenticationFilter {
     private final UserService userService;
+    @Autowired
+    private LocationService locationService;
 
     public AuthorizationFilter(AuthenticationManager authManager, UserService userService) {
         super(authManager);
@@ -34,16 +41,25 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader(SecurityConstants.HEADER_NAME);
 
+        request.getRemoteAddr();
+        var loc =
+
         if (header != null) {
-            UsernamePasswordAuthenticationToken authentication = this.authenticate(request);
+            UsernamePasswordAuthenticationToken authentication = this.authenticate(request, loc);
             // Set principal, using the principal stored in the token returned by authenticate
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
         }
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            var guest = new Guest(loc);
+            var auth = new UsernamePasswordAuthenticationToken(guest, null, new ArrayList<>());
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request) {
+    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request, Location loc) {
         String token = request.getHeader(SecurityConstants.HEADER_NAME);
         if (token == null)
             return null;
@@ -67,6 +83,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (claims != null) {
             String username = claims.getSubject();
             var authPrincipal = userService.loadUserByUsername(username);
+            authPrincipal.setLocation(loc);
             return new UsernamePasswordAuthenticationToken(authPrincipal, null, authPrincipal.getAuthorities());
         } else {
             return null;

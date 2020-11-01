@@ -7,6 +7,15 @@ public class Location {
     double latitude;
     double longitude;
 
+    public Location(double lat, double lng) {
+        latitude = lat;
+        longitude = lng;
+    }
+
+    public Location() {
+        this(0, 0);
+    }
+
     public double latitudeRadians() {
         return latitude * Math.PI / 180;
     }

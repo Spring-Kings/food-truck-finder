@@ -16,4 +16,9 @@ public class FoodTruckApplication {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public LocationService locationService() {
+        return new LocationService();
+    }
 }
