@@ -1,0 +1,35 @@
+{
+    "routeId": 1,
+    "truck": {
+        "id": 1,
+        "userId": 2,
+        "name": "WaluigisTacoStand",
+        "menu": null,
+        "textMenu": null,
+        "priceRating": null,
+        "description": null,
+        "schedule": null,
+        "foodCategory": null
+    },
+    "routeName": "RouteWaa",
+    "active": true,
+    "locations": [
+        {
+            "routeLocationId": 1,
+            "arrivalTime": "2020-11-01T00:15:23Z",
+            "exitTime": "2020-11-01T00:15:23Z",
+            "lng": 55,
+            "lat": 77
+        },
+        {
+            "routeLocationId": 2,
+            "arrivalTime": "2020-11-01T00:15:23Z",
+            "exitTime": "2020-11-01T00:15:23Z",
+            "lng": 99,
+            "lat": 9001
+        }
+    ],
+    "days": [
+        "SATURDAY"
+    ]
+}

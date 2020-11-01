@@ -1,0 +1,24 @@
+[
+  {
+    "routeLocationId": 1,
+    "arrivalTime": "2020-11-01T00:15:23Z",
+    "exitTime": "2020-11-01T00:15:23Z",
+    "stopId": 1,
+    "state": 1,
+    "coords": {
+      "lng": 55,
+      "lat": 77
+    }
+  },
+  {
+    "routeLocationId": 2,
+    "arrivalTime": "2020-11-01T00:15:23Z",
+    "exitTime": "2020-11-01T00:15:23Z",
+    "stopId": 2,
+    "state": 1,
+    "coords": {
+      "lng": 99,
+      "lat": 9001
+    }
+  }
+]
