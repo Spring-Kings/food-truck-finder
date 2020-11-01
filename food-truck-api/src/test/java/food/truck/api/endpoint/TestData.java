@@ -64,22 +64,22 @@ public class TestData {
         testRouteA = routeService.createRoute(testTruckA, "testRouteA", true);
         routeService.addDayToRoute(testRouteA.getRouteId(), LocalDateTime.now().getDayOfWeek());
         routeService.createLocation(testRouteA.getRouteId(), 1.23, 1.23, Instant.now(), Instant.now().plusSeconds(1000));
-        testRouteA = routeService.findRouteById(testRouteA.getRouteId()).get(); // Save above two changes
 
         ownerB = userService.createUser("ownerB", "password", "yeetarino", true);
         testTruckB = truckService.createTruck(ownerB.getId(), "testTruckB");
 
-        flushAllChanges();
+        reloadFromDb();
 
         log.info("Done creating test data");
     }
 
-    public void flushAllChanges() {
-        userRepository.flush();
-        reviewRepository.flush();
-        subscriptionRepository.flush();
-        routeLocationRepository.flush();
-        routeRepository.flush();
-        truckRepository.flush();
+    public void reloadFromDb() {
+        standardUser = userService.findUserById(standardUser.getId()).get();
+        ownerA = userService.findUserById(ownerA.getId()).get();
+        testTruckA = truckService.findTruckById(testTruckA.getId()).get();
+        testRouteA = routeService.findRouteById(testRouteA.getRouteId()).get();
+        ownerB = userService.findUserById(ownerB.getId()).get();
+        testTruckB = truckService.findTruckById(testTruckB.getId()).get();
     }
+
 }

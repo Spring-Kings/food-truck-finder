@@ -1,14 +1,13 @@
 package food.truck.api.user;
 
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @Entity
@@ -31,10 +30,13 @@ public class User implements UserDetails {
     @Column(name = "is_owner", nullable = true)
     Boolean isOwner;
 
-    // TODO: These overridden methods may need more functionality
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        var list = new ArrayList<SimpleGrantedAuthority>();
+        list.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (isOwner)
+            list.add(new SimpleGrantedAuthority("ROLE_OWNER"));
+        return list;
     }
 
     @Override
