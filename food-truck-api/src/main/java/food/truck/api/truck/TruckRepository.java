@@ -9,4 +9,5 @@ import java.util.List;
 public interface TruckRepository extends JpaRepository<Truck, Long> {
     List<Truck> findByName(String name);
     List<Truck> findByUserId(Long userId);
+    List<Truck> findByNameLikeAndDescriptionLike(String name, String description);
 }

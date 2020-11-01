@@ -49,6 +49,9 @@ public class TruckEndpoint {
         return truckService.findTruckById(id);
     }
 
+    @GetMapping(path = "/truck/search")
+    public List<Truck> searchTrucks(@RequestParam String search){ return truckService.findTrucks(search);}
+
     @GetMapping("/truck/{truckId}/reviews")
     public String getTruckReviews(@PathVariable long truckId) {
         return ""; // TODO
