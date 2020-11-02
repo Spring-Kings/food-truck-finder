@@ -2,8 +2,8 @@ import api from "../../util/api";
 import { RouteLocation } from "../../components/map/route-map/RouteLocation";
 import * as RouteLocationApi from "../RouteLocation";
 
-import mock_route from "./mock_route_backend.json";
-import mock_route_locs from "./mock_route_frontend.json";
+import mock_route from "./mock_backend_response.json";
+import mock_route_locs from "./frontend_oracle.json";
 
 /**
  * This says 'this whole module is now a mock'. That lets us supply custom return values,
