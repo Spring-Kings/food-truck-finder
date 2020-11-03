@@ -92,7 +92,7 @@ public class NotificationEndpoint {
     ) {
         var notification = notificationService.findById(updateStatus.notificationId);
         notification.ifPresent(n -> {
-            if (n.getSubscription().getUser().getId() == user.getId()) {
+            if (n.getSubscription().getUser().getId().equals(user.getId())) {
                 n.setRead(updateStatus.isRead);
                 notificationService.saveNotification(n);
             }

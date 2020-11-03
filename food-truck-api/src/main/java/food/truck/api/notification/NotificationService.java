@@ -49,11 +49,11 @@ public class NotificationService {
         var n = new Notification();
         n.setSubscription(subscription);
         n.setMessage(message);
-        notificationRepository.saveNotification(n);
+        notificationRepository.save(n);
     }
 
     public void saveNotification(Notification notification) {
-        notificationRepository.saveNotification(notification);
+        notificationRepository.save(notification);
     }
 
 }
