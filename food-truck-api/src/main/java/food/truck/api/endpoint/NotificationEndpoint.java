@@ -2,6 +2,7 @@ package food.truck.api.endpoint;
 
 import food.truck.api.notification.Notification;
 import food.truck.api.notification.NotificationService;
+import food.truck.api.notification.NotificationView;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
@@ -36,7 +37,7 @@ public class NotificationEndpoint {
     }
 
     @Secured({"ROLE_USER"})
-    @PostMapping("/truck/{truckId}/notification")
+    @PostMapping("/truck/notification")
     public boolean sendNotificationForTruck(
         @AuthenticationPrincipal User u,
         @RequestBody SendNotificationParams notificationParams
@@ -50,15 +51,13 @@ public class NotificationEndpoint {
             return false;
         }
         var subscriptions = subscriptionService.findSubsByTruck(truck);
-        for (var subscription : subscriptions) {
-            notificationService.saveNotification(subscription, notificationParams.message);
-        }
+        notificationService.saveNotification(subscriptions, notificationParams.message);
         return true;
     }
 
     @Secured({"ROLE_USER"})
     @GetMapping("/truck/{truckId}/notifications")
-    public List<Notification> sendNotificationForTruck(
+    public List<NotificationView> sendNotificationForTruck(
         @AuthenticationPrincipal User u,
         @PathVariable long truckId
     ) {
@@ -75,7 +74,7 @@ public class NotificationEndpoint {
 
     @Secured({"ROLE_USER"})
     @GetMapping("/notifications")
-    public List<Notification> getNotificationsForUser(@AuthenticationPrincipal User user) {
+    public List<NotificationView> getNotificationsForUser(@AuthenticationPrincipal User user) {
         return notificationService.findNotificationsByUser(user);
     }
 

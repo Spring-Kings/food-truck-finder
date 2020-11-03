@@ -2,6 +2,7 @@ package food.truck.api.endpoint;
 
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
+import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
@@ -235,7 +236,7 @@ public class TruckEndpoint {
 
     @Secured({"ROLE_USER"})
     @PostMapping("/truck/{truckId}/subscribe")
-    public Optional<Subscription> subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
+    public Optional<SubscriptionView> subscribe(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
         if (t.isEmpty()) {
             return Optional.empty();
@@ -246,7 +247,7 @@ public class TruckEndpoint {
         sub.setTruck(truck);
         sub.setUser(u);
 
-        return Optional.of(subscriptionService.saveSubscription(sub));
+        return Optional.of(subscriptionService.saveSubscription(sub)).map(SubscriptionView::of);
     }
 
     @Secured({"ROLE_USER"})
