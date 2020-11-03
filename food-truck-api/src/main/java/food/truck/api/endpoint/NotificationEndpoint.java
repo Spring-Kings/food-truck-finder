@@ -46,7 +46,7 @@ public class NotificationEndpoint {
             return false;
         }
         var truck = t.get();
-        if (!truck.getUserId().equals(u.getId())) {
+        if (!truck.getUserId().equals(u.getId()) && u.getIsOwner()) {
             return false;
         }
         var subscriptions = subscriptionService.findSubsByTruck(truck);
@@ -67,7 +67,7 @@ public class NotificationEndpoint {
             return List.of();
         }
         var truck = t.get();
-        if (!truck.getUserId().equals(u.getId())) {
+        if (!truck.getUserId().equals(u.getId()) && u.getIsOwner()) {
             return List.of();
         }
         return notificationService.findNotificationsByTruck(truck);
@@ -92,8 +92,10 @@ public class NotificationEndpoint {
     ) {
         var notification = notificationService.findById(updateStatus.notificationId);
         notification.ifPresent(n -> {
-            n.setRead(updateStatus.isRead);
-            notificationService.saveNotification(n);
+            if (n.getSubscription().getUser().getId() == user.getId()) {
+                n.setRead(updateStatus.isRead);
+                notificationService.saveNotification(n);
+            }
         });
     }
 }
