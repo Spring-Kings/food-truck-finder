@@ -8,7 +8,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,12 +26,12 @@ import java.util.ArrayList;
 @Log4j2
 public class AuthorizationFilter extends BasicAuthenticationFilter {
     private final UserService userService;
-    @Autowired
-    private LocationService locationService;
+    private final LocationService locationService;
 
-    public AuthorizationFilter(AuthenticationManager authManager, UserService userService) {
+    public AuthorizationFilter(AuthenticationManager authManager, UserService userSvc, LocationService locSvc) {
         super(authManager);
-        this.userService = userService;
+        userService = userSvc;
+        locationService = locSvc;
     }
 
     @Override
@@ -40,9 +39,14 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader(SecurityConstants.HEADER_NAME);
-
-        request.getRemoteAddr();
-        var loc =
+        Location loc;
+        try {
+            loc = locationService.estimateLocation(request);
+        } catch (Exception e) {
+            log.warn("Failed to estimate location", e);
+            // Fall back to some random place in Waco
+            loc = new Location(31.546807, -97.120069);
+        }
 
         if (header != null) {
             UsernamePasswordAuthenticationToken authentication = this.authenticate(request, loc);
