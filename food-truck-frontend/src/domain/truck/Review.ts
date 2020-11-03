@@ -33,7 +33,7 @@ export function backendToFrontend(obj: any, username: string): Review {
     starRating: obj.starRating,
     costRating: obj.costRating,
     review: obj.reviewText,
-    timestamp: obj.timestamp,
+    timestamp: new Date(obj.day_time),
     username,
   };
 }
