@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Button,
   Container,
   FormControlLabel,
   Grid,
@@ -10,6 +11,7 @@ import {
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Review, { emptyReview } from "../../../domain/truck/Review";
 import {
+  deleteReview,
   getSaveReviewUrl,
   loadReviewFromTruckForUser,
 } from "../../../api/RateReview";
@@ -18,6 +20,7 @@ import getUserInfo, { UserInfo } from "../../../util/token";
 import HiddenAttributeForm from "../../util/HiddenAttributeForm";
 import { MoneyRating, StarRating } from "./ratings";
 import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
+import Router from "next/router";
 
 interface RateProps {
   truckId: number;
@@ -41,6 +44,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
     };
     this.switchExtended = this.switchExtended.bind(this);
     this.changeRating = this.changeRating.bind(this);
+    this.deleteReview = this.deleteReview.bind(this);
   }
 
   async componentDidMount() {
@@ -106,6 +110,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         <Grid item key="hidden_review_form">
           <HiddenAttributeForm
             submitUrl={getSaveReviewUrl(this.props.truckId)}
+            onSuccessfulSubmit={() => Router.replace(`/truck/reviews/${this.props.truckId}`)}
             hiddenAttrs={[
               { name: "userId", defaultValue: this.state.user.userID },
             ]}
@@ -138,6 +143,9 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             ) : null}
           </HiddenAttributeForm>
         </Grid>
+        <Grid item xs>
+          <Button variant="outlined" color="secondary" onClick={this.deleteReview}>DELETE REVIEW</Button>
+        </Grid>
       </Grid>
     );
   }
@@ -159,6 +167,11 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         extended: checked
       }
     });
+  }
+
+  private deleteReview() {
+    if (confirm("Are you sure you want to delete your review?") && deleteReview(this.props.truckId, DEFAULT_ERR_RESP))
+      Router.replace(`/truck/reviews/${this.props.truckId}`);
   }
 }
 

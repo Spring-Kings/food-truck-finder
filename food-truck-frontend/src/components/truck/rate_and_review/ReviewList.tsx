@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import {
+  Button,
   Container,
   Grid,
   Typography,
@@ -9,6 +10,7 @@ import Review from "../../../domain/truck/Review";
 import { loadReviewsByTruck } from "../../../api/RateReview";
 import { DEFAULT_ERR_KICK } from "../../../api/DefaultResponses";
 import { MoneyRating, StarRating } from "./ratings";
+import Router from "next/router";
 
 interface RateProps {
   truckId: number;
@@ -25,6 +27,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     this.state = {
       reviews: [],
     };
+    this.returnTruckPage = this.returnTruckPage.bind(this);
   }
 
   async componentDidMount() {
@@ -53,6 +56,9 @@ class ReviewListComponent extends Component<RateProps, RateState> {
   private createReviewHeader = () => (
     /** TODO put title, overall stars, overall cost here */
     <Grid container item xs key="head">
+      <Grid item xs key="back">
+        <Button variant="contained" onClick={this.returnTruckPage}>Back to Truck</Button>
+      </Grid>
       <Grid item xs key="name">
         <Typography variant="h4">{/** TODO put title here */}</Typography>
       </Grid>
@@ -97,6 +103,10 @@ class ReviewListComponent extends Component<RateProps, RateState> {
       </Grid>
     </Grid>
   );
+
+  private returnTruckPage() {
+    Router.replace(`/truck/${this.props.truckId}`)
+  }
 }
 
 export default ReviewListComponent;
