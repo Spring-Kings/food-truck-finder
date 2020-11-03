@@ -48,4 +48,8 @@ public class NotificationService {
         notificationRepository.saveNotification(n);
     }
 
+    public void saveNotification(Notification notification) {
+        notificationRepository.saveNotification(notification);
+    }
+
 }

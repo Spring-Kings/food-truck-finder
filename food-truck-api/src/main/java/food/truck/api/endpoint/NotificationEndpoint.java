@@ -78,4 +78,27 @@ public class NotificationEndpoint {
     public List<Notification> getNotificationsForUser(@AuthenticationPrincipal User user) {
         return notificationService.findNotificationsByUser(user);
     }
+
+    public static class UpdateNotificationStatusParams {
+        long notificationId;
+        boolean isRead;
+    }
+
+    @Secured({"ROLE_USER"})
+    @PutMapping("/notification/read")
+    public void setNotificationReadStatus(
+        @AuthenticationPrincipal User user,
+        @RequestBody UpdateNotificationStatusParams updateStatus
+    ) {
+        var notifications = notificationService.findNotificationsByUser(user);
+        var filtered = notifications
+            .stream()
+            .filter(n -> n.getId() == updateStatus.notificationId)
+            .iterator();
+        if (filtered.hasNext()) {
+            var notification = filtered.next();
+            notification.setRead(updateStatus.isRead);
+            notificationService.saveNotification(notification);
+        }
+    }
 }
