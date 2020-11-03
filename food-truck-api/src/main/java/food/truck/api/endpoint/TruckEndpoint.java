@@ -10,15 +10,15 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,21 +73,24 @@ public class TruckEndpoint {
         String truckName;
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @DeleteMapping("/truck/delete/{truckId}")
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
-        t.ifPresent(truck -> {
-            if (truck.getUserId().equals(u.getId())) {
-                truckService.deleteTruck(truckId);
-            }
-        });
+        if (t.isPresent()) {
+            var truck = t.get();
+            if (!truck.getUserId().equals(u.getId()))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+            truckService.deleteTruck(truckId);
+        } else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
     @Value
@@ -111,18 +114,19 @@ public class TruckEndpoint {
     }
 
     @GetMapping("/truck/owner")
+    @Secured("ROLE_OWNER")
     public List<Truck> getTruckByUser(@AuthenticationPrincipal User u) {
         return truckService.findTruck(u.getId());
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
         var t = truckService.findTruckById(data.truckId);
         if (t.isPresent()) {
             var truck = t.get();
             if (!u.getId().equals(truck.getUserId())) {
-                return Optional.empty();
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             }
             return Optional.of(truckService.updateTruck(
                     truck,
@@ -141,28 +145,40 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/routes")
     public List<Route> getRoutes(@PathVariable long truckId) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck == null || truck.isEmpty()) {
-            return new LinkedList<Route>();
+        if (truck.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         return routeService.findRouteByTruck(truck.get());
     }
 
+    @Secured("ROLE_OWNER")
     @DeleteMapping("/truck/routes-delete/{routeId}")
     public void deleteRoute(@AuthenticationPrincipal User u, @PathVariable long routeId) {
-        routeService.deleteRoute(routeId);
+        var r = routeService.findRouteById(routeId);
+        if (r.isPresent()) {
+            var route = r.get();
+            if (!route.getTruck().getUserId().equals(u.getId()))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+            routeService.deleteRoute(routeId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 
     @Value
-    private static class UpdateRouteParams {
+    public static class UpdateRouteParams {
         long routeId;
-        Optional<String> newName;
-        Optional<Boolean> newActive;
+        @Nullable
+        String newName;
+        @Nullable
+        Boolean newActive;
     }
 
     @PutMapping("/truck/{truckId}/update-route")
     public boolean updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
-        return routeService.updateRoute(data.routeId, data.newName, data.newActive);
+        return routeService.updateRoute(data.routeId, Optional.ofNullable(data.newName), Optional.ofNullable(data.newActive));
     }
 
     @Value

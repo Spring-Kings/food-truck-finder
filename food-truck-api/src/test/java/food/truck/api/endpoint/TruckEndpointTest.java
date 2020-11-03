@@ -1,69 +1,183 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.routes.Route;
 import food.truck.api.truck.Truck;
-import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class TruckEndpointTest extends AuthenticationEndpointTest {
+public class TruckEndpointTest extends EndpointTest {
     @Test
-    public void createTruck() {
-        loginSuccess();
-        String path = base + "truck/create";
-        var data = new TruckEndpoint.CreateTruckParams("truck1");
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var request = new HttpEntity<>(data, headers);
-        var response = template.postForEntity(path, request, Truck.class);
-        var truck = response.getBody();
+    public void getTruck() throws Exception {
+        var req = get("/truck/{id}", data.testTruckA.getId());
+        var strResponse = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        var truck = fromJson(strResponse, Truck.class);
         assertNotNull(truck);
-        assertEquals(truck.getName(), "truck1");
     }
 
     @Test
-    public void deleteTruck() {
-        createTruck();
-        String path = base + "truck/delete/1";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var request = new HttpEntity<>("", headers);
-        template.exchange(path, HttpMethod.DELETE, request, String.class);
-        var response = template.getForEntity(base + "truck/1", Truck.class);
-        var truck = response.getBody();
-        assertNull(truck);
+    public void createTruck() throws Exception {
+        var req = post("/truck/create")
+                .content(asJson(new TruckEndpoint.CreateTruckParams("truck123")))
+                .contentType("application/json")
+                .with(user(data.ownerA));
+        var strResp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Truck result = fromJson(strResp, Truck.class);
+
+        assertNotNull(result);
+        assertEquals(result.getName(), "truck123");
     }
 
     @Test
-    public void updateTruck() {
-        createTruck();
-        String path = base + "truck/update";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var body = new TruckEndpoint.UpdateTruckParams(1, "new name", "desc", (long)5, null, null, null, null);
-        var request = new HttpEntity<>(body, headers);
-        var response = template.exchange(path, HttpMethod.PUT, request, Truck.class);
-        var truck = response.getBody();
-        assertNotNull(truck);
-        assertEquals(body.getName(), truck.getName());
-        assertEquals(body.getDescription(), truck.getDescription());
-        assertEquals(body.getPriceRating(), truck.getPriceRating());
-        assertNull(truck.getFoodCategory());
-        assertNull(truck.getMenu());
-        assertNull(truck.getTextMenu());
-        assertNull(truck.getSchedule());
+    public void createTruckAsStandardUserFail() throws Exception {
+        var req = post("/truck/create")
+                .content(asJson(new TruckEndpoint.CreateTruckParams("truck123")))
+                .contentType("application/json")
+                .with(user(data.standardUser));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+
+        assertTrue(truckService.findTruck("truck123").isEmpty());
     }
 
     @Test
-    public void getTruck() {
-        createTruck();
-        var response = template.getForEntity(base + "truck/1", Truck.class);
-        var truck = response.getBody();
-        assertNotNull(truck);
-        response = template.getForEntity(base + "truck/2", Truck.class);
-        truck = response.getBody();
-        assertNull(truck);
+    public void deleteTruck() throws Exception {
+        var req = delete("/truck/delete/{id}", data.testTruckA.getId())
+                .with(user(data.ownerA));
+        mockMvc.perform(req)
+                .andExpect(status().isOk());
+
+        assertEquals(0, truckService.findTruck(data.testTruckA.getName()).size());
     }
+
+    @Test
+    public void deleteTruckStandardUserFail() throws Exception {
+        var req = delete("/truck/delete/{id}", data.testTruckA.getId())
+                .with(user(data.standardUser));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+        assertEquals(1, truckService.findTruck(data.testTruckA.getName()).size());
+    }
+
+    @Test
+    public void deleteDifferentOwnersTruckFail() throws Exception {
+        var req = delete("/truck/delete/{id}", data.testTruckA.getId())
+                .with(user(data.ownerB));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+        assertEquals(1, truckService.findTruck(data.testTruckA.getName()).size());
+    }
+
+    @Test
+    public void getOwnTruck() throws Exception {
+        var req = get("/truck/owner")
+                .with(user(data.ownerA));
+        var strResp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        var trucks = fromJsonList(strResp, Truck.class);
+        assertThat(trucks, contains(data.testTruckA));
+    }
+
+    @Test
+    public void getOwnTruckStandardUserFail() throws Exception {
+        var req = get("/truck/owner")
+                .with(user(data.standardUser));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void updateTruck() throws Exception {
+        var req = put("/truck/update")
+                .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
+                        3L, null, null, null, null)))
+                .contentType("application/json")
+                .with(user(data.ownerA));
+        String resp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        Truck t = fromJson(resp, Truck.class);
+        assertEquals("truck1337", t.getName());
+        assertEquals("a cool truck", t.getDescription());
+        assertEquals(3L, t.getPriceRating());
+        assertNull(t.getFoodCategory());
+        assertNull(t.getMenu());
+        assertNull(t.getTextMenu());
+        assertNull(t.getSchedule());
+
+        var truck = truckService.findTruck("truck1337").get(0);
+        assertEquals(truck, t);
+    }
+
+    @Test
+    public void updateOtherOwnersTruckFail() throws Exception {
+        var req = put("/truck/update")
+                .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
+                        3L, null, null, null, null)))
+                .contentType("application/json")
+                .with(user(data.ownerB));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @Transactional
+    public void getRoutes() throws Exception {
+        var req = get("/truck/{id}/routes", data.testTruckA.getId());
+        String resp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        var list = fromJsonList(resp, Route.class);
+        assertThat(list, contains(data.testRouteA));
+    }
+
+    @Test
+    public void getRoutesBadId() throws Exception {
+        var req = get("/truck/{id}/routes", 83579233);
+        mockMvc.perform(req).andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void deleteRoute() throws Exception {
+        var req = delete("/truck/routes-delete/{rId}", data.testRouteA.getRouteId())
+                .with(user(data.ownerA));
+        mockMvc.perform(req)
+                .andExpect(status().isOk());
+        assertTrue(routeService.findRouteById(data.testRouteA.getRouteId()).isEmpty());
+    }
+
+    @Test
+    public void deleteOtherOwnersRouteFail() throws Exception {
+        var req = delete("/truck/routes-delete/{rId}", data.testRouteA.getRouteId())
+                .with(user(data.ownerB));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError());
+        assertTrue(routeService.findRouteById(data.testRouteA.getRouteId()).isPresent());
+    }
+
+    @Test
+    public void updateRoute() throws Exception {
+        var req = put("/truck/{tId}/update-route", data.testTruckA.getId())
+                .content(asJson(new TruckEndpoint.UpdateRouteParams(data.testRouteA.getRouteId(), "newName", null)))
+                .contentType("application/json")
+                .with(user(data.ownerA));
+        mockMvc.perform(req)
+                .andExpect(status().isOk());
+        var r = routeService.findRouteById(data.testRouteA.getRouteId());
+        assertTrue(r.isPresent());
+        assertEquals("newName", r.get().getRouteName());
+        assertEquals(data.testRouteA.isActive(), r.get().isActive());
+    }
+
 }
