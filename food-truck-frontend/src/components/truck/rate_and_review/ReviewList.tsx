@@ -25,7 +25,6 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     this.state = {
       reviews: [],
     };
-    this.setState = this.setState.bind(this);
   }
 
   async componentDidMount() {
@@ -44,7 +43,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     }
 
     return (
-      <Grid container direction="column">
+      <Grid container direction="column" spacing={5}>
         {this.createReviewHeader()}
         {this.state.reviews.map((review) => this.createReviewEntry(review))}
       </Grid>
@@ -95,9 +94,6 @@ class ReviewListComponent extends Component<RateProps, RateState> {
             {review.review}
           </Grid>
         )}
-        <Grid item key="br">
-          <br />
-        </Grid>
       </Grid>
     </Grid>
   );
