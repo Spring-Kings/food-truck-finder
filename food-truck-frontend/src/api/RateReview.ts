@@ -36,11 +36,54 @@ export const loadReviewsByUser = async (
     }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    if (onFail) onFail(e);
     reviews = [];
+    if (onFail) onFail(e);
   }
 
   return reviews;
+};
+
+/**
+ * Get the review on a truck by a particular user
+ * @param truckId The ID of the truck to load the review for
+ * @param userId The ID of the user to load the review from
+ * @param onFail An optional response to the API request failing
+ */
+export const loadReviewFromTruckForUser = async (
+  truckId: number,
+  userId: number,
+  onFail?: ClientResponseAction
+) => {
+  let review: Review | null = null;
+  try {
+    // Fetch username
+    let name: any = await api.request({
+      url: `/user/${userId}`,
+      method: "GET",
+    });
+
+    // If we got a good response, then this user exists; create frontend representation of reviews
+    if (name.data !== null) {
+      // Get the reviews by this user
+      let resp: any = await api.request({
+        url: `/reviews/truck/${truckId}/user`,
+        params: {
+          userId: userId
+        },
+        method: "GET",
+      });
+
+      // Map review to a frontend review
+      if (resp.data !== null)
+        review = backendToFrontend(resp.data, name.data.username);
+    }
+  } catch (e: any) {
+    // Derp. Handle failure as the client requested and return null
+    review = null;
+    if (onFail) onFail(e);
+  }
+
+  return review;
 };
 
 /**
@@ -80,8 +123,8 @@ export const loadReviewsByTruck = async (
       }));
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    if (onFail) onFail(e);
     reviews = [];
+    if (onFail) onFail(e);
   }
 
   return reviews;

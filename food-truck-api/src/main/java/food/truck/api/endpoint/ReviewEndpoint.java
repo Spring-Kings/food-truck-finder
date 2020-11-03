@@ -56,6 +56,11 @@ public class ReviewEndpoint {
         return reviewService.findReviewByTruckId(truckId);
     }
 
+    @GetMapping("/reviews/truck/{truckId}/user")
+    public Review getTruckReviews(@PathVariable long truckId, @RequestParam Long userId) {
+        return reviewService.findReviewForUser(userId, truckId);
+    }
+
     @Value
     private static class PostReviewParams {
         Long userId;

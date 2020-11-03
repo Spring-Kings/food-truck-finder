@@ -9,11 +9,15 @@ import {
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Review, { emptyReview } from "../../../domain/truck/Review";
-import { getSaveReviewUrl } from "../../../api/RateReview";
+import {
+  getSaveReviewUrl,
+  loadReviewFromTruckForUser,
+} from "../../../api/RateReview";
 import NotFound from "../../NotFound";
 import getUserInfo, { UserInfo } from "../../../util/token";
 import HiddenAttributeForm from "../../util/HiddenAttributeForm";
 import { MoneyRating, StarRating } from "./ratings";
+import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
 
 interface RateProps {
   truckId: number;
@@ -22,7 +26,6 @@ interface RateProps {
 export interface RateState {
   review: Review;
   user: UserInfo | null | undefined;
-  extended: boolean;
 }
 
 /** Number of rows for the review field */
@@ -35,22 +38,29 @@ class RateReviewComponent extends Component<RateProps, RateState> {
     this.state = {
       review: emptyReview(-1, this.props.truckId),
       user: undefined,
-      extended: false,
     };
     this.switchExtended = this.switchExtended.bind(this);
     this.changeRating = this.changeRating.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     let user: UserInfo | null = getUserInfo();
     if (user !== null) {
-      this.setState({
-        review: {
-          ...this.state.review,
-          userId: user.userID,
-        },
-        user,
-      });
+      let review: Review | null = await loadReviewFromTruckForUser(
+        this.props.truckId,
+        user.userID,
+        DEFAULT_ERR_RESP
+      );
+      console.log(review);
+      if (review === null)
+        this.setState({
+          review: {
+            ...this.state.review,
+            userId: user.userID,
+          },
+          user,
+        });
+      else this.setState({ review: review, user: user });
     } else
       this.setState({
         user: getUserInfo(),
@@ -86,7 +96,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             label="Leave Extended Review"
             control={
               <Switch
-                value={this.state.extended}
+                defaultChecked={this.state.review.extended}
+                value={this.state.review.extended}
                 onChange={this.switchExtended}
               />
             }
@@ -97,14 +108,28 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             submitUrl={getSaveReviewUrl(this.props.truckId)}
             hiddenAttrs={[
               { name: "userId", defaultValue: this.state.user.userID },
-            ]}>
-            <StarRating name="score" onChange={(_: any, value: number | null) => this.changeRating(value, "starRating")} />
-            <MoneyRating name="costRating" onChange={(_: any, value: number | null) => this.changeRating(value, "costRating")} />
-            {this.state.extended ? (
+            ]}
+          >
+            <StarRating
+              name="score"
+              defaultValue={this.state.review.starRating}
+              onChange={(_: any, value: number | null) =>
+                this.changeRating(value, "starRating")
+              }
+            />
+            <MoneyRating
+              name="costRating"
+              defaultValue={this.state.review.costRating}
+              onChange={(_: any, value: number | null) =>
+                this.changeRating(value, "costRating")
+              }
+            />
+            {this.state.review.extended ? (
               <TextField
                 label="Review"
                 variant="outlined"
                 name="reviewText"
+                defaultValue={this.state.review.review}
                 multiline
                 fullWidth
                 rows={NUM_ROWS}
@@ -123,13 +148,16 @@ class RateReviewComponent extends Component<RateProps, RateState> {
 
     this.setState({
       ...this.state,
-      [which]: newRating
+      [which]: newRating,
     });
   }
 
   private switchExtended(_: any, checked: boolean) {
     this.setState({
-      extended: checked,
+      review: {
+        ...this.state.review,
+        extended: checked
+      }
     });
   }
 }

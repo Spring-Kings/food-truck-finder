@@ -62,4 +62,8 @@ public class ReviewService {
         reviewRepository.delete(r);
         return true;
     }
+
+    public Review findReviewForUser(Long userId, Long truckId) {
+        return reviewRepository.findByUserIdAndTruckId(userId, truckId).stream().findFirst().orElse(null);
+    }
 }

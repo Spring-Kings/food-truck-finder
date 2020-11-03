@@ -3,6 +3,7 @@ interface Review {
   reviewId: number;
   userId: number;
   truckId: number;
+  extended: boolean | undefined;
 
   // Information of interest to users
   username: string;
@@ -17,6 +18,7 @@ export function emptyReview(userId: number, truckId: number): Review {
     reviewId: -1,
     userId,
     truckId,
+    extended: false,
     username: "",
     starRating: 0,
     costRating: 0,
@@ -30,6 +32,7 @@ export function backendToFrontend(obj: any, username: string): Review {
     reviewId: obj.reviewId,
     userId: obj.userId,
     truckId: obj.truckId,
+    extended: obj.reviewText.length > 0,
     starRating: obj.starRating,
     costRating: obj.costRating,
     review: obj.reviewText,
@@ -45,7 +48,7 @@ export function frontendToBackend(review: Review): any {
     truckId: review.truckId,
     starRating: review.starRating,
     costRating: review.costRating,
-    review: review.review,
+    review: (review.extended? review.review : ""),
     timestamp: review.timestamp,
   };
 }
