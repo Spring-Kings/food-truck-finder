@@ -25,7 +25,7 @@ const subscriptionJSON =
     [{
             id: "",
             userId: "",
-            name: "ice cream",
+            name: "",
             menu: "",
             textMenu: "",
             priceRating: "",

@@ -14,10 +14,10 @@ import {
 } from "@material-ui/core";
 import DateFns from "@date-io/date-fns";
 
-import { RouteStop } from "./RouteStop";
+import { RouteLocation } from "./RouteLocation";
 
 interface ERSDProps {
-  routePt: RouteStop | undefined;
+  routePt: RouteLocation | undefined;
   confirm: (arrival: Date, departure: Date) => void;
   cancel: () => void;
   delete: () => void;
