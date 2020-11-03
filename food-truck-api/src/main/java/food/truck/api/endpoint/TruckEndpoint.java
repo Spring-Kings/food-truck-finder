@@ -1,5 +1,7 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.reviews_and_subscriptions.Subscription;
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
@@ -21,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -30,6 +33,9 @@ public class TruckEndpoint {
 
     @Autowired
     private RouteService routeService;
+
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @GetMapping("/nearby-trucks")
     public String getNearbyTrucks(@RequestParam String location) {
@@ -225,5 +231,40 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/active-route")
     public Route getTodaysRoute(@PathVariable long truckId) {
         return truckService.getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+    }
+
+    @Secured({"ROLE_USER"})
+    @PostMapping("/truck/{truckId}/subscribe")
+    public Optional<Subscription> subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
+        var t = truckService.findTruckById(truckId);
+        if (t.isEmpty()) {
+            return Optional.empty();
+        }
+        var truck = t.get();
+
+        var sub = new Subscription();
+        sub.setTruck(truck);
+        sub.setUser(u);
+
+        return Optional.of(subscriptionService.saveSubscription(sub));
+    }
+
+    @Secured({"ROLE_USER"})
+    @DeleteMapping("/truck/{truckId}/unsubscribe")
+    public void unsubscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
+        var t = truckService.findTruckById(truckId);
+        if (t.isEmpty()) {
+            return;
+        }
+        var truck = t.get();
+        var subs = subscriptionService.findSubsByUser(u);
+        var filteredSubs = subs
+            .stream()
+            .filter(sub -> sub.getTruck().equals(truck))
+            .iterator();
+        if (filteredSubs.hasNext()) {
+            var sub = filteredSubs.next();
+            subscriptionService.deleteSubscription(sub);
+        }
     }
 }

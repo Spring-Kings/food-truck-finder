@@ -1,5 +1,6 @@
 package food.truck.api.notification;
 
+import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionRepository;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +39,13 @@ public class NotificationService {
 
     public List<Notification> findNotificationsBySubscriptionId(long id) {
         return notificationRepository.findBySubscriptionId(id);
+    }
+
+    public void saveNotification(Subscription subscription, String message) {
+        var n = new Notification();
+        n.setSubscription(subscription);
+        n.setMessage(message);
+        notificationRepository.saveNotification(n);
     }
 
 }

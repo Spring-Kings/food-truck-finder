@@ -22,6 +22,9 @@ public class Notification {
     @Column(name = "message", nullable = false)
     String message;
 
+    @Column(name = "is_read", nullable = false)
+    boolean isRead;
+
     @Column(name = "time", nullable = false)
     Instant time;
 }
