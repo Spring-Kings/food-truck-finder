@@ -119,13 +119,22 @@ class TruckView extends Component<TruckProps, State> {
             Text Menu: {this.state.textMenu}
           </ListItem>
         </List>
-        {userCanEditTruck(this.state.userId) &&
-          <Button variant="outlined"
-                  color="primary"
-                  onClick={this.editTruck}>
-            Edit
-          </Button>
-        }        </Grid>
+        <Grid container direction="row">
+          <Grid item>
+            {userCanEditTruck(this.state.userId)?
+              <Button variant="outlined"
+                      color="primary"
+                      onClick={this.editTruck}>
+                Edit
+              </Button> :
+              <Button variant="outlined" color="primary" onClick={this.reviewTruck}>Leave Review</Button>
+            }
+          </Grid>
+          <Grid>
+            <Button variant="outlined" color="primary" onClick={this.readReviews}>Read Reviews</Button>
+          </Grid>
+        </Grid>
+        </Grid>
         <Grid item xs>
           <TruckRouteMapComponent routePts={this.state.routePts} />
         </Grid>
@@ -135,6 +144,14 @@ class TruckView extends Component<TruckProps, State> {
 
   editTruck = () => {
     Router.replace(`/truck/edit/${this.state.id}`);
+  };
+  
+  reviewTruck = () => {
+    Router.replace(`/truck/reviews/create/${this.state.id}`);
+  };
+
+  readReviews = () => {
+    Router.replace(`/truck/reviews/${this.state.id}`);
   };
 }
 
