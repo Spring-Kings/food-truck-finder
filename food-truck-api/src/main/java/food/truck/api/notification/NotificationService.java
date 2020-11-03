@@ -19,6 +19,10 @@ public class NotificationService {
     @Autowired
     SubscriptionRepository subscriptionRepository;
 
+    public Optional<Notification> findById(long id) {
+        return notificationRepository.findById(id);
+    }
+
     public List<Notification> findBySubscriptionId(long subId) {
         return notificationRepository.findBySubscriptionId(subId);
     }

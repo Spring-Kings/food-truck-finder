@@ -90,15 +90,10 @@ public class NotificationEndpoint {
         @AuthenticationPrincipal User user,
         @RequestBody UpdateNotificationStatusParams updateStatus
     ) {
-        var notifications = notificationService.findNotificationsByUser(user);
-        var filtered = notifications
-            .stream()
-            .filter(n -> n.getId() == updateStatus.notificationId)
-            .iterator();
-        if (filtered.hasNext()) {
-            var notification = filtered.next();
-            notification.setRead(updateStatus.isRead);
-            notificationService.saveNotification(notification);
-        }
+        var notification = notificationService.findById(updateStatus.notificationId);
+        notification.ifPresent(n -> {
+            n.setRead(updateStatus.isRead);
+            notificationService.saveNotification(n);
+        });
     }
 }
