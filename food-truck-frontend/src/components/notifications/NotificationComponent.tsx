@@ -4,6 +4,7 @@ import {deleteNotification, Notification, setNotificationAsRead} from "../../api
 
 interface NotificationProps {
   notification: Notification;
+  deletedCallback: (id: number) => void;
 }
 
 function NotificationComponent(props: NotificationProps) {
@@ -15,7 +16,10 @@ function NotificationComponent(props: NotificationProps) {
           {`From: ${props.notification.truck.name} at ${props.notification.time}`}
           <Button variant="outlined"
                   color="secondary"
-                  onClick={() => deleteNotification(props.notification.id)}>
+                  onClick={async () => {
+                    props.deletedCallback(props.notification.id);
+                    await deleteNotification(props.notification.id);
+                  }}>
             Delete
           </Button>
           {"Read"}

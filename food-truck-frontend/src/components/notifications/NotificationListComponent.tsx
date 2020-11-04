@@ -18,9 +18,25 @@ function NotificationListComponent() {
     setNotifications(notifs);
   };
 
+  const deleteNotification = (id: number) => {
+    if (notifications == null) {
+      return;
+    }
+    const ndx: number = notifications?.map(notification => notification.id).indexOf(id);
+    if (ndx > -1) {
+      notifications?.splice(ndx, 1);
+    }
+    setNotifications(notifications);
+  };
+
   return (
     <Grid container direction="column" style={{ overflow: "auto" }}>
-      {notifications?.map((notification: Notification) => <NotificationComponent notification={notification}/>)}
+      {
+        notifications?.map((notification: Notification) => <NotificationComponent
+          notification={notification}
+          deletedCallback={deleteNotification}
+        />)
+      }
     </Grid>
   );
 }
