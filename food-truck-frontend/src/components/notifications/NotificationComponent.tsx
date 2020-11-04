@@ -20,6 +20,7 @@ function NotificationComponent(props: NotificationProps) {
           </Button>
           {"Read"}
           <Switch value={read}
+                  defaultChecked={read}
                   onChange={async () => {
                     setRead(!read);
                     await setNotificationAsRead(props.notification.id, read);
