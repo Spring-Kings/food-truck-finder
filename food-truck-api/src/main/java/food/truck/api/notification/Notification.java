@@ -22,6 +22,7 @@ public class Notification {
     @Column(name = "message", nullable = false)
     String message;
 
+    // This gets returned in json as "read" because Lombok likes to be smart
     @Column(name = "is_read", nullable = false)
     boolean isRead;
 

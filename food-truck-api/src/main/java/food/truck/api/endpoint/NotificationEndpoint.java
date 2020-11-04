@@ -78,6 +78,7 @@ public class NotificationEndpoint {
         return notificationService.findNotificationsByUser(user);
     }
 
+    @Value
     public static class UpdateNotificationStatusParams {
         long notificationId;
         boolean isRead;
@@ -91,9 +92,7 @@ public class NotificationEndpoint {
     ) {
         var notification = notificationService.findById(updateStatus.notificationId);
         notification.ifPresent(n -> {
-            log.info("notif present");
             if (n.getSubscription().getUser().getId().equals(user.getId())) {
-                log.info("same uid");
                 n.setRead(updateStatus.isRead);
                 notificationService.saveNotification(n);
             }

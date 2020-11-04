@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {Grid, Card, CardContent, Button, Switch} from "@material-ui/core";
 import {deleteNotification, Notification, setNotificationAsRead} from "../../api/Notification";
 
@@ -7,6 +7,7 @@ interface NotificationProps {
 }
 
 function NotificationComponent(props: NotificationProps) {
+  const [read, setRead]: [boolean, any] = useState(props.notification.read);
   return (
     <Grid item xs>
       <Card>
@@ -18,8 +19,11 @@ function NotificationComponent(props: NotificationProps) {
             Delete
           </Button>
           {"Read"}
-          <Switch value={props.notification.isRead}
-                  onChange={() => setNotificationAsRead(props.notification.id, !props.notification.isRead)}
+          <Switch value={read}
+                  onChange={async () => {
+                    setRead(!read);
+                    await setNotificationAsRead(props.notification.id, read);
+                  }}
                   name="Read"
           />
         </CardContent>
@@ -29,10 +33,6 @@ function NotificationComponent(props: NotificationProps) {
       </Card>
     </Grid>
   );
-}
-
-const toggleRead = () => {
-
 }
 
 export default NotificationComponent;

@@ -6,7 +6,7 @@ export interface Notification {
   message: string;
   truck: TruckState;
   time: Date;
-  isRead: boolean;
+  read: boolean;
 }
 
 export const getNotifications = async () => {
