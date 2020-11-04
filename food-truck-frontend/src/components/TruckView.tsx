@@ -17,6 +17,10 @@ import { RouteLocation } from "./map/route-map/RouteLocation";
 
 import { DEFAULT_ERR_RESP } from "../api/DefaultResponses";
 import { loadTodaysRoute } from "../api/RouteLocation";
+import SendNotificationComponent from "./notifications/SendNotificationComponent";
+import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from "../api/Subscription";
+import {Subscription} from "../api/Subscription";
+import {getSortedUsageRows} from "@jest/core/build/lib/watch_plugins_helpers";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -52,6 +56,7 @@ export interface TruckProps {
 
 type State = TruckState & TruckViewState & {
   routePts: RouteLocation[];
+  subscription: Subscription | null;
 };
 
 class TruckView extends Component<TruckProps, State> {
@@ -67,7 +72,8 @@ class TruckView extends Component<TruckProps, State> {
       priceRating: null,
       foodCategory: null,
       textMenu: null,
-      routePts: []
+      routePts: [],
+      subscription: null,
     };
   }
 
@@ -86,8 +92,18 @@ class TruckView extends Component<TruckProps, State> {
         this.setState(null);
       });
 
+    await getSubscriptionForTruck(this.props.truckId).then((sub) => {
+      this.setState({
+        ...this.state,
+        subscription: sub
+      })
+    });
+
     // Load today's route
-    this.setState({ routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP) });
+    this.setState({
+      ...this.state,
+      routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP),
+    });
   }
 
   render() {
@@ -104,28 +120,42 @@ class TruckView extends Component<TruckProps, State> {
     return (
       <Grid container direction="row">
         <Grid item xs>
-        <Typography variant="h4">{this.state.name}</Typography>
-        <List>
-          <ListItem>
-            Truck Description: {this.state.description}
-          </ListItem>
-          <ListItem>
-            Price Rating: {this.state.priceRating}
-          </ListItem>
-          <ListItem>
-            Food Category: {this.state.foodCategory}
-          </ListItem>
-          <ListItem>
-            Text Menu: {this.state.textMenu}
-          </ListItem>
-        </List>
-        {userCanEditTruck(this.state.userId) &&
-          <Button variant="outlined"
-                  color="primary"
-                  onClick={this.editTruck}>
-            Edit
-          </Button>
-        }        </Grid>
+          <Typography variant="h4">{this.state.name}</Typography>
+          <List>
+            <ListItem>
+              Truck Description: {this.state.description}
+            </ListItem>
+            <ListItem>
+              Price Rating: {this.state.priceRating}
+            </ListItem>
+            <ListItem>
+              Food Category: {this.state.foodCategory}
+            </ListItem>
+            <ListItem>
+              Text Menu: {this.state.textMenu}
+            </ListItem>
+          </List>
+          <Grid>
+            <Button variant="outlined"
+                    color="primary"
+                    onClick={this.handleSubscription}>
+              {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
+            </Button>
+            {userCanEditTruck(this.state.userId) &&
+              <>
+                <Button variant="outlined"
+                        color="primary"
+                        onClick={this.editTruck}>
+                  Edit
+                </Button>
+                <Grid>
+                  {"Send Notification To Subscribers:"}
+                  <SendNotificationComponent truckId={this.state.id}/>
+                </Grid>
+              </>
+            }
+          </Grid>
+        </Grid>
         <Grid item xs>
           <TruckRouteMapComponent routePts={this.state.routePts} />
         </Grid>
@@ -136,6 +166,23 @@ class TruckView extends Component<TruckProps, State> {
   editTruck = () => {
     Router.replace(`/truck/edit/${this.state.id}`);
   };
+
+  handleSubscription = () => {
+    if (this.state.subscription != null) {
+      unsubscribeFromTruck(this.state.id).then(() => {});
+      this.setState({
+        ...this.state,
+        subscription: null,
+      });
+    } else {
+      subscribeToTruck(this.state.id).then((sub) => {
+        this.setState({
+          ...this.state,
+          subscription: sub
+        });
+      });
+    }
+  }
 }
 
 export default TruckView;
