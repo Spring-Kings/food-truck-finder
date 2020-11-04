@@ -28,10 +28,8 @@ export const sendNotification = async (
   onFail?: (res: any) => void
 ) => {
   let config = {
-    "params": {
-      "truckId": truckId,
-      "message": message,
-    }
+    truckId: truckId,
+    message: message
   };
   await api.post(`/truck/notification`, config)
     .catch(onFail);
@@ -51,10 +49,8 @@ export const setNotificationAsRead = async (
   onFail?: (res: any) => void
 ) => {
   await api.put(`/notification/read`, {
-    params: {
-      notificationId: notificationId,
-      isRead: isRead
-    }
+    notificationId: notificationId,
+    isRead: isRead
   })
     .catch(onFail);
 }

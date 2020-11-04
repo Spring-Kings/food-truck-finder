@@ -23,7 +23,7 @@ function NotificationComponent(props: NotificationProps) {
                   defaultChecked={read}
                   onChange={async () => {
                     setRead(!read);
-                    await setNotificationAsRead(props.notification.id, read);
+                    await setNotificationAsRead(props.notification.id, !read).catch(err => console.log(err));
                   }}
                   name="Read"
           />
