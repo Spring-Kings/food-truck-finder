@@ -4,10 +4,12 @@ import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 
 function NotificationListComponent() {
-  const [notifications, setNotifications]: [Notification[] | null, any] = useState(null);
+  const [notifications, setNotifications]: [Notification[], any] = useState([]);
+  const [initialized, setInitialized]: [boolean, any] = useState(false);
   useEffect(() => {
-    if (!notifications) {
+    if (!initialized) {
       updateNotifications().then();
+      setInitialized(true);
     } else {
       setInterval(updateNotifications, 5000);
     }
@@ -22,9 +24,13 @@ function NotificationListComponent() {
     if (notifications == null) {
       return;
     }
-    const ndx: number = notifications?.map(notification => notification.id).indexOf(id);
+    const ndx: number = notifications.map(notification => notification.id).indexOf(id);
     if (ndx > -1) {
-      notifications?.splice(ndx, 1);
+      if (notifications.length < 2) {
+        setNotifications([]);
+      } else {
+        notifications.splice(ndx, 1);
+      }
     }
     setNotifications(notifications);
   };
@@ -32,7 +38,7 @@ function NotificationListComponent() {
   return (
     <Grid container direction="column" style={{ overflow: "auto" }}>
       {
-        notifications?.map((notification: Notification) => <NotificationComponent
+        notifications.map((notification: Notification) => <NotificationComponent
           notification={notification}
           deletedCallback={deleteNotification}
         />)
