@@ -1,7 +1,6 @@
 import React from "react";
-
-import { Grid, Card, CardContent } from "@material-ui/core";
-import { Notification } from "../../api/Notification";
+import {Grid, Card, CardContent, Button, Switch} from "@material-ui/core";
+import {deleteNotification, Notification, setNotificationAsRead} from "../../api/Notification";
 
 interface NotificationProps {
   notification: Notification;
@@ -12,12 +11,28 @@ function NotificationComponent(props: NotificationProps) {
     <Grid item xs>
       <Card>
         <CardContent>
-          {props.notification.truck.name}
+          {`From: ${props.notification.truck.name} at ${props.notification.time}`}
+          <Button variant="outlined"
+                  color="secondary"
+                  onClick={() => deleteNotification(props.notification.id)}>
+            Delete
+          </Button>
+          {"Read"}
+          <Switch value={props.notification.isRead}
+                  onChange={() => setNotificationAsRead(props.notification.id, !props.notification.isRead)}
+                  name="Read"
+          />
+        </CardContent>
+        <CardContent>
           {props.notification.message}
         </CardContent>
       </Card>
     </Grid>
   );
+}
+
+const toggleRead = () => {
+
 }
 
 export default NotificationComponent;

@@ -2,20 +2,22 @@ import api from "../util/api";
 import {TruckState} from "../components/TruckView";
 
 export interface Notification {
+  id: number;
   message: string;
   truck: TruckState;
+  time: Date;
+  isRead: boolean;
 }
 
-export const getNotifications = async (onFail?: (res: any) => void): Promise<Notification[]> => {
+export const getNotifications = async () => {
   let notifications: Notification[] = [];
 
   await api.get(`/notifications`, {})
     .then((response: any) => {
       if (response.data) {
-        notifications.concat(response.data);
+        notifications = response.data;
       }
-    })
-    .catch(onFail);
+    });
 
   return notifications;
 }
@@ -32,5 +34,27 @@ export const sendNotification = async (
     }
   };
   await api.post(`/truck/notification`, config)
+    .catch(onFail);
+}
+
+export const deleteNotification = async (
+  notificationId: number,
+  onFail?: (res: any) => void
+) => {
+  await api.delete(`/notification/${notificationId}/delete`, {})
+    .catch(onFail);
+}
+
+export const setNotificationAsRead = async (
+  notificationId: number,
+  isRead: boolean,
+  onFail?: (res: any) => void
+) => {
+  await api.put(`/notification/read`, {
+    params: {
+      notificationId: notificationId,
+      isRead: isRead
+    }
+  })
     .catch(onFail);
 }

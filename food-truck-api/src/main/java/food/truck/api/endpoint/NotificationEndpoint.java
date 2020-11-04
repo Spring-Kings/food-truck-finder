@@ -91,10 +91,26 @@ public class NotificationEndpoint {
     ) {
         var notification = notificationService.findById(updateStatus.notificationId);
         notification.ifPresent(n -> {
+            log.info("notif present");
             if (n.getSubscription().getUser().getId().equals(user.getId())) {
+                log.info("same uid");
                 n.setRead(updateStatus.isRead);
                 notificationService.saveNotification(n);
             }
+        });
+    }
+
+    @Secured({"ROLE_USER"})
+    @DeleteMapping("/notification/{notificationId}/delete")
+    public void deleteNotification(
+        @AuthenticationPrincipal User user,
+        @PathVariable long notificationId
+    ) {
+        var notification = notificationService.findById(notificationId);
+        notification.ifPresent(n -> {
+           if (n.getSubscription().getUser().getId().equals(user.getId()))  {
+               notificationService.deleteNotification(n);
+           }
         });
     }
 }

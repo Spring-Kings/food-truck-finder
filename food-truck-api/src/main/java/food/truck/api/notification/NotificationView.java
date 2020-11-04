@@ -11,7 +11,7 @@ public class NotificationView {
     long id;
 
     @NonNull
-    Truck t;
+    Truck truck;
 
     @NonNull
     String message;
@@ -19,12 +19,16 @@ public class NotificationView {
     @NonNull
     Instant time;
 
+    @NonNull
+    boolean isRead;
+
     public static NotificationView of(Notification notif) {
         return new NotificationView(
             notif.getId(),
             notif.getSubscription().getTruck(),
             notif.getMessage(),
-            notif.getTime()
+            notif.getTime(),
+            notif.isRead()
         );
     }
 }
