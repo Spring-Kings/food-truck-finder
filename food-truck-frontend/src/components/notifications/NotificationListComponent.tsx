@@ -19,14 +19,10 @@ function NotificationListComponent() {
   };
 
   const deleteNotification = (id: number) => {
-    if (notifications == null) {
-      return;
+    if (notifications !== null) {
+      let notifs: Notification[] = notifications?.filter((notification: Notification) => notification.id != id);
+      setNotifications(notifs);
     }
-    const ndx: number = notifications?.map(notification => notification.id).indexOf(id);
-    if (ndx > -1) {
-      notifications?.splice(ndx, 1);
-    }
-    setNotifications(notifications);
   };
 
   return (
