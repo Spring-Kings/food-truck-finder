@@ -20,13 +20,14 @@ function NotificationListComponent(props: NotificationListProps) {
       // updateNotifications().then();
       setInitialized(true);
     } else {
-      setInterval(() => {
-        // console.log('hi');
+      const timer = setInterval(() => {
         props.loadNotificationsFromBackend().then();
         setNotifications(props.data.notifications);
       }, 5000);
+      return () => clearInterval(timer);
     }
-  }, []);
+    return () => {};
+  });
 
   // const updateNotifications = async () => {
   //   const notifs: Notification[] = await getNotifications();
