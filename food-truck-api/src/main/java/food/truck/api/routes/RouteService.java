@@ -121,5 +121,16 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
+    public Optional<RouteLocation> getCurrentRouteLocation(long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return Optional.empty();
+        var r = route.get();
+        var now = Instant.now();
+        return r.getLocations().stream().filter(
+                loc -> now.isAfter(loc.arrivalTime) && now.isBefore(loc.exitTime)
+        ).findFirst();
+    }
+
 
 }
