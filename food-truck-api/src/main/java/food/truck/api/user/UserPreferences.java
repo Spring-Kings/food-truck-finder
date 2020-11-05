@@ -6,8 +6,8 @@ import java.util.List;
 
 @Value
 public class UserPreferences {
-    double acceptibleRadius;
+    double acceptableRadius;
     double priceRating;
-    String foodCategories;
+    String foodCategory; // TODO: Consider string or enum
     List<String> menuItems;
 }

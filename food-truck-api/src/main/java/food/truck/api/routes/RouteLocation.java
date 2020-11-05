@@ -1,6 +1,7 @@
 package food.truck.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import food.truck.api.Location;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,4 +37,8 @@ public class RouteLocation {
 
     @Column(name = "lat", nullable = false)
     double lat;
+
+    public Location getLocation() {
+        return new Location(lng, lat);
+    }
 }

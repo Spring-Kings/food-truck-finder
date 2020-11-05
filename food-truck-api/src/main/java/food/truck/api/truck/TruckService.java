@@ -1,6 +1,8 @@
 package food.truck.api.truck;
 
+import food.truck.api.Location;
 import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
 import lombok.NonNull;
@@ -9,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -81,5 +85,29 @@ public class TruckService {
                 .filter(r -> r.isActive() && r.getDays().contains(w))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Route getActiveRoute(long truckId) {
+        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+    }
+
+    public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {
+        var route = getActiveRoute(truckId);
+        if (route == null)
+            return Optional.empty();
+
+        return routeService.getCurrentRouteLocation(route.getRouteId());
+    }
+
+    public List<Truck> getTrucksCloseToLocation(Location loc, double radiusMiles) {
+        return truckRepository.findAll().stream().filter(truck -> {
+                    var curLoc = getCurrentRouteLocation(truck.id);
+                    if (curLoc.isEmpty())
+                        return false;
+                    var truckLocation = curLoc.get().getLocation();
+                    double distance = loc.distanceInMiles(truckLocation);
+                    return distance < radiusMiles;
+                }
+        ).collect(Collectors.toList());
     }
 }
