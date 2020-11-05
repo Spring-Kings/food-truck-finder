@@ -40,7 +40,6 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
         }
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.sortSearchTruck = this.sortSearchTruck.bind(this);
 
     }
 
@@ -49,25 +48,6 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
         api.get(`/truck/search?search=${this.state.search}`).then(event => {
                 this.setState({trucks: event.data});
         }).catch();
-    }
-
-    sortSearchTruck(a: TruckData, b: TruckData){
-        var aa = 0, bb = 0;
-
-        if(a.name != null && a.name.toLowerCase().includes(this.state.search)){
-            aa += 2;
-        }
-        if(b.name != null && b.name.toLowerCase().includes(this.state.search)){
-            bb += 2;
-        }
-        if(a.description != null && a.description.toLowerCase().includes(this.state.search)){
-            aa += 1;
-        }
-        if(b.description != null && b.description.toLowerCase().includes(this.state.search)){
-            bb += 1;
-        }
-
-        return bb - aa;
     }
 
     render() {
@@ -91,7 +71,7 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
                     </Grid>
                 </FormGroup>
                 <List>
-                    {this.state.trucks.sort(this.sortSearchTruck).map(value => (
+                    {this.state.trucks.map(value => (
                         <SearchTruckRow truck={value}/>
                     ))}
                 </List>
