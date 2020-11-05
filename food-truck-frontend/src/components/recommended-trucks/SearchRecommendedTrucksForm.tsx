@@ -136,7 +136,7 @@ class RecommendedTrucksForm extends Component<
         },
         method: "POST",
       })
-      .then((resp: any) => console.log(`SUCCESS:\n${resp.data}`))
+      .then((resp: any) => console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`))
       .catch(DEFAULT_ERR_RESP);
   };
 }

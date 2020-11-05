@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -61,7 +62,7 @@ public class TruckEndpoint {
             result = new ArrayList<>();
 
         // return the results set
-        return result.subList(0, Math.min(location.getNumRequested(), result.size()));
+        return result.stream().sequential().limit(location.getNumRequested()).collect(Collectors.toList());
     }
 
     @GetMapping(path = "/truck/{id}")
