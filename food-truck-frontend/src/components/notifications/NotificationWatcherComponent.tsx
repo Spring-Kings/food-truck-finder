@@ -7,7 +7,6 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   const [notified, setNotified]: [boolean, any] = useState(false);
   const notifyUnread = () => {
     const foundItem = props.data.notifications.find((notification) => !notification.read);
-    console.log(foundItem);
     if (foundItem !== null && foundItem !== undefined) {
       setNotified(true);
       alert('You have unread notification(s)');
@@ -17,16 +16,20 @@ function NotificationWatcherComponent(props: NotificationListProps) {
     if (!initialized) {
       // Load
       var id: number | undefined = getUserInfo()?.userID;
-      props.loadNotificationsFromBackend().then();
-      if (!notified && id !== undefined && id !== 0) {
+      if (id !== undefined && id !== 0) {
+        props.loadNotificationsFromBackend().then();
+      }
+      if (!notified) {
         notifyUnread();
       }
       setInitialized(true);
     } else {
       const timer = setInterval(() => {
         var id: number | undefined = getUserInfo()?.userID;
-        props.loadNotificationsFromBackend().then();
-        if (!notified && id !== undefined && id !== 0) {
+        if (id !== undefined && id !== 0) {
+          props.loadNotificationsFromBackend().then();
+        }
+        if (!notified) {
           notifyUnread();
         }
       }, 5000);

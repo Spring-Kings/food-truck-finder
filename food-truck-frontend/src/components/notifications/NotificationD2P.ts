@@ -29,8 +29,6 @@ const mapDispatchToProps = (dispatch: Dispatch<NotificationAction>) => {
         var id: number | undefined = getUserInfo()?.userID;
         if (id !== undefined) {
           updateNotifications(dispatch);
-        } else {
-          throw "No user logged in!";
         }
       });
     },
