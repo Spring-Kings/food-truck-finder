@@ -4,7 +4,9 @@ import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 import { NotificationData } from "../../redux/notifications/NotificationReducer";
 
-type NotificationListProps = NotificationData;
+type NotificationListProps = NotificationData & {
+  loadNotificationsFromBackend: () => Promise<void>;
+};
 
 function NotificationListComponent(props: NotificationListProps) {
   const [notifications, setNotifications]: [Notification[], any] = useState(props.notifications);
