@@ -26,7 +26,7 @@ function SearchTruckRow(truck: TruckProp){
             <Divider/>
             <ListItem button onClick={() => {router.push(`/truck/${truck.truck.id}`)}}>
                 <ListItemText primary={truck.truck.name}/>
-                <ListItemText secondary={truck.truck.description}/>
+                <ListItemText secondary={truck.truck.description ? truck.truck.description : "No Description"}/>
             </ListItem>
         </div>
     )

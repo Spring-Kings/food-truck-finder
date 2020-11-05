@@ -29,7 +29,7 @@ public class TruckService {
     }
 
     public List<Truck> findTrucks(String search){ 
-        return truckRepository.findByNameLikeAndDescriptionLike("%" + search + "%",
+        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
             "%" + search + "%");
     }
 
