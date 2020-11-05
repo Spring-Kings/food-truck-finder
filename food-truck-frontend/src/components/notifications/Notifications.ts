@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import NotificationListComponent from "./NotificationListComponent";
 import mapDispatchToProps from "./NotificationD2P";
 
-function mapStateToProps(state: any, myProps: any) {
+export function mapStateToProps(state: any, myProps: any) {
   return {
     data: state.notifications.data
   };

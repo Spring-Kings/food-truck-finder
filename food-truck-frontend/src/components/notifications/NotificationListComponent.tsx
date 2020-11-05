@@ -4,7 +4,7 @@ import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 import { NotificationData } from "../../redux/notifications/NotificationReducer";
 
-type NotificationListProps = {
+export type NotificationListProps = {
   data: NotificationData,
   loadNotificationsFromBackend: () => Promise<void>;
 };
