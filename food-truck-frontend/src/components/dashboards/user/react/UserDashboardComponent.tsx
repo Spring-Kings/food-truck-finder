@@ -101,6 +101,17 @@ class UserDashboardComponent extends Component<
               </Card>
             ) : null}
 
+            {/* Go to notifications page */}
+            <Card>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.toNotifications}
+              >
+                Notifications
+              </Button>
+            </Card>
+
             {/* Subscribe list */}
             <Accordion>
               <AccordionSummary>Subscribed Trucks</AccordionSummary>
@@ -134,6 +145,10 @@ class UserDashboardComponent extends Component<
 
   private toOwnerDashboard() {
     Router.replace("/dashboard/owner");
+  }
+
+  private toNotifications() {
+    Router.replace("/notifications");
   }
 }
 
