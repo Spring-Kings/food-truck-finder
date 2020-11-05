@@ -4,21 +4,27 @@ import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 import { NotificationData } from "../../redux/notifications/NotificationReducer";
 
-type NotificationListProps = NotificationData & {
+type NotificationListProps = {
+  data: NotificationData,
   loadNotificationsFromBackend: () => Promise<void>;
 };
 
 function NotificationListComponent(props: NotificationListProps) {
-  const [notifications, setNotifications]: [Notification[], any] = useState(props.notifications);
+  const [notifications, setNotifications]: [Notification[], any] = useState([]);
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   useEffect(() => {
     if (!initialized) {
       // Load
       props.loadNotificationsFromBackend().then();
+      setNotifications(props.data.notifications);
       // updateNotifications().then();
       setInitialized(true);
     } else {
-      setInterval(props.loadNotificationsFromBackend, 5000);
+      setInterval(() => {
+        // console.log('hi');
+        props.loadNotificationsFromBackend().then();
+        setNotifications(props.data.notifications);
+      }, 5000);
     }
   }, []);
 

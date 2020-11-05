@@ -4,7 +4,9 @@ import NotificationListComponent from "./NotificationListComponent";
 import mapDispatchToProps from "./NotificationD2P";
 
 function mapStateToProps(state: any, myProps: any) {
-  return state.notifications.data;
+  return {
+    data: state.notifications.data
+  };
 }
 
 export default connect(
