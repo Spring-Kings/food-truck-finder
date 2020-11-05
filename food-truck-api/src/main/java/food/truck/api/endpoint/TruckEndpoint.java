@@ -13,10 +13,12 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -274,13 +276,13 @@ public class TruckEndpoint {
     public void unsubscribe(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var t = truckService.findTruckById(truckId);
         if (t.isEmpty()) {
-            return;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription does not exist");
         }
         var truck = t.get();
         var subs = subscriptionService.findSubsByUser(u);
         var filteredSubs = subs
             .stream()
-            .filter(sub -> sub.getTruck().equals(truck))
+            .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
             .iterator();
         if (filteredSubs.hasNext()) {
             var sub = filteredSubs.next();

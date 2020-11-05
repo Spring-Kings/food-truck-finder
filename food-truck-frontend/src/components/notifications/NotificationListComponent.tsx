@@ -25,7 +25,7 @@ function NotificationListComponent(props: NotificationListProps) {
       setInitialized(true);
     } else {
       const timer = setInterval(() => {
-        var id: number | undefined = getUserInfo()?.userID;
+        let id: number | undefined = getUserInfo()?.userID;
         if (id !== undefined && id !== 0) {
           props.loadNotificationsFromBackend().then();
           setNotifications(props.data.notifications);
@@ -35,11 +35,6 @@ function NotificationListComponent(props: NotificationListProps) {
     }
     return () => {};
   });
-
-  // const updateNotifications = async () => {
-  //   const notifs: Notification[] = await getNotifications();
-  //   setNotifications(notifs);
-  // };
 
   const deleteNotification = (id: number) => {
     if (notifications !== null) {

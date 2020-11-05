@@ -7,7 +7,7 @@ async function updateNotifications(
   dispatch: Dispatch<NotificationAction>,
 ) {
   // Fetch notifications
-  await getNotifications()
+  getNotifications()
     .then(
       (notifications) => {
         // Dispatch update

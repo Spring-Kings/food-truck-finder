@@ -57,7 +57,7 @@ public class NotificationEndpoint {
 
     @Secured({"ROLE_USER"})
     @GetMapping("/truck/{truckId}/notifications")
-    public List<NotificationView> sendNotificationForTruck(
+    public List<NotificationView> getNotificationsForTruck(
         @AuthenticationPrincipal User u,
         @PathVariable long truckId
     ) {

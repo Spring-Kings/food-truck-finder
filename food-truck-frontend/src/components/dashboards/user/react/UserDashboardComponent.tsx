@@ -101,7 +101,7 @@ class UserDashboardComponent extends Component<
               </Card>
             ) : null}
 
-            {/* Go to owner dashboard */}
+            {/* Go to notifications page */}
             <Card>
               <Button
                 variant="contained"

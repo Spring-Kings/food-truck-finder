@@ -5,6 +5,15 @@ import getUserInfo from "../../util/token";
 function NotificationWatcherComponent(props: NotificationListProps) {
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
+  const reloadNotifications = () => {
+    const id: number | undefined = getUserInfo()?.userID;
+    if (id !== undefined && id !== 0) {
+      props.loadNotificationsFromBackend();
+    }
+    if (!notified) {
+      notifyUnread();
+    }
+  };
   const notifyUnread = () => {
     const foundItem = props.data.notifications.find((notification) => !notification.read);
     if (foundItem !== null && foundItem !== undefined) {
@@ -14,25 +23,10 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   };
   useEffect(() => {
     if (!initialized) {
-      // Load
-      var id: number | undefined = getUserInfo()?.userID;
-      if (id !== undefined && id !== 0) {
-        props.loadNotificationsFromBackend().then();
-      }
-      if (!notified) {
-        notifyUnread();
-      }
+      reloadNotifications();
       setInitialized(true);
     } else {
-      const timer = setInterval(() => {
-        var id: number | undefined = getUserInfo()?.userID;
-        if (id !== undefined && id !== 0) {
-          props.loadNotificationsFromBackend().then();
-        }
-        if (!notified) {
-          notifyUnread();
-        }
-      }, 5000);
+      const timer = setInterval(reloadNotifications, 5000);
       return () => clearInterval(timer);
     }
     return () => {};
