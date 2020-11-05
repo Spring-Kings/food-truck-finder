@@ -1,24 +1,29 @@
-import React, {Component, useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Grid } from "@material-ui/core";
 import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
+import { NotificationData } from "../../redux/notifications/NotificationReducer";
 
-function NotificationListComponent() {
-  const [notifications, setNotifications]: [Notification[], any] = useState([]);
+type NotificationListProps = NotificationData;
+
+function NotificationListComponent(props: NotificationListProps) {
+  const [notifications, setNotifications]: [Notification[], any] = useState(props.notifications);
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   useEffect(() => {
     if (!initialized) {
-      updateNotifications().then();
+      // Load
+      props.loadNotificationsFromBackend().then();
+      // updateNotifications().then();
       setInitialized(true);
     } else {
-      setInterval(updateNotifications, 5000);
+      setInterval(props.loadNotificationsFromBackend, 5000);
     }
   }, []);
 
-  const updateNotifications = async () => {
-    const notifs: Notification[] = await getNotifications();
-    setNotifications(notifs);
-  };
+  // const updateNotifications = async () => {
+  //   const notifs: Notification[] = await getNotifications();
+  //   setNotifications(notifs);
+  // };
 
   const deleteNotification = (id: number) => {
     if (notifications !== null) {
@@ -30,7 +35,7 @@ function NotificationListComponent() {
   return (
     <Grid container direction="column" style={{ overflow: "auto" }}>
       {
-        notifications.map((notification: Notification) => <NotificationComponent
+        notifications?.map((notification: Notification) => <NotificationComponent
           notification={notification}
           deletedCallback={deleteNotification}
         />)

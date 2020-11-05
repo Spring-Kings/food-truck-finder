@@ -1,0 +1,41 @@
+import { Dispatch } from "redux";
+import { NotificationAction, NotificationActionTypes } from "../../redux/notifications/NotificationActions";
+import {getNotifications} from "../../api/Notification";
+import getUserInfo from "../../util/token";
+
+async function updateNotifications(
+  dispatch: Dispatch<NotificationAction>,
+) {
+  // Fetch notifications
+  await getNotifications()
+    .then(
+      (notifications) => {
+        // Dispatch update
+        dispatch({
+          type: NotificationActionTypes.LOAD_NOTIFICATIONS,
+          payload: { notifications: notifications }
+        });
+      },
+      (err) => {
+        console.log(err);
+      }
+    );
+}
+
+const mapDispatchToProps = (dispatch: Dispatch<NotificationAction>) => {
+  return {
+    loadNotificationsFromBackend: () => {
+      return new Promise<void>(() => {
+        var id: number | undefined = getUserInfo()?.userID;
+        if (id !== undefined) {
+          updateNotifications(dispatch);
+        } else {
+          throw "No user logged in!";
+        }
+      });
+    },
+    dispatch,
+  };
+};
+
+export default mapDispatchToProps;
