@@ -39,6 +39,6 @@ public class RouteLocation {
     double lat;
 
     public Location getLocation() {
-        return new Location(lng, lat);
+        return new Location(lat, lng);
     }
 }

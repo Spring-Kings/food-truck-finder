@@ -42,22 +42,26 @@ public class TruckEndpoint {
         return ""; //TODO
     }
 
-    @GetMapping(path = "/truck/recommended")
+    @PostMapping(path = "/truck/recommended")
     public List<Truck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
-            @RequestParam UserPreferences location
+            @RequestBody UserPreferences location
     ) {
         // Prepare with empty results, and visit to get the recommendation strategy
-        List<Truck> result = new ArrayList<>();
+        List<Truck> result;
+        ss.setUserPreferences(location);
+        ss.setTruckSvc(truckService);
         u.visit(ss);
 
         // Request and act on the recommendation strategy
         var strategy = ss.getRecommendationStrategy();
         if (strategy != null)
             result = strategy.selectTrucks();
+        else
+            result = new ArrayList<>();
 
         // return the results set
-        return result;
+        return result.subList(0, Math.min(location.getNumRequested(), result.size()));
     }
 
     @GetMapping(path = "/truck/{id}")

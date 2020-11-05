@@ -7,17 +7,17 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class StrategySelector implements UserVisitor {
-    @Autowired
+    @Setter
     private TruckService truckSvc;
 
     @Setter
-    private UserPreferences up;
+    private UserPreferences userPreferences;
 
     @Getter
     private TruckRecommendationStrategy recommendationStrategy;
 
     public void accept(User u) {
-        recommendationStrategy = new ScoringRecommendationStrategy(truckSvc, u, up);
+        recommendationStrategy = new ScoringRecommendationStrategy(truckSvc, u, userPreferences);
     }
 
     public void accept(Guest g) {

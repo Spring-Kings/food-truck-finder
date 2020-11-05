@@ -123,17 +123,21 @@ class RecommendedTrucksForm extends Component<
   };
 
   submit = async () => {
-    api.request({
-      url: "/truck/recommended",
-      params: {
-        acceptableRadius: this.state.acceptibleRadius,
-        priceRating: this.state.priceRating,
-        foodCategory: this.state.foodCategory,
-        menuItems: this.state.menuItems,
-        location: this.state.location,
-      },
-      method: "GET",
-    }).then(resp => console.log(resp)).catch(DEFAULT_ERR_RESP);
+    await api
+      .request({
+        url: "/truck/recommended",
+        data: {
+          acceptableRadius: this.state.acceptibleRadius,
+          priceRating: this.state.priceRating,
+          foodCategory: this.state.foodCategory,
+          menuItems: this.state.menuItems,
+          location: this.state.location,
+          numRequested: 10
+        },
+        method: "POST",
+      })
+      .then((resp: any) => console.log(`SUCCESS:\n${resp.data}`))
+      .catch(DEFAULT_ERR_RESP);
   };
 }
 
