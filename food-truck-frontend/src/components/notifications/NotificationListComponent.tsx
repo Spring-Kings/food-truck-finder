@@ -3,6 +3,7 @@ import { Grid } from "@material-ui/core";
 import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 import { NotificationData } from "../../redux/notifications/NotificationReducer";
+import getUserInfo from "../../util/token";
 
 export type NotificationListProps = {
   data: NotificationData,
@@ -13,16 +14,22 @@ function NotificationListComponent(props: NotificationListProps) {
   const [notifications, setNotifications]: [Notification[], any] = useState([]);
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   useEffect(() => {
+    var id: number | undefined = getUserInfo()?.userID;
     if (!initialized) {
       // Load
-      props.loadNotificationsFromBackend().then();
-      setNotifications(props.data.notifications);
+      if (id !== undefined && id !== 0) {
+        props.loadNotificationsFromBackend().then();
+        setNotifications(props.data.notifications);
+      }
       // updateNotifications().then();
       setInitialized(true);
     } else {
       const timer = setInterval(() => {
-        props.loadNotificationsFromBackend().then();
-        setNotifications(props.data.notifications);
+        var id: number | undefined = getUserInfo()?.userID;
+        if (id !== undefined && id !== 0) {
+          props.loadNotificationsFromBackend().then();
+          setNotifications(props.data.notifications);
+        }
       }, 5000);
       return () => clearInterval(timer);
     }

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {NotificationListProps} from "./NotificationListComponent";
+import getUserInfo from "../../util/token";
 
 function NotificationWatcherComponent(props: NotificationListProps) {
   const [initialized, setInitialized]: [boolean, any] = useState(false);
@@ -15,15 +16,17 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   useEffect(() => {
     if (!initialized) {
       // Load
+      var id: number | undefined = getUserInfo()?.userID;
       props.loadNotificationsFromBackend().then();
-      if (!notified) {
+      if (!notified && id !== undefined && id !== 0) {
         notifyUnread();
       }
       setInitialized(true);
     } else {
       const timer = setInterval(() => {
+        var id: number | undefined = getUserInfo()?.userID;
         props.loadNotificationsFromBackend().then();
-        if (!notified) {
+        if (!notified && id !== undefined && id !== 0) {
           notifyUnread();
         }
       }, 5000);
