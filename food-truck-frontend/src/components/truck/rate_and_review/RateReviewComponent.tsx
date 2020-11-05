@@ -29,6 +29,7 @@ interface RateProps {
 export interface RateState {
   review: Review;
   user: UserInfo | null | undefined;
+  old_review_text: string;
 }
 
 /** Number of rows for the review field */
@@ -41,6 +42,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
     this.state = {
       review: emptyReview(-1, this.props.truckId),
       user: undefined,
+      old_review_text: ""
     };
     this.switchExtended = this.switchExtended.bind(this);
     this.changeRating = this.changeRating.bind(this);
@@ -55,7 +57,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         user.userID,
         DEFAULT_ERR_RESP
       );
-      console.log(review);
+
       if (review === null)
         this.setState({
           review: {
@@ -63,8 +65,9 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             userId: user.userID,
           },
           user,
+          old_review_text: "",
         });
-      else this.setState({ review: review, user: user });
+      else this.setState({ review: review, user: user, old_review_text: review.review });
     } else
       this.setState({
         user: getUserInfo(),
@@ -161,11 +164,14 @@ class RateReviewComponent extends Component<RateProps, RateState> {
   }
 
   private switchExtended(_: any, checked: boolean) {
+    let review_text: string = checked? this.state.old_review_text : "";
     this.setState({
+      old_review_text: this.state.review.review,
       review: {
         ...this.state.review,
+        review: review_text,
         extended: checked
-      }
+      },
     });
   }
 
