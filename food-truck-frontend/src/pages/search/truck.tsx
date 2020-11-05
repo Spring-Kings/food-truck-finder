@@ -75,7 +75,6 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
                         <SearchTruckRow truck={value}/>
                     ))}
                 </List>
-                <p>{JSON.stringify(this.state.trucks)}</p>
             </div>
         )
     }
