@@ -8,7 +8,7 @@ require('dotenv').config();
 
 function HomePage() {
     return (
-        <CoolLayout>
+        <>
             <p>This is the home page!</p>
 
             <Link href="#" passHref><a onClick={logout}>Log Out</a></Link><br/>
@@ -24,8 +24,9 @@ function HomePage() {
             <Link href="/user-info" passHref>User info</Link><br/>
             <Link href="/search/user" passHref>User Search Page</Link><br/>
             <Link href="/search/owner" passHref>Owner Search Page</Link><br/>
-            <Link href="/create-truck" passHref>Create Truck Page</Link>
-        </CoolLayout>
+            <Link href="/create-truck" passHref>Create Truck Page</Link><br/>
+            <Link href="/notifications" passHref>Notifications Page</Link>
+        </>
     )
 }
 

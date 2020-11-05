@@ -94,16 +94,6 @@ public class UserEndpoint {
         return trucks;
     }
 
-    @PostMapping("/user/subscribe")
-    public String subscribe(@AuthenticationPrincipal User u, @RequestBody long truckId) {
-        return ""; // TODO
-    }
-
-    @PostMapping("/user/unsubscribe")
-    public String unsubscribe(@AuthenticationPrincipal User u, @RequestBody long subscriptionId) {
-        return ""; // TODO
-    }
-
     @GetMapping("/user/{userId}/reviews")
     public List<Review> getUserReviews(@PathVariable long userId) {
         return reviewService.findReviewsByUserId(userId);

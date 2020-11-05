@@ -2,6 +2,7 @@ import React from 'react';
 import {createMuiTheme, ThemeProvider, StylesProvider, jssPreset, withStyles} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
+import CoolLayout from "../components/CoolLayout"
 
 const jss = create({plugins: [...jssPreset().plugins, rtl()]});
 
@@ -48,7 +49,9 @@ export const FoodTruckThemeProvider = ({children}) => {
     return (
         <StylesProvider jss={jss}>
             <ThemeProvider theme={theme}>
-                {children}
+                <CoolLayout>
+                    {children}
+                </CoolLayout>
             </ThemeProvider>
         </StylesProvider>
     );
