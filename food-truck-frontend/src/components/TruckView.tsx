@@ -136,11 +136,13 @@ class TruckView extends Component<TruckProps, State> {
             </ListItem>
           </List>
           <Grid>
-            <Button variant="outlined"
-                    color="primary"
-                    onClick={this.handleSubscription}>
-              {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
-            </Button>
+            {!userCanEditTruck(this.state.userId) &&
+              <Button variant="outlined"
+                      color="primary"
+                      onClick={this.handleSubscription}>
+                {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
+              </Button>
+            }
             {userCanEditTruck(this.state.userId) &&
               <>
                 <Button variant="outlined"

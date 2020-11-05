@@ -243,11 +243,16 @@ public class TruckEndpoint {
         }
         var truck = t.get();
 
-        var sub = new Subscription();
-        sub.setTruck(truck);
-        sub.setUser(u);
+        // Prevent an owner from subscribing to their own truck.
+        if (!u.getId().equals(truck.getUserId())) {
+            var sub = new Subscription();
+            sub.setTruck(truck);
+            sub.setUser(u);
 
-        return Optional.of(subscriptionService.saveSubscription(sub)).map(SubscriptionView::of);
+            return Optional.of(subscriptionService.saveSubscription(sub)).map(SubscriptionView::of);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Secured({"ROLE_USER"})
