@@ -1,11 +1,14 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.recommendation.StrategySelector;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
+import food.truck.api.user.UserPreferences;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -19,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,17 +35,29 @@ public class TruckEndpoint {
     @Autowired
     private RouteService routeService;
 
-    @GetMapping("/nearby-trucks")
+    private StrategySelector ss = new StrategySelector();
+
+    @GetMapping("/truck/nearby")
     public String getNearbyTrucks(@RequestParam String location) {
         return ""; //TODO
     }
 
-    @GetMapping(path = "/recommended-trucks")
-    public String getRecommendedTrucks(
-            @AuthenticationPrincipal @Nullable User user,
-            @RequestParam String location
+    @GetMapping(path = "/truck/recommended")
+    public List<Truck> getRecommendedTrucks(
+            @AuthenticationPrincipal AbstractUser u,
+            @RequestParam UserPreferences location
     ) {
-        return ""; // TODO
+        // Prepare with empty results, and visit to get the recommendation strategy
+        List<Truck> result = new ArrayList<>();
+        u.visit(ss);
+
+        // Request and act on the recommendation strategy
+        var strategy = ss.getRecommendationStrategy();
+        if (strategy != null)
+            result = strategy.selectTrucks();
+
+        // return the results set
+        return result;
     }
 
     @GetMapping(path = "/truck/{id}")

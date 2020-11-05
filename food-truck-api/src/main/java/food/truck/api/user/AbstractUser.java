@@ -10,4 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AbstractUser {
     protected Location location;
+
+    public void visit(UserVisitor v) {
+        v.accept(this);
+    }
 }

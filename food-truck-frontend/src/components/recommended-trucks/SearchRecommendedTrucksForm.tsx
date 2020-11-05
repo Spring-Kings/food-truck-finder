@@ -1,14 +1,18 @@
-import { Slider, TextField, Typography } from "@material-ui/core";
-import React, { Component } from "react";
+import { LatLng } from "@google/maps";
+import { Button, Slider, TextField, Typography } from "@material-ui/core";
+import React, { ChangeEvent, Component } from "react";
+import { DEFAULT_ERR_KICK, DEFAULT_ERR_RESP } from "../../api/DefaultResponses";
+import api from "../../util/api";
 import Form from "../Form";
 import { MoneyRating } from "../truck/rate_and_review/ratings";
 import MultiField from "./multi_field";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
+  location: LatLng;
   acceptibleRadius: number;
   priceRating: number;
-  foodCategories: string;
+  foodCategory: string;
   menuItems: string[];
 };
 
@@ -28,7 +32,7 @@ const MARKS = [
   {
     value: 30,
     label: "30 mi",
-  }
+  },
 ];
 
 class RecommendedTrucksForm extends Component<
@@ -38,17 +42,29 @@ class RecommendedTrucksForm extends Component<
   constructor(props: RecommendedTruckProps) {
     super(props);
     this.state = {
+      location: { lat: 0, lng: 0 },
       acceptibleRadius: 1,
       priceRating: 3,
-      foodCategories: "",
+      foodCategory: "",
       menuItems: [],
     };
     this.setState = this.setState.bind(this);
   }
 
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition((location) =>
+      this.setState({
+        location: {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        },
+      })
+    );
+  }
+
   render() {
     return (
-      <Form submitUrl={`/url`}>
+      <>
         <Typography variant="h6">Acceptable Radius</Typography>
         <Slider
           value={this.state.acceptibleRadius}
@@ -67,13 +83,24 @@ class RecommendedTrucksForm extends Component<
         />
 
         <Typography variant="h6">Price Rating</Typography>
-        <MoneyRating name="priceRating" defaultValue={this.state.priceRating} />
+        <MoneyRating
+          name="priceRating"
+          defaultValue={this.state.priceRating}
+          onChange={this.changePrice}
+        />
 
         <Typography variant="h6">Food Categories</Typography>
-        <TextField name="foodCategories" value={this.state.foodCategories} />
+        <TextField
+          name="foodCategories"
+          value={this.state.foodCategory}
+          onChange={this.changeCategory}
+        />
 
         <MultiField title="Desired Menu Items" name="menuItems" />
-      </Form>
+        <Button variant="contained" color="primary" onClick={this.submit}>
+          Search Trucks
+        </Button>
+      </>
     );
   }
 
@@ -83,6 +110,30 @@ class RecommendedTrucksForm extends Component<
     } else {
       return (val as number[])[0];
     }
+  };
+
+  changePrice = (_: any, newVal: number | null) => {
+    if (newVal !== null) this.setState({ priceRating: newVal });
+  };
+
+  changeCategory = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    this.setState({ foodCategory: event.target.value });
+  };
+
+  submit = async () => {
+    api.request({
+      url: "/truck/recommended",
+      params: {
+        acceptableRadius: this.state.acceptibleRadius,
+        priceRating: this.state.priceRating,
+        foodCategory: this.state.foodCategory,
+        menuItems: this.state.menuItems,
+        location: this.state.location,
+      },
+      method: "GET",
+    }).then(resp => console.log(resp)).catch(DEFAULT_ERR_RESP);
   };
 }
 

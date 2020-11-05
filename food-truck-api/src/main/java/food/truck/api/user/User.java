@@ -59,4 +59,8 @@ public class User extends AbstractUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void visit(UserVisitor v) {
+        v.accept(this);
+    }
 }

@@ -66,7 +66,7 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             scores.put(truck, distScore + priceScore + categoryScore + menuScore + ratingScore);
         }
 
-        trucks.sort((a, b) -> Double.compare(scores.get(a), scores.get(b)));
+        trucks.sort((a, b) -> Double.compare(scores.get(b), scores.get(a)));
         return trucks;
     }
 }

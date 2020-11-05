@@ -8,4 +8,8 @@ public class Guest extends AbstractUser {
     public Guest(Location loc) {
         location = loc;
     }
+
+    public void visit(UserVisitor v) {
+        v.accept(this);
+    }
 }
