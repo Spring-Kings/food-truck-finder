@@ -46,7 +46,6 @@ class RateReviewComponent extends Component<RateProps, RateState> {
       old_review_text: ""
     };
     this.switchExtended = this.switchExtended.bind(this);
-    this.changeRating = this.changeRating.bind(this);
     this.deleteReview = this.deleteReview.bind(this);
   }
 
@@ -104,8 +103,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             label="Leave Extended Review"
             control={
               <Switch
-                defaultChecked={this.state.review.extended}
                 value={this.state.review.extended}
+                checked={this.state.review.extended}
                 onChange={this.switchExtended}
               />
             }
@@ -123,16 +122,10 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             <StarRating
               name="score"
               defaultValue={this.state.review.starRating}
-              onChange={(_: any, value: number | null) =>
-                this.changeRating(value, "starRating")
-              }
             />
             <MoneyRating
               name="costRating"
               defaultValue={this.state.review.costRating}
-              onChange={(_: any, value: number | null) =>
-                this.changeRating(value, "costRating")
-              }
             />
             {this.state.review.extended ? (
               <TextField
@@ -152,16 +145,6 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         </Grid>
       </Grid>
     );
-  }
-
-  private changeRating(providedRating: number | null, which: string) {
-    let newRating: number = 0;
-    if (providedRating !== null) newRating = providedRating;
-
-    this.setState({
-      ...this.state,
-      [which]: newRating,
-    });
   }
 
   private switchExtended(_: any, checked: boolean) {

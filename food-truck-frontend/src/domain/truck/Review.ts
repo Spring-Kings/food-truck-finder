@@ -29,9 +29,9 @@ export function emptyReview(userId: number, truckId: number): Review {
 
 export function backendToFrontend(obj: any, username: string): Review {
   return {
-    reviewId: obj.reviewId,
+    reviewId: obj.id,
     userId: obj.userId,
-    truckId: obj.truckId,
+    truckId: obj.truck.id,
     extended: obj.reviewText? obj.reviewText.length > 0 : false,
     starRating: obj.starRating,
     costRating: obj.costRating,
