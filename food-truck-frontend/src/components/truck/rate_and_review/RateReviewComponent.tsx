@@ -21,6 +21,7 @@ import HiddenAttributeForm from "../../util/HiddenAttributeForm";
 import { MoneyRating, StarRating } from "./ratings";
 import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
 import Router from "next/router";
+import { getTime } from "date-fns";
 
 interface RateProps {
   truckId: number;
@@ -112,6 +113,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         </Grid>
         <Grid item key="hidden_review_form">
           <HiddenAttributeForm
+            key={`form${this.state.review.extended}`}
             submitUrl={getSaveReviewUrl(this.props.truckId)}
             onSuccessfulSubmit={() => Router.replace(`/truck/reviews/${this.props.truckId}`)}
             hiddenAttrs={[
@@ -137,11 +139,10 @@ class RateReviewComponent extends Component<RateProps, RateState> {
                 label="Review"
                 variant="outlined"
                 name="reviewText"
-                defaultValue={this.state.review.review}
+                value={this.state.review.review}
                 multiline
                 fullWidth
                 rows={NUM_ROWS}
-                value={this.state.review.review}
               />
             ) : null}
           </HiddenAttributeForm>

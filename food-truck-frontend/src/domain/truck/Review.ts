@@ -32,7 +32,7 @@ export function backendToFrontend(obj: any, username: string): Review {
     reviewId: obj.reviewId,
     userId: obj.userId,
     truckId: obj.truckId,
-    extended: obj.reviewText !== null && obj.reviewText.length > 0,
+    extended: obj.reviewText? obj.reviewText.length > 0 : false,
     starRating: obj.starRating,
     costRating: obj.costRating,
     review: obj.reviewText,
