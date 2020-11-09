@@ -1,6 +1,9 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.recommendation.StrategySelector;
+import food.truck.api.reviews_and_subscriptions.Subscription;
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
+import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
@@ -35,8 +38,10 @@ public class TruckEndpoint {
 
     @Autowired
     private RouteService routeService;
-
     private StrategySelector ss = new StrategySelector();
+
+    @Autowired
+    private SubscriptionService subscriptionService;
 
     @GetMapping("/truck/nearby")
     public String getNearbyTrucks(@RequestParam String location) {
@@ -262,5 +267,59 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/active-route")
     public Route getTodaysRoute(@PathVariable long truckId) {
         return truckService.getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+    }
+
+    @Secured({"ROLE_USER"})
+    @PostMapping("/truck/{truckId}/subscribe")
+    public Optional<SubscriptionView> subscribe(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var t = truckService.findTruckById(truckId);
+        if (t.isEmpty()) {
+            return Optional.empty();
+        }
+        var truck = t.get();
+
+        // Prevent an owner from subscribing to their own truck.
+        if (!u.getId().equals(truck.getUserId())) {
+            var sub = new Subscription();
+            sub.setTruck(truck);
+            sub.setUser(u);
+
+            return Optional.of(subscriptionService.saveSubscription(sub)).map(SubscriptionView::of);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Secured({"ROLE_USER"})
+    @GetMapping("/truck/{truckId}/subscription")
+    public Optional<SubscriptionView> subscribedToTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var subs = subscriptionService.findSubsByUser(u);
+        var iter = subs.stream()
+            .filter(sub -> sub.getTruck().getId().equals(truckId))
+            .map(SubscriptionView::of)
+            .iterator();
+        if (iter.hasNext()) {
+            return Optional.of(iter.next());
+        }
+        return Optional.empty();
+    }
+
+    @Secured({"ROLE_USER"})
+    @DeleteMapping("/truck/{truckId}/unsubscribe")
+    public void unsubscribe(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var t = truckService.findTruckById(truckId);
+        if (t.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription does not exist");
+        }
+        var truck = t.get();
+        var subs = subscriptionService.findSubsByUser(u);
+        var filteredSubs = subs
+            .stream()
+            .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
+            .iterator();
+        if (filteredSubs.hasNext()) {
+            var sub = filteredSubs.next();
+            subscriptionService.deleteSubscription(sub);
+        }
     }
 }

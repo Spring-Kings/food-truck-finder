@@ -1,4 +1,3 @@
-import CoolLayout from '../components/CoolLayout'
 import api from '../util/api'
 import getUserInfo from "../util/token";
 import Form from "../components/Form";
@@ -113,10 +112,7 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
 
 function AccountPage() {
     return (
-        <CoolLayout>
-            <AccountPageComponent/>
-        </CoolLayout>
-
+        <AccountPageComponent/>
     )
 }
 
