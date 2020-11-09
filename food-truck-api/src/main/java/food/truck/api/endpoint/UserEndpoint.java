@@ -77,8 +77,8 @@ public class UserEndpoint {
     public List<Truck> getUserSubscriptions(@PathVariable long id) {
         var user = userService.findUserById(id);
         List<Truck> trucks = new LinkedList<>();
-        if(user != null) {
-            subscriptionService.findSubsByUser(user.get()).stream().forEach(s -> trucks.add(s.getTruck()));
+        if (user.isPresent()) {
+            subscriptionService.findSubsByUser(user.get()).forEach(s -> trucks.add(s.getTruck()));
         }
 
         return trucks;
@@ -89,7 +89,7 @@ public class UserEndpoint {
         User user = userService.loadUserByUsername(username);
         List<Truck> trucks = new LinkedList<>();
         if(user != null) {
-            subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
+            subscriptionService.findSubsByUser(user).forEach(s -> trucks.add(s.getTruck()));
         }
         return trucks;
     }
@@ -103,7 +103,7 @@ public class UserEndpoint {
     public List<Review> getUserReviews(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         if(user == null){
-            return new LinkedList<Review>();
+            return List.of();
         }
         return reviewService.findReviewsByUserId(user.getId());
     }

@@ -38,7 +38,7 @@ public class TruckEndpoint {
 
     @Autowired
     private RouteService routeService;
-    private StrategySelector ss = new StrategySelector();
+    private final StrategySelector ss = new StrategySelector();
 
     @Autowired
     private SubscriptionService subscriptionService;
@@ -245,7 +245,7 @@ public class TruckEndpoint {
         // TODO check permissions
         boolean good = true;
         for (var d : data) {
-            if (!routeService.updateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
                 good = false;
         }
         return good;

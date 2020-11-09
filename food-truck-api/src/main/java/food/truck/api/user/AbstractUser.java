@@ -1,6 +1,6 @@
 package food.truck.api.user;
 
-import food.truck.api.Location;
+import food.truck.api.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AbstractUser {
-    protected Location location;
+    protected Position position;
 
     public void visit(UserVisitor v) {
         v.accept(this);

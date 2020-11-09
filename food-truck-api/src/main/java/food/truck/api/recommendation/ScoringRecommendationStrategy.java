@@ -35,12 +35,12 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
 
     @Override
     public List<Truck> selectTrucks() {
-        var trucks = truckSvc.getTrucksCloseToLocation(user.getLocation(), prefs.getAcceptableRadius());
+        var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
         var scores = new HashMap<Truck, Double>();
         for (var truck : trucks) {
             // I think this .get() is okay because .getTrucksCloseToLocation already filtered it to trucks with a valid current location
-            var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId()).get().getLocation();
-            double distRatio = user.getLocation().distanceInMiles(truckLocation) / prefs.getAcceptableRadius();
+            var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId()).get().getPosition();
+            double distRatio = user.getPosition().distanceInMiles(truckLocation) / prefs.getAcceptableRadius();
             double distScore = ScoreWeights.DistWeight.val * (1 - distRatio);
 
             double priceScore;

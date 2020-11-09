@@ -1,6 +1,6 @@
 package food.truck.api.truck;
 
-import food.truck.api.Location;
+import food.truck.api.Position;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
@@ -99,12 +99,12 @@ public class TruckService {
         return routeService.getCurrentRouteLocation(route.getRouteId());
     }
 
-    public List<Truck> getTrucksCloseToLocation(Location loc, double radiusMiles) {
+    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles) {
         return truckRepository.findAll().stream().filter(truck -> {
                     var curLoc = getCurrentRouteLocation(truck.id);
                     if (curLoc.isEmpty())
                         return false;
-                    var truckLocation = curLoc.get().getLocation();
+                    var truckLocation = curLoc.get().getPosition();
                     double distance = loc.distanceInMiles(truckLocation);
                     return distance < radiusMiles;
                 }

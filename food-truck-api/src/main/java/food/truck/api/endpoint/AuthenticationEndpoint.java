@@ -54,22 +54,22 @@ public class AuthenticationEndpoint {
     public String test(@AuthenticationPrincipal AbstractUser u) {
         if (u == null)
             return "User is null";
-        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getLocation());
+        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getPosition());
     }
 
     @GetMapping("/test2")
     public String test2(@AuthenticationPrincipal User u) {
-        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getLocation());
+        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getPosition());
     }
 
     @GetMapping("/test2.5")
     @Secured("ROLE_USER")
     public String test25(@AuthenticationPrincipal User u) {
-        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getLocation());
+        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getPosition());
     }
 
     @GetMapping("/test3")
     public String test3(@AuthenticationPrincipal @NonNull User u) {
-        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getLocation());
+        return String.format("User is a %s, location is %s", u.getClass().getSimpleName(), u.getPosition());
     }
 }

@@ -1,12 +1,12 @@
 package food.truck.api.user;
 
-import food.truck.api.Location;
+import food.truck.api.Position;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class Guest extends AbstractUser {
-    public Guest(Location loc) {
-        location = loc;
+    public Guest(Position loc) {
+        position = loc;
     }
 
     public void visit(UserVisitor v) {

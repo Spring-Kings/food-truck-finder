@@ -3,16 +3,16 @@ package food.truck.api;
 import lombok.Value;
 
 @Value
-public class Location {
+public class Position {
     double latitude;
     double longitude;
 
-    public Location(double lat, double lng) {
+    public Position(double lat, double lng) {
         latitude = lat;
         longitude = lng;
     }
 
-    public Location() {
+    public Position() {
         this(0, 0);
     }
 
@@ -26,7 +26,7 @@ public class Location {
 
     protected static final int EARTH_RADIUS_MILES = 3959;
 
-    public double distanceInMiles(Location other) {
+    public double distanceInMiles(Position other) {
         //https://www.movable-type.co.uk/scripts/latlong.html
         //haversine formula
 

@@ -1,5 +1,6 @@
 package food.truck.api.routes;
 
+import food.truck.api.Position;
 import food.truck.api.truck.Truck;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,14 +81,13 @@ public class RouteService {
     public RouteLocation createLocation(long routeId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
         RouteLocation routeLoc = new RouteLocation();
         routeLoc.setRoute(routeRepository.getOne(routeId)); // .getOne() uses lazy loading, so it doesn't really load the whole route here
-        routeLoc.setLat(lat);
-        routeLoc.setLng(lng);
+        routeLoc.setPosition(new Position(lat, lng));
         routeLoc.setArrivalTime(arrivalTime);
         routeLoc.setExitTime(exitTime);
         return routeLocationRepository.save(routeLoc);
     }
 
-    public boolean updateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public boolean addOrUpdateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
         // If the location doesn't exist, make a new one
         if (locId == null) {
             createLocation(routeId, lat, lng, arrivalTime, exitTime);
@@ -99,8 +99,7 @@ public class RouteService {
         if (l.isEmpty())
             return false;
         var loc = l.get();
-        loc.setLat(lat);
-        loc.setLng(lng);
+        loc.setPosition(new Position(lat, lng));
         loc.setArrivalTime(arrivalTime);
         loc.setExitTime(exitTime);
         routeLocationRepository.save(loc);

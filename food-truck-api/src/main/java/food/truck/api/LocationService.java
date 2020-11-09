@@ -20,12 +20,12 @@ public class LocationService {
         reader = new DatabaseReader.Builder(stream).withCache(new CHMCache()).build();
     }
 
-    public Location estimateLocation(HttpServletRequest request) throws IOException, GeoIp2Exception {
+    public Position estimateLocation(HttpServletRequest request) throws IOException, GeoIp2Exception {
         return estimateLocation(InetAddress.getByName(request.getRemoteAddr()));
     }
 
-    public Location estimateLocation(InetAddress addr) throws IOException, GeoIp2Exception {
+    public Position estimateLocation(InetAddress addr) throws IOException, GeoIp2Exception {
         var loc = reader.city(addr).getLocation();
-        return new Location(loc.getLatitude(), loc.getLongitude());
+        return new Position(loc.getLatitude(), loc.getLongitude());
     }
 }

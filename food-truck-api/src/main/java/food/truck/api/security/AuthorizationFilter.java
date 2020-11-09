@@ -1,7 +1,7 @@
 package food.truck.api.security;
 
-import food.truck.api.Location;
 import food.truck.api.LocationService;
+import food.truck.api.Position;
 import food.truck.api.user.Guest;
 import food.truck.api.user.UserService;
 import io.jsonwebtoken.Claims;
@@ -39,13 +39,13 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
         String header = request.getHeader(SecurityConstants.HEADER_NAME);
-        Location loc;
+        Position loc;
         try {
             loc = locationService.estimateLocation(request);
         } catch (Exception e) {
             log.warn("Failed to estimate location", e);
             // Fall back to some random place in Waco
-            loc = new Location(31.546807, -97.120069);
+            loc = new Position(31.546807, -97.120069);
         }
 
         if (header != null) {
@@ -63,7 +63,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         chain.doFilter(request, response);
     }
 
-    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request, Location loc) {
+    private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request, Position loc) {
         String token = request.getHeader(SecurityConstants.HEADER_NAME);
         if (token == null)
             return null;
@@ -87,7 +87,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (claims != null) {
             String username = claims.getSubject();
             var authPrincipal = userService.loadUserByUsername(username);
-            authPrincipal.setLocation(loc);
+            authPrincipal.setPosition(loc);
             return new UsernamePasswordAuthenticationToken(authPrincipal, null, authPrincipal.getAuthorities());
         } else {
             return null;
