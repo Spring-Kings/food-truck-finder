@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import javax.persistence.AttributeConverter;
 
 @Log4j2
-public class LocationConverter implements AttributeConverter<Position, String> {
+public class PositionConverter implements AttributeConverter<Position, String> {
     @Override
     public String convertToDatabaseColumn(Position l) {
         return l.getLatitude() + "," + l.getLongitude();
