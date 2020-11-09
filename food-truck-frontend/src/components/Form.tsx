@@ -103,6 +103,17 @@ class Form extends Component<Props, State> {
             }
         }));
     }
+
+    static getDerivedStateFromProps(props: Props, state: State) {
+        let newFormData: any = {};
+        if (props.children)
+            React.Children.forEach(props.children, (c: any) => {
+                let name: string = (c as ReactElement).props.name as string;
+                newFormData[name] = state.formData[name];
+            });
+        state.formData = newFormData;
+        return state;
+    }
 }
 
 
