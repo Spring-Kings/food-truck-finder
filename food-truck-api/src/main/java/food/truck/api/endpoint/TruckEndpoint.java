@@ -6,6 +6,8 @@ import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
+import food.truck.api.search.IndexingService;
+import food.truck.api.search.TruckSearchService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
@@ -40,6 +42,12 @@ public class TruckEndpoint {
     @Autowired
     private SubscriptionService subscriptionService;
 
+    @Autowired
+    private IndexingService indexingService;
+
+    @Autowired
+    private TruckSearchService truckSearchService;
+
     @GetMapping("/nearby-trucks")
     public String getNearbyTrucks(@RequestParam String location) {
         return ""; //TODO
@@ -58,8 +66,13 @@ public class TruckEndpoint {
         return truckService.findTruckById(id);
     }
 
+    @PostMapping("/reindex")
+    public void reindex() throws InterruptedException {
+        indexingService.initiateIndexing();
+    }
+
     @GetMapping(path = "/truck/search")
-    public List<Truck> searchTrucks(@RequestParam String search){ return truckService.findTrucks(search);}
+    public List<Truck> searchTrucks(@RequestParam String search){ return truckSearchService.getTruckBaseOnText(search);}
 
     @GetMapping("/truck/{truckId}/reviews")
     public String getTruckReviews(@PathVariable long truckId) {
