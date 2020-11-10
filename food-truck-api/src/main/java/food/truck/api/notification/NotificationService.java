@@ -1,9 +1,7 @@
 package food.truck.api.notification;
 
-import food.truck.api.Position;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionRepository;
-import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
@@ -19,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -93,7 +92,7 @@ public class NotificationService {
         return notifications.stream()
             .filter(notif -> user
                 .getPosition()
-                .distanceInMiles(new Position(notif.getLatitude(), notif.getLongitude())) < milesThreshold)
+                .distanceInMiles(notif.getPosition()) < milesThreshold)
             .map(NotificationView::of)
             .collect(Collectors.toList());
     }
@@ -149,8 +148,7 @@ public class NotificationService {
             n.setTruck(truck);
             n.setMessage(message);
             n.setTime(Instant.now());
-            n.setLatitude(loc.getPosition().getLatitude());
-            n.setLongitude(loc.getPosition().getLongitude());
+            n.setPosition(loc.getPosition());
             nearbyNotificationRepository.save(n);
         });
     }

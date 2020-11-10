@@ -1,5 +1,7 @@
 package food.truck.api.notification;
 
+import food.truck.api.Position;
+import food.truck.api.PositionConverter;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.truck.Truck;
 import lombok.AllArgsConstructor;
@@ -27,9 +29,7 @@ public class NearbyNotification {
     @Column(name = "time", nullable = false)
     Instant time;
 
-    @Column(name = "latitude")
-    double latitude;
-
-    @Column(name = "longitude")
-    double longitude;
+    @Convert(converter = PositionConverter.class)
+    @Column(name = "position")
+    Position position;
 }
