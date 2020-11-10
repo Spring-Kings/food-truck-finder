@@ -1,11 +1,13 @@
 import React, {ReactElement, useEffect, useState} from 'react';
 import {NotificationListProps} from "./NotificationListComponent";
+import Router, {useRouter} from "next/router";
 import getUserInfo from "../../util/token";
 import CreateRouteDialog from "../route/CreateRouteDialog";
 import {Button, Dialog, DialogContent, DialogTitle, Grid, TextField} from "@material-ui/core";
 import Form from "../Form";
 
 function NotificationWatcherComponent(props: NotificationListProps) {
+  const router = useRouter();
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   const [notify, setNotify]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
@@ -19,6 +21,10 @@ function NotificationWatcherComponent(props: NotificationListProps) {
       setNotify(true);
     }
   };
+  const redirectToNotifications = () => {
+    setNotified(true);
+    router.replace('/notifications');
+  }
   useEffect(() => {
     if (!initialized) {
       reloadNotifications();
@@ -35,6 +41,7 @@ function NotificationWatcherComponent(props: NotificationListProps) {
       <DialogContent>
         <Grid container direction="column" alignItems="center">
           <Button variant="contained" onClick={() => setNotified(true)}>OK</Button>
+          <Button variant="contained" onClick={redirectToNotifications}>See Notifications</Button>
         </Grid>
       </DialogContent>
     </Dialog>
