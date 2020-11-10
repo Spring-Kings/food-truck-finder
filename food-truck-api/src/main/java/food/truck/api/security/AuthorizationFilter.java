@@ -2,6 +2,7 @@ package food.truck.api.security;
 
 import food.truck.api.LocationService;
 import food.truck.api.Position;
+import food.truck.api.PositionConverter;
 import food.truck.api.user.Guest;
 import food.truck.api.user.UserService;
 import io.jsonwebtoken.Claims;
@@ -38,29 +39,42 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
+
         String header = request.getHeader(SecurityConstants.HEADER_NAME);
-        Position loc;
-        try {
-            loc = locationService.estimateLocation(request);
-        } catch (Exception e) {
-            log.warn("Failed to estimate location", e);
-            // Fall back to some random place in Waco
-            loc = new Position(31.546807, -97.120069);
-        }
+        var position = getPosition(request);
 
         if (header != null) {
-            UsernamePasswordAuthenticationToken authentication = this.authenticate(request, loc);
+            UsernamePasswordAuthenticationToken authentication = this.authenticate(request, position);
             // Set principal, using the principal stored in the token returned by authenticate
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            var guest = new Guest(loc);
+            var guest = new Guest(position);
             var auth = new UsernamePasswordAuthenticationToken(guest, null, new ArrayList<>());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         chain.doFilter(request, response);
+    }
+
+    private Position getPosition(HttpServletRequest request) {
+        Position pos = null;
+        String posHeader = request.getHeader("Coordinates");
+        if (posHeader != null) {
+            pos = new PositionConverter().convertToEntityAttribute(posHeader);
+        }
+        if (pos == null) {
+            try {
+                pos = locationService.estimateLocation(request);
+            } catch (Exception e) {
+                log.warn("Failed to estimate location", e);
+                // Fall back to some random place in Waco
+                pos = new Position(31.546807, -97.120069);
+            }
+        }
+
+        return pos;
     }
 
     private UsernamePasswordAuthenticationToken authenticate(HttpServletRequest request, Position loc) {
