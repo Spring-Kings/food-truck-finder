@@ -19,7 +19,6 @@ public class NotificationView {
     @NonNull
     Instant time;
 
-    @NonNull
     boolean isRead;
 
     public static NotificationView of(Notification notif) {

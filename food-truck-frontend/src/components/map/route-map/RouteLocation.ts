@@ -1,4 +1,4 @@
-import { LatLngLiteral } from "@google/maps";
+import {LatLngLiteral} from "@google/maps";
 
 /**
  * CREATED: Just created, not sent to backend
@@ -32,8 +32,8 @@ export const backendToFrontend = (pt: any, stopId: number) => ({
   stopId: stopId,
   routeLocationId: pt.routeLocationId,
   coords: {
-    lat: pt.lat,
-    lng: pt.lng,
+    lat: pt.position.latitude,
+    lng: pt.position.longitude,
   },
   arrivalTime: pt.arrivalTime,
   exitTime: pt.exitTime,
@@ -42,9 +42,9 @@ export const backendToFrontend = (pt: any, stopId: number) => ({
 
 export const frontendToBackend = (pt: RouteLocation, routeId: number) => ({
   routeId: routeId,
-  routeLocationId: pt.routeLocationId > 0? pt.routeLocationId : null,
+  routeLocationId: pt.routeLocationId > 0 ? pt.routeLocationId : null,
   arrivalTime: pt.arrivalTime,
   exitTime: pt.exitTime,
-  lng: pt.coords.lng,
   lat: pt.coords.lat,
+  lng: pt.coords.lng,
 });

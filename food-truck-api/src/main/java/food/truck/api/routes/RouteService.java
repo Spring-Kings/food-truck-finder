@@ -1,19 +1,20 @@
 package food.truck.api.routes;
 
+import food.truck.api.Position;
 import food.truck.api.truck.Truck;
+import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.time.DayOfWeek;
 import java.time.Instant;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class RouteService {
     @Autowired
     private RouteRepository routeRepository;
@@ -81,14 +82,13 @@ public class RouteService {
     public RouteLocation createLocation(long routeId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
         RouteLocation routeLoc = new RouteLocation();
         routeLoc.setRoute(routeRepository.getOne(routeId)); // .getOne() uses lazy loading, so it doesn't really load the whole route here
-        routeLoc.setLat(lat);
-        routeLoc.setLng(lng);
+        routeLoc.setPosition(new Position(lat, lng));
         routeLoc.setArrivalTime(arrivalTime);
         routeLoc.setExitTime(exitTime);
         return routeLocationRepository.save(routeLoc);
     }
 
-    public boolean updateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public boolean addOrUpdateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
         // If the location doesn't exist, make a new one
         if (locId == null) {
             createLocation(routeId, lat, lng, arrivalTime, exitTime);
@@ -100,8 +100,7 @@ public class RouteService {
         if (l.isEmpty())
             return false;
         var loc = l.get();
-        loc.setLat(lat);
-        loc.setLng(lng);
+        loc.setPosition(new Position(lat, lng));
         loc.setArrivalTime(arrivalTime);
         loc.setExitTime(exitTime);
         routeLocationRepository.save(loc);
@@ -122,5 +121,26 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
+    public Optional<RouteLocation> getCurrentRouteLocation(long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return Optional.empty();
+        var r = route.get();
+        var now = Instant.now();
+        return r.getLocations().stream().filter(
+                loc -> now.isAfter(loc.arrivalTime) && now.isBefore(loc.exitTime)
+        ).findFirst();
+    }
 
+    public boolean userOwnsRoute(User u, long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return false;
+        return route.get().getTruck().getUserId().equals(u.getId());
+    }
+
+    public boolean userOwnsLocation(User u, long locationId) {
+        var loc = routeLocationRepository.findById(locationId);
+        return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
+    }
 }

@@ -7,18 +7,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Properties;
 
 @SpringBootApplication
 public class FoodTruckApplication {
     public static void main(String[] args) {
         SpringApplication.run(FoodTruckApplication.class);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
