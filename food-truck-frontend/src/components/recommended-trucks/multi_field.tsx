@@ -1,7 +1,7 @@
-import { Grid, IconButton, TextField, Typography } from "@material-ui/core";
+import {Grid, IconButton, TextField, Typography} from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
-import React, { Component } from "react";
+import React, {Component} from "react";
 
 type MultiProps = {
   title: string;
@@ -63,8 +63,6 @@ class MultiField extends Component<MultiProps, MultiState> {
   };
 
   dropKid = (dropNdx: number) => {
-    console.log(this.state.defaultValue);
-    console.log(dropNdx)
     this.setState({
       defaultValue: this.state.defaultValue.filter(
         (val, ndx) => ndx !== dropNdx

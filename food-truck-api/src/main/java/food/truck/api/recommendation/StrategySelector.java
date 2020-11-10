@@ -1,30 +1,22 @@
 package food.truck.api.recommendation;
 
 import food.truck.api.truck.TruckService;
-import food.truck.api.user.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import food.truck.api.user.AbstractUser;
+import food.truck.api.user.User;
+import food.truck.api.user.UserPreferences;
 
-public class StrategySelector implements UserVisitor {
-    @Setter
-    private TruckService truckSvc;
+public class StrategySelector {
+    private final TruckService truckSvc;
 
-    @Setter
-    private UserPreferences userPreferences;
-
-    @Getter
-    private TruckRecommendationStrategy recommendationStrategy;
-
-    public void accept(User u) {
-        recommendationStrategy = new ScoringRecommendationStrategy(truckSvc, u, userPreferences);
+    public StrategySelector(TruckService truckSvc) {
+        this.truckSvc = truckSvc;
     }
 
-    public void accept(Guest g) {
-        recommendationStrategy = null;
-    }
+    public TruckRecommendationStrategy selectStrategy(AbstractUser u, UserPreferences prefs) {
+        if (u instanceof User) {
+            return new ScoringRecommendationStrategy(truckSvc, (User) u, prefs);
+        }
 
-    public void accept(AbstractUser u) {
-        recommendationStrategy = null;
+        throw new IllegalStateException("Not implemented"); // TODO
     }
 }

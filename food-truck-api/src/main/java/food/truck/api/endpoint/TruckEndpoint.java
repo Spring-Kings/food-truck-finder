@@ -25,23 +25,24 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
 public class TruckEndpoint {
-    @Autowired
-    private TruckService truckService;
+    private final TruckService truckService;
+    private final RouteService routeService;
+    private final SubscriptionService subscriptionService;
+    private final StrategySelector ss;
 
     @Autowired
-    private RouteService routeService;
-    private final StrategySelector ss = new StrategySelector();
-
-    @Autowired
-    private SubscriptionService subscriptionService;
+    public TruckEndpoint(TruckService truckService, RouteService routeService, SubscriptionService subscriptionService) {
+        this.truckService = truckService;
+        this.routeService = routeService;
+        this.subscriptionService = subscriptionService;
+        this.ss = new StrategySelector(truckService);
+    }
 
     @GetMapping("/truck/nearby")
     public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
@@ -52,23 +53,11 @@ public class TruckEndpoint {
     @PostMapping(path = "/truck/recommended")
     public List<Truck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
-            @RequestBody UserPreferences location
+            @RequestBody UserPreferences prefs
     ) {
-        // Prepare with empty results, and visit to get the recommendation strategy
-        List<Truck> result;
-        ss.setUserPreferences(location);
-        ss.setTruckSvc(truckService);
-        u.visit(ss);
+        var strategy = ss.selectStrategy(u, prefs);
 
-        // Request and act on the recommendation strategy
-        var strategy = ss.getRecommendationStrategy();
-        if (strategy != null)
-            result = strategy.selectTrucks();
-        else
-            result = new ArrayList<>();
-
-        // return the results set
-        return result.stream().sequential().limit(location.getNumRequested()).collect(Collectors.toList());
+        return strategy.selectTrucks().subList(0, prefs.getNumRequested());
     }
 
     @GetMapping(path = "/truck/{id}")
