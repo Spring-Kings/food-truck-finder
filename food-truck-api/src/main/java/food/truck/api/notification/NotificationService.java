@@ -135,7 +135,7 @@ public class NotificationService {
             n.setMessage(message);
             n.setTime(Instant.now());
             n.setLatitude(loc.getPosition().getLatitude());
-            n.setLongitude(loc.getPosition().getLatitude());
+            n.setLongitude(loc.getPosition().getLongitude());
             nearbyNotificationRepository.save(n);
         });
     }
