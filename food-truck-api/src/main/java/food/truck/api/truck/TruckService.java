@@ -28,6 +28,11 @@ public class TruckService {
         return truckRepository.findByUserId(userId);
     }
 
+    public List<Truck> findTrucks(String search){ 
+        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
+            "%" + search + "%");
+    }
+
     public Optional<Truck> findTruckById(Long truckId) {
         return truckRepository.findById(truckId);
     }
