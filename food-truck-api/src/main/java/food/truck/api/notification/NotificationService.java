@@ -3,15 +3,14 @@ package food.truck.api.notification;
 import food.truck.api.Position;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionRepository;
-import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
+import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.aspectj.AnnotationAsyncExecutionAspect;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -34,7 +33,7 @@ public class NotificationService {
     SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    RouteService routeService;
+    TruckService truckService;
 
     @Autowired
     JavaMailSender mailSender;
@@ -129,19 +128,15 @@ public class NotificationService {
     }
 
     public void saveNearbyNotification(Truck truck, String message) {
-        routeService
-            .findRouteByTruck(truck)
-            .stream()
-            .findFirst()
-            .flatMap(route -> route.getLocations().stream().findFirst())
-            .ifPresent(loc -> {
-                var n = new NearbyNotification();
-                n.setTruck(truck);
-                n.setMessage(message);
-                n.setTime(Instant.now());
-                n.setLatitude(loc.getPosition().getLatitude());
-                n.setLongitude(loc.getPosition().getLatitude());
-                nearbyNotificationRepository.save(n);
-            });
+        var routeLocation = truckService.getCurrentRouteLocation(truck.getId());
+        routeLocation.ifPresent(loc -> {
+            var n = new NearbyNotification();
+            n.setTruck(truck);
+            n.setMessage(message);
+            n.setTime(Instant.now());
+            n.setLatitude(loc.getPosition().getLatitude());
+            n.setLongitude(loc.getPosition().getLatitude());
+            nearbyNotificationRepository.save(n);
+        });
     }
 }
