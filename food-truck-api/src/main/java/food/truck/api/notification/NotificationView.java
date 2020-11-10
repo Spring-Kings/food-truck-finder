@@ -30,4 +30,14 @@ public class NotificationView {
             notif.isRead()
         );
     }
+
+    public static NotificationView of(NearbyNotification notif) {
+        return new NotificationView(
+            notif.getId(),
+            notif.getTruck(),
+            notif.getMessage(),
+            notif.getTime(),
+            true
+        );
+    }
 }
