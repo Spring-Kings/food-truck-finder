@@ -3,6 +3,7 @@ package food.truck.api.notification;
 import food.truck.api.Position;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionRepository;
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
@@ -52,7 +53,21 @@ public class NotificationService {
     public List<NotificationView> findNotificationsByUser(AbstractUser user) {
         var notifications = findNearbyNotifications(user, 30);
         if (user instanceof User) {
-            notifications.addAll(findNotificationsByUser((User)user));
+            var authenticatedUser = (User)user;
+            notifications.addAll(findNotificationsByUser(authenticatedUser));
+            notifications = notifications
+                .stream()
+                .filter(notification -> !truckService.userOwnsTruck(authenticatedUser, notification.getTruck().getId()))
+                .filter(notification -> {
+                    if (notification.getType().equals("LOCATION")) {
+                        var subscriptions = subscriptionRepository.findByUser(authenticatedUser);
+                        return subscriptions
+                            .stream()
+                            .noneMatch(sub -> sub.getTruck().getId().equals(notification.getTruck().getId()));
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
         }
         return notifications;
     }

@@ -1,24 +1,22 @@
-import React, {useEffect, useState} from 'react';
+import React, {ReactElement, useEffect, useState} from 'react';
 import {NotificationListProps} from "./NotificationListComponent";
 import getUserInfo from "../../util/token";
+import CreateRouteDialog from "../route/CreateRouteDialog";
+import {Button, Dialog, DialogContent, DialogTitle, Grid, TextField} from "@material-ui/core";
+import Form from "../Form";
 
 function NotificationWatcherComponent(props: NotificationListProps) {
   const [initialized, setInitialized]: [boolean, any] = useState(false);
+  const [notify, setNotify]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
   const reloadNotifications = () => {
-    const id: number | undefined = getUserInfo()?.userID;
-    if (id !== undefined && id !== 0) {
-      props.loadNotificationsFromBackend();
-    }
-    if (!notified) {
-      notifyUnread();
-    }
+    props.loadNotificationsFromBackend();
+    notifyUnread();
   };
   const notifyUnread = () => {
     const foundItem = props.data.notifications.find((notification) => !notification.read);
     if (foundItem !== null && foundItem !== undefined) {
-      setNotified(true);
-      alert('You have unread notification(s)');
+      setNotify(true);
     }
   };
   useEffect(() => {
@@ -32,7 +30,14 @@ function NotificationWatcherComponent(props: NotificationListProps) {
     return () => {};
   });
   return (
-    <></>
+    <Dialog open={notify && !notified}>
+      <DialogTitle>You have unread notifications!</DialogTitle>
+      <DialogContent>
+        <Grid container direction="column" alignItems="center">
+          <Button variant="contained" onClick={() => setNotified(true)}>OK</Button>
+        </Grid>
+      </DialogContent>
+    </Dialog>
   );
 }
 

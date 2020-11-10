@@ -26,10 +26,7 @@ const mapDispatchToProps = (dispatch: Dispatch<NotificationAction>) => {
   return {
     loadNotificationsFromBackend: () => {
       return new Promise<void>(() => {
-        var id: number | undefined = getUserInfo()?.userID;
-        if (id !== undefined) {
-          updateNotifications(dispatch);
-        }
+        updateNotifications(dispatch);
       });
     },
     dispatch,

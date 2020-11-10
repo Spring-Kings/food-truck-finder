@@ -76,7 +76,6 @@ public class NotificationEndpoint {
         return notificationService.findNotificationsByTruck(truck);
     }
 
-    @Secured({"ROLE_USER"})
     @GetMapping("/notifications")
     public List<NotificationView> getNotificationsForUser(@AuthenticationPrincipal AbstractUser user) {
         return notificationService.findNotificationsByUser(user);
