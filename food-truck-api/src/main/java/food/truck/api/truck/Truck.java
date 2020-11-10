@@ -29,6 +29,9 @@ public class Truck {
     @Column(name = "price_rating")
     Long priceRating;
 
+    @Column(name = "star_rating")
+    Long starRating;
+
     @Column(name = "description")
     String description;
 

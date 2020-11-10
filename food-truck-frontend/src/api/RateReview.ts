@@ -1,4 +1,5 @@
-import Review, { backendToFrontend } from "../domain/truck/Review";
+import Review, { backendToFrontend as review_backendToFrontend, TruckReviews } from "../domain/truck/Review";
+import Truck, { backendToFrontend as truck_backendToFrontend } from "../domain/truck/Truck";
 import api from "../util/api";
 import { ClientResponseAction } from "./ResponseTypes";
 
@@ -31,7 +32,7 @@ export const loadReviewsByUser = async (
       // Map all backend reviews to frontend reviews
       reviews = resp.data.map(async (r: any) => {
         // Create frontend representation for 1 review, with either the username or a blank string
-        return backendToFrontend(r, name.data.username);
+        return review_backendToFrontend(r, name.data.username);
       });
     }
   } catch (e: any) {
@@ -75,7 +76,7 @@ export const loadReviewFromTruckForUser = async (
 
       // Map review to a frontend review
       if (resp.data !== null)
-        review = backendToFrontend(resp.data, name.data.username);
+        review = review_backendToFrontend(resp.data, name.data.username);
     }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return null
@@ -95,7 +96,12 @@ export const loadReviewsByTruck = async (
   truckId: number,
   onFail?: ClientResponseAction
 ) => {
-  let reviews: Review[] = [];
+  let reviews: TruckReviews = {
+    reviews: [],
+    avgCostRating: null,
+    avgStarRating: null,
+    truckName: ""
+  };
 
   try {
     // Get the reviews for this truck
@@ -105,10 +111,10 @@ export const loadReviewsByTruck = async (
     });
 
     // If we got a good response, then create frontend representation
-    if (resp.data !== null)
+    if (resp.data !== null) {
       // Map all backend reviews to frontend reviews
       // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
-      reviews = await Promise.all(resp.data.map(async (r: any) => {
+      reviews.reviews = await Promise.all(resp.data.map(async (r: any) => {
         // Fetch username
         let name: any = await api.request({
           url: `/user/${r.userId}`,
@@ -116,14 +122,28 @@ export const loadReviewsByTruck = async (
         });
         
         // Create frontend representation for 1 review, with either the username or a blank string
-        return backendToFrontend(
+        return review_backendToFrontend(
           r,
           name.data !== null ? name.data.username : ""
         );
       }));
+    }
+
+    // Fetch the truck's info. Yes, I could've gotten it from the reviews. That seemed like a coupling hazard, what happens
+    // if we change the way reviews get stored and they suddenly don't store trucks directly?
+    let truck: Truck | null = truck_backendToFrontend((await api.request({
+      url: `/truck/${truckId}`,
+      method: "GET"
+    })).data);
+    console.log(truck);
+    if (truck !== null) {
+      reviews.truckName = truck.name;
+      reviews.avgCostRating = truck.priceRating;
+      reviews.avgStarRating = truck.starRating;
+    }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    reviews = [];
+    reviews.reviews = [];
     if (onFail) onFail(e);
   }
 

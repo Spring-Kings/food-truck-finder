@@ -3,6 +3,7 @@ package food.truck.api.reviews_and_subscriptions;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckRepository;
 import food.truck.api.user.User;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 public class ReviewService {
     @Autowired
@@ -25,10 +28,6 @@ public class ReviewService {
 
     public List<Review> findReviewByTruckId(Long truckId) {
         return reviewRepository.findByTruckId(truckId);
-    }
-
-    public Review saveReview(Review review) {
-        return reviewRepository.save(review);
     }
 
     public Review findReviewById(long reviewId) {
@@ -48,7 +47,9 @@ public class ReviewService {
         r.setCostRating(costRating);
         r.setReviewText(reviewText);
         r.setDay_time(Timestamp.from(Instant.now()));
-        return reviewRepository.save(r);
+        var result = reviewRepository.save(r);
+        updateAverageRating(result);
+        return result;
     }
 
     public boolean deleteReviewByUser(User u, long truckId) {
@@ -60,10 +61,32 @@ public class ReviewService {
 
         // Delete review
         reviewRepository.delete(r);
+        updateAverageRating(r);
         return true;
     }
 
     public Review findReviewForUser(Long userId, Long truckId) {
         return reviewRepository.findByUserIdAndTruckId(userId, truckId).stream().findFirst().orElse(null);
+    }
+
+    /**
+     * I hate this solution, but it didn't work out any other way...
+     */
+    private void updateAverageRating(Review review) {
+        var truck = review.getTruck();
+        var coll = reviewRepository.findByTruckId(review.getId());
+
+        // Get new average cost and star ratings
+        long cost = coll.parallelStream()
+                .collect(Collectors.averagingInt(r -> r.getCostRating()))
+                .intValue();
+        long star = coll.parallelStream()
+                .collect(Collectors.averagingInt(r -> r.getCostRating()))
+                .intValue();
+
+        // Persist new rating
+        truck.setPriceRating(cost);
+        truck.setStarRating(star);
+        truckRepository.save(truck);
     }
 }

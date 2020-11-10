@@ -6,7 +6,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review from "../../../domain/truck/Review";
+import Review, { TruckReviews } from "../../../domain/truck/Review";
 import { loadReviewsByTruck } from "../../../api/RateReview";
 import { DEFAULT_ERR_KICK } from "../../../api/DefaultResponses";
 import { MoneyRating, StarRating } from "./ratings";
@@ -17,7 +17,7 @@ interface RateProps {
 }
 
 export interface RateState {
-  reviews: Review[];
+  reviews: TruckReviews | undefined;
 }
 
 class ReviewListComponent extends Component<RateProps, RateState> {
@@ -25,7 +25,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     super(props);
 
     this.state = {
-      reviews: [],
+      reviews: undefined,
     };
     this.returnTruckPage = this.returnTruckPage.bind(this);
   }
@@ -37,7 +37,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
   }
 
   render() {
-    if (!this.state) {
+    if (!this.state.reviews) {
       return (
         <Container>
           <CircularProgress />
@@ -47,27 +47,23 @@ class ReviewListComponent extends Component<RateProps, RateState> {
 
     return (
       <Grid container direction="column" spacing={5}>
-        {this.createReviewHeader()}
-        {this.state.reviews.map((review) => this.createReviewEntry(review))}
+        {this.createReviewHeader(this.state.reviews)}
+        {this.state.reviews.reviews.map((review) => this.createReviewEntry(review))}
       </Grid>
     );
   }
 
-  private createReviewHeader = () => (
-    /** TODO put title, overall stars, overall cost here */
+  private createReviewHeader = (reviews: TruckReviews) => (
     <Grid container item xs key="head">
       <Grid item xs key="back">
         <Button variant="contained" onClick={this.returnTruckPage}>Back to Truck</Button>
       </Grid>
       <Grid item xs key="name">
-        <Typography variant="h4">{/** TODO put title here */}</Typography>
+        <Typography variant="h4">{reviews.truckName}</Typography>
       </Grid>
-      <Grid item xs key="star">
-        Star Rating
-      </Grid>
-      <Grid item xs key="cost">
-        Cost Rating
-      </Grid>
+      {reviews.avgStarRating !== null && reviews.avgCostRating !== null?
+      this.ratingsReport(-1, reviews.avgStarRating, reviews.avgCostRating)
+      : <Typography variant="h5">Unrated</Typography>}
     </Grid>
   );
 
@@ -82,17 +78,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
           {review.timestamp.toLocaleDateString()}
         </Grid>
 
-        {/* I can't believe that actually worked */}
-        <Grid container item xs key={`${review.reviewId}/basics`}>
-          <Grid item xs key={`${review.reviewId}/star`}>
-            <Typography variant="h6">Quality:</Typography>
-            <StarRating disabled value={review.starRating} />
-          </Grid>
-          <Grid item xs key={`${review.reviewId}/cost`}>
-            <Typography variant="h6">Value:</Typography>
-            <MoneyRating disabled value={review.costRating} />
-          </Grid>
-        </Grid>
+        {this.ratingsReport(review.reviewId, review.starRating, review.costRating)}
 
         {review.review && (
           <Grid item xs key={`${review.reviewId}/revw`}>
@@ -103,6 +89,18 @@ class ReviewListComponent extends Component<RateProps, RateState> {
       </Grid>
     </Grid>
   );
+
+  ratingsReport = (id: number, starRating: number, costRating: number, item: boolean = false) => (
+    <Grid container item={item} xs key={`${id}/ratings`}>
+      <Grid item xs key={"star"}>
+        <Typography variant="h6">Quality:</Typography>
+        <StarRating disabled value={starRating} />
+      </Grid>
+      <Grid item xs key={"`cost"}>
+        <Typography variant="h6">Value:</Typography>
+        <MoneyRating disabled value={costRating} />
+      </Grid>
+    </Grid>)
 
   private returnTruckPage() {
     Router.replace(`/truck/${this.props.truckId}`)

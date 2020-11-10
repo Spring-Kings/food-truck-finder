@@ -13,6 +13,15 @@ interface Review {
   timestamp: Date;
 }
 
+export type TruckReviews = {
+  reviews: Review[];
+
+  // Truck bookkeeping info
+  truckName: string;
+  avgStarRating: number | null;
+  avgCostRating: number | null;
+}
+
 export function emptyReview(userId: number, truckId: number): Review {
   return {
     reviewId: -1,
