@@ -58,8 +58,6 @@ bootJar {
 dependencies {
 
     compile 'org.hibernate:hibernate-search-orm:5.11.5.Final'
-    compile group: 'org.hibernate.search', name: 'hibernate-search-backend-elasticsearch', version: '6.0.0.Beta3'
-
 
     compile group: 'com.google.guava', name: 'guava'
     compile group: 'com.gitlab.bessemer', name: 'cornerstone'
