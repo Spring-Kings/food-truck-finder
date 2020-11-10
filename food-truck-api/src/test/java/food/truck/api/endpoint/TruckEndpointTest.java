@@ -20,7 +20,7 @@ public class TruckEndpointTest extends EndpointTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         var truck = fromJson(strResponse, Truck.class);
-        assertNotNull(truck);
+        assertEquals(data.testTruckA, truck);
     }
 
     @Test
@@ -144,7 +144,7 @@ public class TruckEndpointTest extends EndpointTest {
 
     @Test
     public void getRoutesBadId() throws Exception {
-        var req = get("/truck/{id}/routes", 83579233);
+        var req = get("/truck/{id}/routes", -1337);
         mockMvc.perform(req).andExpect(status().is4xxClientError());
     }
 

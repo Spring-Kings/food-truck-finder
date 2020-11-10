@@ -4,7 +4,7 @@ import OwnerDashboardComponent from '../../components/dashboards/owner';
 
 function OwnerDashboard() {
   return (
-    <OwnerDashboardComponent />
+    <OwnerDashboardComponent/>
   );
 }
 
