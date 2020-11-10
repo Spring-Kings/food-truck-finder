@@ -2,6 +2,7 @@ package food.truck.api.routes;
 
 import food.truck.api.Position;
 import food.truck.api.truck.Truck;
+import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -131,5 +132,15 @@ public class RouteService {
         ).findFirst();
     }
 
+    public boolean userOwnsRoute(User u, long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return false;
+        return route.get().getTruck().getUserId().equals(u.getId());
+    }
 
+    public boolean userOwnsLocation(User u, long locationId) {
+        var loc = routeLocationRepository.findById(locationId);
+        return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
+    }
 }

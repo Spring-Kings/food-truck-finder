@@ -4,6 +4,7 @@ import food.truck.api.reviews_and_subscriptions.Review;
 import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import food.truck.api.user.UserView;
@@ -34,7 +35,7 @@ public class UserEndpoint {
     private SubscriptionService subscriptionService;
 
     @GetMapping("/user/{id}")
-    public UserView findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
+    public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         return userService.findUserById(id)
                 .map(UserView::of)
                 .orElse(null);
@@ -50,6 +51,7 @@ public class UserEndpoint {
     }
 
     @PutMapping("/user")
+    @Secured("ROLE_USER")
     public boolean editUser(@AuthenticationPrincipal User u, @RequestBody EditUserParams data) {
         if (!userService.passwordMatches(u, data.password)) {
             return false;

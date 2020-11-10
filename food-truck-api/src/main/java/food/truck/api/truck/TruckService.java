@@ -5,7 +5,7 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
-import lombok.NonNull;
+import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,16 +60,19 @@ public class TruckService {
     }
 
     public Truck updateTruck(
-            @NonNull
-                    Truck truck,
+            long truckId,
             Optional<String> name,
             Optional<byte[]> menu,
             Optional<String> textMenu,
             Optional<Long> priceRating,
             Optional<String> description,
-        Optional<byte[]> schedule,
-        Optional<String> foodCategory
+            Optional<byte[]> schedule,
+            Optional<String> foodCategory
     ) {
+        var t = findTruckById(truckId);
+        if (t.isEmpty())
+            return null;
+        var truck = t.get();
         name.ifPresent(truck::setName);
         truck.setMenu(menu.orElse(null));
         truck.setTextMenu(textMenu.orElse(null));
@@ -109,5 +112,10 @@ public class TruckService {
                     return distance < radiusMiles;
                 }
         ).collect(Collectors.toList());
+    }
+
+    public boolean userOwnsTruck(User u, long truckId) {
+        var t = findTruckById(truckId);
+        return t.isPresent() && t.get().getUserId().equals(u.getId());
     }
 }
