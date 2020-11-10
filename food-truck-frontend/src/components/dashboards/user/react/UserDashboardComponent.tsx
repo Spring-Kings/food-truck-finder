@@ -21,6 +21,9 @@ import {
 import TruckRouteMapComponent from "../../../map";
 import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
+import { RouteLocation } from "../../../map/route-map/RouteLocation";
+import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
+import { getNearbyTrucks } from "../../../../api/Truck";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -30,8 +33,8 @@ interface UserDashboardProps {
 
 // Dashboard state
 interface UserDashboardState {
-  addTruck: boolean;
   inError: string | null;
+  nearbyTrucks: RouteLocation[];
 }
 
 // Dashboard component
@@ -44,8 +47,8 @@ class UserDashboardComponent extends Component<
 
     // Create state
     this.state = {
-      addTruck: false,
       inError: null,
+      nearbyTrucks: []
     };
 
     // Bind methods
@@ -53,12 +56,15 @@ class UserDashboardComponent extends Component<
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // Load
-    this.props.loadUserFromBackend().then(
-      (_response: any) => this.setState({ inError: null }),
-      (err: any) => this.setState({ inError: err })
-    );
+    try {
+      await this.props.loadUserFromBackend();
+      await getNearbyTrucks(DEFAULT_ERR_RESP);
+      this.setState({ inError: null });
+    } catch (err) {
+      this.setState({ inError: err });
+    }
   }
 
   render() {
@@ -132,7 +138,13 @@ class UserDashboardComponent extends Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckRouteMapComponent routePts={[]} />
+            <TruckRouteMapComponent
+              locations={this.state.nearbyTrucks}
+              isRoute={false}
+              onMarkerClick={(pt, latLng) => {
+                alert(pt);
+              }}
+            />
           </GridListTile>
         </GridList>
       </React.Fragment>

@@ -159,7 +159,7 @@ class TruckView extends Component<TruckProps, State> {
           </Grid>
         </Grid>
         <Grid item xs>
-          <TruckRouteMapComponent routePts={this.state.routePts} />
+          <TruckRouteMapComponent locations={this.state.routePts} />
         </Grid>
       </Grid>
     );
