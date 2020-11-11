@@ -6,7 +6,6 @@ import React, {Component} from 'react'
 import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
-import FormData from 'form-data'
 
 interface EditTruckState {
     message: string;
@@ -21,14 +20,12 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
             id: this.props.truckId,
             userId: -1,
             name: "",
-            description: null,
-            priceRating: null,
-            foodCategory: null,
-            textMenu: null,
+            description: "",
+            priceRating: -1,
             message: "",
+            tags: []
         };
 
-        this.uploadMenuHandler = this.uploadMenuHandler.bind(this);
     }
 
   render() {
@@ -40,23 +37,22 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
             <Typography variant={'h4'}>Edit Truck ID: {this.state.id}</Typography>
             <Form submitMethod="PUT" submitUrl={'/truck/update'} onSuccessfulSubmit={this.onSubmit}
                   onFailedSubmit={this.onFail}>
-                <TextField disabled label="Truck ID" variant="outlined" name="truckId" defaultValue={this.state.id}/>
+                <TextField className={"hidden"} disabled label="Truck ID" name="truckId" defaultValue={this.state.id}/>
+
                 <TextField label="Truck Name" variant="outlined" name="name" defaultValue={this.state.name}/>
                 <TextField label="Description" variant="outlined" name="description"
                            defaultValue={this.state.description}/>
                 <TextField label="Price Rating" variant="outlined" name="priceRating"
                            defaultValue={this.state.priceRating}/>
-                <TextField label="Food Category" variant="outlined" name="foodCategory"
-                           defaultValue={this.state.foodCategory}/>
-                <TextField label="Text Menu" variant="outlined" name="textMenu" defaultValue={this.state.textMenu}/>
+                <TextField label="Tags" variant="outlined" name="tags" defaultValue={this.state.tags}/>
             </Form>
 
             <Typography variant={'h4'}>Upload Menu</Typography>
-            <Form submitUrl="" customSubmitHandler={this.uploadMenuHandler}
-                  formProps={{encType: "multipart/form-data"}}>
-                <input id={"fileInput"} accept="image/*" type="file" name="file"/>
-            </Form>
-
+            <form encType="multipart/form-data">
+                <Button variant="contained" component="label">Upload Menu
+                    <input className="hidden" type="file" id="fileInput" name="file" onChange={this.onMenuChange}/>
+                </Button>
+            </form>
 
             <Button variant="outlined"
                     color="secondary"
@@ -69,38 +65,24 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
     );
   }
 
-    uploadMenuHandler(event: React.FormEvent, formData: any) {
-        const data = new FormData();
-        const file: HTMLInputElement = document.querySelector('#fileInput') as HTMLInputElement;
-        if (file === null || file.files === null || file.files[0] === null) {
+    onMenuChange = (event: React.FormEvent) => {
+        var formData = new FormData();
+        var imagefile = document.querySelector('#fileInput') as HTMLInputElement;
+
+        if (imagefile === null || imagefile.files === null || imagefile.files[0] == null) {
             console.log("Don't see a file there mate");
             return;
         }
 
-        data.append('file', file.files[0]);
-        api.request({
-            url: `/truck/${this.state.id}/upload-menu`,
-            data: formData,
-            method: "POST",
+        formData.append("file", imagefile.files[0]);
+        api.post(`/truck/${this.state.id}/upload-menu`, formData, {
             headers: {
-                ...data.getHeaders(),
-                "Content-Length": data.getLengthSync()
+                'Content-Type': 'multipart/form-data'
             }
         })
-            .then(response => {
-                console.log("Yeet");
-            })
-            .catch(error => {
-                if (error.response) {
-                    console.log("Got response with error status code");
-                } else if (error.request) {
-                    console.log("Got no response")
-                } else {
-                    console.log('Failed to make request', error.message);
-                }
-            })
+            .then(_ => this.setState({message: "Successfully uploaded menu"}))
+            .catch(err => this.setState({message: "Failed to upload menu"}));
     }
-
 
     componentDidMount() {
         api.get(`/truck/${this.props.truckId}`, {})

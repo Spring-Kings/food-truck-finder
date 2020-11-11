@@ -127,10 +127,6 @@ public class TruckEndpoint {
         Long priceRating;
         @Nullable
         Set<String> tags;
-        @Nullable
-        byte[] menu;
-        @Nullable
-        String textMenu;
     }
 
     @Secured({"ROLE_OWNER"})
@@ -315,7 +311,7 @@ public class TruckEndpoint {
         var t = truck.get();
 
         var menu = t.getMenu();
-        if (menu.length == 0)
+        if (menu == null || menu.length == 0)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         var headers = new HttpHeaders();

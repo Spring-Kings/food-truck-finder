@@ -61,7 +61,7 @@ public class TruckService {
         t.setName(name);
         t.setUserId(userId);
         t.setDescription("");
-        t.setMenuTags(new HashSet<>());
+        t.setTags(new HashSet<>());
         return saveTruck(t);
     }
 
@@ -89,7 +89,7 @@ public class TruckService {
         name.ifPresent(truck::setName);
         truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
-        truck.setMenuTags(tags.orElse(null));
+        truck.setTags(tags.orElse(null));
         return saveTruck(truck);
     }
 

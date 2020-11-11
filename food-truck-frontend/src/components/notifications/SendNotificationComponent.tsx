@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {TextField} from "@material-ui/core";
 import Form from "../Form";
 import {AxiosResponse} from "axios";
@@ -26,7 +26,8 @@ class SendNotificationComponent extends Component<SendNotificationProps, SendNot
   render() {
     return (
       <Form submitMethod="POST" submitUrl={'/truck/notification'} onFailedSubmit={this.onFail}>
-        <TextField disabled label="Truck ID" variant="outlined" name="truckId" defaultValue={this.state.truckId}/>
+        <TextField className="hidden" disabled label="Truck ID" variant="outlined" name="truckId"
+                   defaultValue={this.state.truckId}/>
         <TextField label="Message" variant="outlined" name="message" defaultValue={this.state.message}/>
       </Form>
     );

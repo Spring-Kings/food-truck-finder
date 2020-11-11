@@ -25,11 +25,7 @@ import {getSortedUsageRows} from "@jest/core/build/lib/watch_plugins_helpers";
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
   if (user) {
-    if (truckOwnerId !== user.userID) {
-      return false;
-    } else {
-      return true;
-    }
+    return truckOwnerId === user.userID;
   }
   return false;
 };
@@ -40,10 +36,7 @@ export interface TruckState {
   name: string;
   description: string | null;
   priceRating: number | null;
-  foodCategory: string | null;
-  // menu: string | null;
-  textMenu: string | null;
-  // schedule: string | null;
+  tags: string[]
 }
 
 interface TruckViewState {
@@ -68,12 +61,11 @@ class TruckView extends Component<TruckProps, State> {
       id: 0,
       userId: 0,
       name: "",
-      description: null,
-      priceRating: null,
-      foodCategory: null,
-      textMenu: null,
+      description: "",
+      priceRating: -1,
       routePts: [],
       subscription: null,
+      tags: []
     };
   }
 
@@ -123,16 +115,19 @@ class TruckView extends Component<TruckProps, State> {
           <Typography variant="h4">{this.state.name}</Typography>
           <List>
             <ListItem>
-              Truck Description: {this.state.description}
+              <img src={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`} alt="Menu"/>
+            </ListItem>
+            <ListItem>
+              Description: {this.state.description}
             </ListItem>
             <ListItem>
               Price Rating: {this.state.priceRating}
             </ListItem>
             <ListItem>
-              Food Category: {this.state.foodCategory}
-            </ListItem>
-            <ListItem>
-              Text Menu: {this.state.textMenu}
+              Tags:
+              <List>
+                {this.state.tags.map(tag => <ListItem>{tag}</ListItem>)}
+              </List>
             </ListItem>
           </List>
           <Grid>

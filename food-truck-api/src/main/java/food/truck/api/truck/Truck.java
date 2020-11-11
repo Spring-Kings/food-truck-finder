@@ -1,6 +1,7 @@
 package food.truck.api.truck;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import food.truck.api.MediaTypeConverter;
 import lombok.Data;
 import org.springframework.http.MediaType;
 
@@ -28,6 +29,7 @@ public class Truck {
     byte[] menu;
 
     @Column(name = "menu_content_type")
+    @Convert(converter = MediaTypeConverter.class)
     MediaType menuContentType;
 
     @Column(name = "price_rating")
@@ -37,11 +39,11 @@ public class Truck {
     String description;
 
     @ElementCollection
-    Set<String> menuTags;
+    Set<String> tags;
 
     @JsonIgnore
     public boolean hasTag(String tag) {
         tag = tag.toLowerCase().strip();
-        return menuTags.contains(tag);
+        return tags.contains(tag);
     }
 }
