@@ -1,6 +1,8 @@
 package food.truck.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import food.truck.api.Position;
+import food.truck.api.PositionConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,9 +33,6 @@ public class RouteLocation {
     @Column(name = "exit_time", nullable = false)
     Instant exitTime;
 
-    @Column(name = "lng", nullable = false)
-    double lng;
-
-    @Column(name = "lat", nullable = false)
-    double lat;
+    @Convert(converter = PositionConverter.class)
+    Position position;
 }

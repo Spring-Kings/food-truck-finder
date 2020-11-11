@@ -2,12 +2,19 @@ import React from 'react';
 import {Button, Divider, FormGroup, Grid, List, ListItem, TextField} from "@material-ui/core";
 import api from "../../util/api";
 import SearchTruckRow from "../../components/search/SearchRow";
+import jssPluginPropsSort from "jss-plugin-props-sort";
 
 const truck = [{
     id: -1,
     name: "",
     description: ""
 }]
+
+type TruckData ={
+    id: number,
+    name: string,
+    description: string
+}
 
 type SearchTruckState = {
     search: string,
@@ -21,7 +28,6 @@ type SearchTruckState = {
 type SearchTruckProps = {
 
 }
-
 
 class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState>{
 
@@ -40,18 +46,19 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
 
     handleSubmit(){
         api.get(`/truck/search?search=${this.state.search}`).then(event => {
-                this.setState({trucks: event.data})
+                this.setState({trucks: event.data});
         }).catch();
     }
 
     render() {
+
         return (
             <div>
                 <FormGroup row>
                     <Grid container spacing={2}>
                         <Grid item xs={8}>
                             <TextField fullWidth label="Search" variant="outlined" onChange={(event) => {
-                                this.setState({search: event.target.value})
+                                this.setState({search: event.target.value.toLowerCase()})
                             }} onKeyDown={event => {
                                 if(event.key === 'Enter'){
                                     this.handleSubmit();

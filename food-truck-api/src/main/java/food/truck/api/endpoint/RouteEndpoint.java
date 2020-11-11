@@ -7,8 +7,11 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -22,12 +25,12 @@ public class RouteEndpoint {
     private RouteService routeService;
 
     @GetMapping("/route/{routeId}/days")
-    public Set<DayOfWeek> getRouteDays(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+    public Set<DayOfWeek> getRouteDays(@PathVariable long routeId) {
         return routeService.findRouteDaysByRouteId(routeId);
     }
 
     @GetMapping("/route/{routeId}/locations")
-    public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+    public List<RouteLocation> getRouteLocations(@PathVariable long routeId) {
         return routeService.findRouteLocationByRouteId(routeId);
     }
 
@@ -38,12 +41,16 @@ public class RouteEndpoint {
     }
 
     @PostMapping("/route/add-day")
+    @Secured("ROLE_OWNER")
     public boolean addDayToRoute(@AuthenticationPrincipal User u, @RequestBody AddRouteDayParams rd) {
+        if (!routeService.userOwnsRoute(u, rd.routeId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
         DayOfWeek w;
         try {
             w = DayOfWeek.valueOf(rd.day_name);
         } catch (IllegalArgumentException e) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return routeService.addDayToRoute(rd.routeId, w);
     }
@@ -55,12 +62,16 @@ public class RouteEndpoint {
     }
 
     @PostMapping("/route/remove-day")
+    @Secured("ROLE_OWNER")
     public boolean removeDayFromRoute(@AuthenticationPrincipal User u, @RequestBody RemoveRouteDayParams rd) {
+        if (!routeService.userOwnsRoute(u, rd.routeId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
         DayOfWeek w;
         try {
             w = DayOfWeek.valueOf(rd.day_name);
         } catch (IllegalArgumentException e) {
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         return routeService.removeDayFromRoute(rd.routeId, w);
     }
@@ -73,8 +84,13 @@ public class RouteEndpoint {
         Instant arrivalTime;
         Instant exitTime;
     }
+
     @PostMapping("/route/create-location")
-    public RouteLocation createRouteLocation(@AuthenticationPrincipal User u, @RequestBody PostLocationParams  l){
+    @Secured("ROLE_OWNER")
+    public RouteLocation createRouteLocation(@AuthenticationPrincipal User u, @RequestBody PostLocationParams l) {
+        if (!routeService.userOwnsRoute(u, l.routeId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
         return routeService.createLocation(l.routeId, l.lat, l.lng, l.arrivalTime, l.exitTime);
     }
 }
