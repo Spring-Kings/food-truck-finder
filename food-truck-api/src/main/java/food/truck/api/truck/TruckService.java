@@ -33,7 +33,7 @@ public class TruckService {
     public List<Truck> findTruck(Long userId) {
         return truckRepository.findByUserId(userId);
     }
-    
+
     public Optional<Truck> findTruckById(Long truckId) {
         return truckRepository.findById(truckId);
     }
