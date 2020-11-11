@@ -1,55 +1,48 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.user.UserView;
-import org.junit.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.Assert.*;
-
-public class UserEndpointTest extends AuthenticationEndpointTest {
+public class UserEndpointTest extends EndpointTest {
     @Test
-    public void viewUser() {
-        loginSuccess();
-        var response = template.getForEntity(base + "user/1", UserView.class);
-        var userView = response.getBody();
-        assertNotNull(userView);
-        assertEquals(1, userView.getId());
-        assertEquals("test@example.com", userView.getEmail());
+    public void viewUser() throws Exception {
+        var req = get("/user/{id}", data.standardUser.getId());
+        String resp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        UserView u = fromJson(resp, UserView.class);
+        assertEquals(UserView.of(data.standardUser), u);
     }
 
     @Test
-    public void updateUser() {
-        loginSuccess();
-        String path = base + "user";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", token);
-        var body = new UserEndpoint.EditUserParams("password", "newPassword", "coolEmail@email.com");
-        var request = new HttpEntity<>(body, headers);
-        var response = template.exchange(path, HttpMethod.PUT, request, Boolean.class);
-        var success = response.getBody();
-        assertNotNull(success);
-        assertTrue(success);
-
-        var viewResp = template.getForEntity(base + "user/1", UserView.class);
-        var userView = viewResp.getBody();
-        assertNotNull(userView);
-        assertEquals("coolEmail@email.com", userView.getEmail());
+    public void updateUser() throws Exception {
+        var req = put("/user")
+                .content(asJson(new UserEndpoint.EditUserParams("password", "newPass", "coolEmail@aaa")))
+                .contentType("application/json")
+                .with(user(data.standardUser));
+        mockMvc.perform(req)
+                .andExpect(status().isOk());
+        var user = userService.findUserById(data.standardUser.getId()).get();
+        assertEquals(user.getEmail(), "coolEmail@aaa");
+        assertTrue(userService.passwordMatches(user, "newPass"));
     }
 
     @Test
-    public void searchUser() {
-        loginSuccess();
-        var params = new HashMap<String, String>();
-        params.put("username", "testUser");
-        // For some reason i can't deserialize into a List<UserView>
-        var viewResp = template.getForEntity(base + "search-usernames", String.class, params);
-        String userView = viewResp.getBody();
-        assertNotNull(userView);
-        assertTrue(userView.contains("1"));
+    public void searchUser() throws Exception {
+        var req = get("/search-usernames?username={x}", "standardUser");
+        String resp = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        var list = fromJsonList(resp, UserView.class);
+        assertThat(list, contains(UserView.of(data.standardUser)));
     }
 }
