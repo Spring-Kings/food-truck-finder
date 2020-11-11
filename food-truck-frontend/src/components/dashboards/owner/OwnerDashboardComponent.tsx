@@ -104,11 +104,6 @@ class OwnerDashboardComponent extends React.Component<
         >
           {/** Side list */}
           <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Image */}
-            <Card>
-              <img src="TODO insert logo" alt="STACKED TRUCKS" />
-            </Card>
-
             {/* Return to user dashboard */}
             <Card>
               <Button

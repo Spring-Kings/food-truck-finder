@@ -86,14 +86,6 @@ class UserDashboardComponent extends Component<
         >
           {/** Side list */}
           <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Image */}
-            <Card>
-              <img
-                src="../../../../resources/stacked_trucks_wheany_CCBY2,0.jpg"
-                alt="STACKED TRUCKS"
-              />
-            </Card>
-
             {/* Go to owner dashboard */}
             {this.props.data.ownedTrucks ? (
               <Card>
