@@ -49,7 +49,7 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
             <div>
                 <FormGroup row>
                     <Grid container spacing={2}>
-                        <Grid item xs={10}>
+                        <Grid item xs={8}>
                             <TextField fullWidth label="Search" variant="outlined" onChange={(event) => {
                                 this.setState({search: event.target.value})
                             }} onKeyDown={event => {

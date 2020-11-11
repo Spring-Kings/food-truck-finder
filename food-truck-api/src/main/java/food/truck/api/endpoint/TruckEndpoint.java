@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +73,13 @@ public class TruckEndpoint {
     }
 
     @GetMapping(path = "/truck/search")
-    public List<Truck> searchTrucks(@RequestParam String search){ return truckSearchService.getTruckBaseOnText(search);}
+    public List<Truck> searchTrucks(@RequestParam String search){
+       if( search.isEmpty()){
+           return new ArrayList<Truck>();
+       }
+       
+        return truckSearchService.getTruckBaseOnText(search);
+    }
 
     @GetMapping("/truck/{truckId}/reviews")
     public String getTruckReviews(@PathVariable long truckId) {
@@ -167,7 +174,7 @@ public class TruckEndpoint {
     public List<Route> getRoutes(@PathVariable long truckId) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
         if (truck == null || truck.isEmpty()) {
-            return new LinkedList<Route>();
+            return new ArrayList<Route>();
         }
 
         return routeService.findRouteByTruck(truck.get());
