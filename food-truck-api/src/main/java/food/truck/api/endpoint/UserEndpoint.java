@@ -2,8 +2,10 @@ package food.truck.api.endpoint;
 
 import food.truck.api.reviews_and_subscriptions.Review;
 import food.truck.api.reviews_and_subscriptions.ReviewService;
+import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import food.truck.api.user.UserView;
@@ -11,12 +13,13 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +37,7 @@ public class UserEndpoint {
     private SubscriptionService subscriptionService;
 
     @GetMapping("/user/{id}")
-    public UserView findUserById(@AuthenticationPrincipal @Nullable User viewer, @PathVariable long id) {
+    public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         return userService.findUserById(id)
                 .map(UserView::of)
                 .orElse(null);
@@ -50,6 +53,7 @@ public class UserEndpoint {
     }
 
     @PutMapping("/user")
+    @Secured("ROLE_USER")
     public boolean editUser(@AuthenticationPrincipal User u, @RequestBody EditUserParams data) {
         if (!userService.passwordMatches(u, data.password)) {
             return false;
@@ -76,26 +80,28 @@ public class UserEndpoint {
     @GetMapping("/user/{id}/subscriptions")
     public List<Truck> getUserSubscriptions(@PathVariable long id) {
         var user = userService.findUserById(id);
-        List<Truck> trucks = new LinkedList<>();
-        if(user != null) {
-            subscriptionService.findSubsByUser(user.get()).stream().forEach(s -> trucks.add(s.getTruck()));
-        }
-
-        return trucks;
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return subscriptionService.findSubsByUser(user.get()).stream()
+                .map(Subscription::getTruck)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/user/subscriptions")
     public List<Truck> getUserSubscriptions(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
-        List<Truck> trucks = new LinkedList<>();
-        if(user != null) {
-            subscriptionService.findSubsByUser(user).stream().forEach(s -> trucks.add(s.getTruck()));
-        }
-        return trucks;
+        if (user == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return subscriptionService.findSubsByUser(user).stream()
+                .map(Subscription::getTruck)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/user/{userId}/reviews")
     public List<Review> getUserReviews(@PathVariable long userId) {
+        var u = userService.findUserById(userId);
+        if (u.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return reviewService.findReviewsByUserId(userId);
     }
 
@@ -103,7 +109,7 @@ public class UserEndpoint {
     public List<Review> getUserReviews(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         if(user == null){
-            return new LinkedList<Review>();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return reviewService.findReviewsByUserId(user.getId());
     }
