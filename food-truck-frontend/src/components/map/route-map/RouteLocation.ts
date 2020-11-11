@@ -1,4 +1,5 @@
 import {LatLngLiteral} from "@google/maps";
+import {utcTimeStringToDate} from "../../../util/date-conversions";
 
 /**
  * CREATED: Just created, not sent to backend
@@ -28,17 +29,19 @@ export interface RouteLocation {
   readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
 }
 
-export const backendToFrontend = (pt: any, stopId: number) => ({
-  stopId: stopId,
-  routeLocationId: pt.routeLocationId,
-  coords: {
-    lat: pt.position.latitude,
-    lng: pt.position.longitude,
-  },
-  arrivalTime: pt.arrivalTime,
-  exitTime: pt.exitTime,
-  state: RouteLocationState.PERSISTED,
-});
+export const backendToFrontend = (pt: any, stopId: number) => {
+  return {
+    stopId: stopId,
+    routeLocationId: pt.routeLocationId,
+    coords: {
+      lat: pt.position.latitude,
+      lng: pt.position.longitude,
+    },
+    arrivalTime: utcTimeStringToDate(pt.arrivalTime),
+    exitTime: utcTimeStringToDate(pt.exitTime),
+    state: RouteLocationState.PERSISTED,
+  }
+}
 
 export const frontendToBackend = (pt: RouteLocation, routeId: number) => ({
   routeId: routeId,

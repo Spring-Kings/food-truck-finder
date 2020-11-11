@@ -26,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -226,9 +227,9 @@ public class TruckEndpoint {
         Long routeLocationId;
         long routeId;
         @NonNull
-        LocalTime arrivalTime;
+        Instant arrivalTime;
         @NonNull
-        LocalTime exitTime;
+        Instant exitTime;
         double lng;
         double lat;
     }
@@ -237,10 +238,14 @@ public class TruckEndpoint {
     @Secured("ROLE_OWNER")
     public boolean updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
         boolean good = true;
+
         for (var d : data) {
             if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+
+            LocalTime arrival = LocalTime.from(d.arrivalTime.atOffset(ZoneOffset.UTC));
+            LocalTime exit = LocalTime.from(d.exitTime.atOffset(ZoneOffset.UTC));
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
                 good = false;
         }
         return good;
