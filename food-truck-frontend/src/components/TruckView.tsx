@@ -126,7 +126,7 @@ class TruckView extends Component<TruckProps, State> {
             <ListItem>
               Tags:
               <List>
-                {this.state.tags.map(tag => <ListItem>{tag}</ListItem>)}
+                {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
               </List>
             </ListItem>
           </List>
