@@ -5,7 +5,7 @@ import { DEFAULT_ERR_KICK, DEFAULT_ERR_RESP } from "../../api/DefaultResponses";
 import api from "../../util/api";
 import Form from "../Form";
 import { MoneyRating } from "../truck/rate_and_review/ratings";
-import MultiField from "./multi_field";
+import MultiField from "../util/multi_field";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {

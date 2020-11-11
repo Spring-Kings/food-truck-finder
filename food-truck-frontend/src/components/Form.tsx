@@ -17,6 +17,15 @@ type State = {
     formData: any
 };
 
+/* Allow passing information other than a ReactEvent, under odd circumstances */
+export interface ReactEventAdapter {
+    target: {
+        type: undefined;
+        value: any;
+        name: string;
+    };
+}
+
 class Form extends Component<Props, State> {
     static defaultProps = {
         submitMethod: "POST"
@@ -101,7 +110,7 @@ class Form extends Component<Props, State> {
         event.preventDefault();
     }
 
-    onValueChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    onValueChanged(event: React.ChangeEvent<HTMLInputElement> | ReactEventAdapter) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;

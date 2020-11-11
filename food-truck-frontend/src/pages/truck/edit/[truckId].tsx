@@ -6,6 +6,7 @@ import React, {Component} from 'react'
 import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
+import MultiField from "../../../components/util/multi_field";
 
 interface EditTruckState {
     message: string;
@@ -44,7 +45,12 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
                            defaultValue={this.state.description}/>
                 <TextField label="Price Rating" variant="outlined" name="priceRating"
                            defaultValue={this.state.priceRating}/>
-                <TextField label="Tags" variant="outlined" name="tags" defaultValue={this.state.tags}/>
+                <MultiField
+                  title="Truck Tags"
+                  name="tags"
+                  variant="h4"
+                  value={this.state.tags}
+                />
             </Form>
 
             <Typography variant={'h4'}>Upload Menu</Typography>
