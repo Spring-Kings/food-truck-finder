@@ -17,7 +17,7 @@ function RouterSelectableComponent<T>(
     if (result) result = createComponent((result as unknown) as T);
     else result = <NotFound />;
 
-    return <CoolLayout>{result}</CoolLayout>;
+    return <>{result}</>;
   };
 }
 

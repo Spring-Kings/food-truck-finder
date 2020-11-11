@@ -5,7 +5,9 @@ import food.truck.api.truck.TruckRepository;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -55,9 +57,7 @@ public class ReviewService {
     public boolean deleteReviewByUser(User u, long truckId) {
         Review r = reviewRepository.findByUserIdAndTruckId(u.getId(), truckId).stream().findFirst().orElse(null);
         if (r == null)
-            return false; // TODO make return a 404
-        else if (!r.getUserId().equals(u.getId()))
-            return false; // TODO make return a 403
+            return false;
 
         // Delete review
         reviewRepository.delete(r);
@@ -65,24 +65,26 @@ public class ReviewService {
         return true;
     }
 
-    public Review findReviewForUser(Long userId, Long truckId) {
-        return reviewRepository.findByUserIdAndTruckId(userId, truckId).stream().findFirst().orElse(null);
+    public Optional<Review> findReviewForUser(Long userId, Long truckId) {
+        return reviewRepository.findByUserIdAndTruckId(userId, truckId).stream().findFirst();
     }
 
-    /**
-     * I hate this solution, but it didn't work out any other way...
-     */
     private void updateAverageRating(Review review) {
         var truck = review.getTruck();
-        var coll = reviewRepository.findByTruckId(review.getId());
+        var coll = reviewRepository.findByTruckId(truck.getId());
 
         // Get new average cost and star ratings
-        long cost = coll.parallelStream()
-                .collect(Collectors.averagingInt(r -> r.getCostRating()))
-                .intValue();
-        long star = coll.parallelStream()
-                .collect(Collectors.averagingInt(r -> r.getCostRating()))
-                .intValue();
+        Long cost = null;
+        Long star = null;
+
+        if (coll.size() != 0) {
+            cost = coll.stream()
+                    .collect(Collectors.averagingInt(Review::getCostRating))
+                    .longValue();
+            star = coll.stream()
+                    .collect(Collectors.averagingInt(Review::getStarRating))
+                    .longValue();
+        }
 
         // Persist new rating
         truck.setPriceRating(cost);

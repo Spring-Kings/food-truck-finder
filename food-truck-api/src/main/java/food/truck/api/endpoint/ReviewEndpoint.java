@@ -58,12 +58,15 @@ public class ReviewEndpoint {
 
     @GetMapping("/reviews/truck/{truckId}/user")
     public Review getTruckReviews(@PathVariable long truckId, @RequestParam Long userId) {
-        return reviewService.findReviewForUser(userId, truckId);
+        var result = reviewService.findReviewForUser(userId, truckId);
+        if (!result.isEmpty())
+            return result.get();
+        else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested review does not exist");
     }
 
     @Value
     private static class PostReviewParams {
-        Long userId;
         int score;
         int costRating;
         @Nullable
@@ -73,22 +76,26 @@ public class ReviewEndpoint {
     @Secured({"ROLE_USER"})
     @PostMapping("/reviews/truck/{truckId}")
     public Review postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
-        // TODO decide if we want to just silently change the review to match
-        if (!user.getId().equals(data.userId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "UserID does not match userID of the provided review");
-
         // Ensure truck exists
         Optional<Truck> truck = truckService.findTruckById(truckId);
         if (truck.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Provided truck does not exist");
 
+        // Ensure not rating my own truck
+        Truck t = truck.get();
+        if (user.getId().equals(t.getUserId()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot rate your own truck");
+
         // Save review
-        return reviewService.saveReview(data.userId, truck.get(), data.score, data.costRating, data.reviewText);
+        return reviewService.saveReview(user.getId(), truck.get(), data.score, data.costRating, data.reviewText);
     }
 
     @Secured({"ROLE_USER"})
     @DeleteMapping("/reviews/truck/{truckId}")
     public boolean deleteReview(@AuthenticationPrincipal User u, @PathVariable long truckId) {
-        return reviewService.deleteReviewByUser(u, truckId);
+        boolean result = reviewService.deleteReviewByUser(u, truckId);
+        if (!result)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find the specified review");
+        return true;
     }
 }

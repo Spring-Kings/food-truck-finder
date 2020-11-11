@@ -17,10 +17,10 @@ import {
 } from "../../../api/RateReview";
 import NotFound from "../../NotFound";
 import getUserInfo, { UserInfo } from "../../../util/token";
-import HiddenAttributeForm from "../../util/HiddenAttributeForm";
 import { MoneyRating, StarRating } from "./ratings";
 import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
 import Router from "next/router";
+import Form from "../../Form";
 
 interface RateProps {
   truckId: number;
@@ -110,12 +110,9 @@ class RateReviewComponent extends Component<RateProps, RateState> {
           />
         </Grid>
         <Grid item key="hidden_review_form">
-          <HiddenAttributeForm
+          <Form
             submitUrl={getSaveReviewUrl(this.props.truckId)}
             onSuccessfulSubmit={() => Router.replace(`/truck/reviews/${this.props.truckId}`)}
-            hiddenAttrs={[
-              { name: "userId", defaultValue: this.state.user.userID },
-            ]}
           >
             <StarRating
               name="score"
@@ -125,7 +122,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
               name="costRating"
               defaultValue={this.state.review.costRating}
             />
-            {this.state.review.extended ? (
+            {this.state.review.extended &&
               <TextField
                 label="Review"
                 variant="outlined"
@@ -135,8 +132,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
                 fullWidth
                 rows={NUM_ROWS}
               />
-            ) : null}
-          </HiddenAttributeForm>
+            }
+          </Form>
         </Grid>
         <Grid item xs>
           <Button variant="outlined" color="secondary" onClick={this.deleteReview}>DELETE REVIEW</Button>

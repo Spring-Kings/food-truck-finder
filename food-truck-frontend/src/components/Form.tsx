@@ -25,6 +25,11 @@ class Form extends Component<Props, State> {
 
         this.state = {formData: {}};
         React.Children.forEach(this.props.children, c => {
+            // Ensure a null didn't slip through (can happen in dynamic forms)
+            if (c === null)
+                return;
+            
+            // Parse child
             const child = c as ReactElement;
             if (typeof (child.props.name) !== 'undefined') {
                 if (typeof (child.props.value) !== 'undefined') {
@@ -48,7 +53,12 @@ class Form extends Component<Props, State> {
                     {/* For each child, shove it in a Grid and add the onChange event callback */}
                     {React.Children.map(this.props.children,
                         child => {
+                            // Ensure a null didn't slip through (can happen in dynamic forms)
                             const c = child as ReactElement;
+                            if (c === null)
+                                return;
+                            
+                            // Parse child
                             if (typeof (c.props.name) === 'undefined')
                                 return c;
                             return (<Grid item>
@@ -108,6 +118,11 @@ class Form extends Component<Props, State> {
         let newFormData: any = {};
         if (props.children)
             React.Children.forEach(props.children, (c: any) => {
+                // Ensure a null didn't slip through (can happen in dynamic forms)
+                if (c === null)
+                    return;
+            
+                // Parse child
                 let name: string = (c as ReactElement).props.name as string;
                 newFormData[name] = state.formData[name];
             });
