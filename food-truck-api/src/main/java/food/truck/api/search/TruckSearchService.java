@@ -35,7 +35,8 @@ public class TruckSearchService {
                 .get();
 
         Query truckQuery = qb.keyword()
-                .onFields("name", "text_menu", "description")
+                .fuzzy().withEditDistanceUpTo(2)
+                .onFields("name", "text_menu", "description", "foodCategory")
                 .matching(text)
                 .createQuery();
 

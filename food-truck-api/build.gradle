@@ -56,7 +56,7 @@ bootJar {
 }
 
 dependencies {
-
+    compile 'org.hibernate:hibernate-search-elasticsearch:5.11.5.Final'
     compile 'org.hibernate:hibernate-search-orm:5.11.5.Final'
 
     compile group: 'com.google.guava', name: 'guava'
