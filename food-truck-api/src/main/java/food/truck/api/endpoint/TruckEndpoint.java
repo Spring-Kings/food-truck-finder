@@ -114,7 +114,7 @@ public class TruckEndpoint {
 
     @Secured({"ROLE_OWNER"})
     @PostMapping("/truck/create")
-    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
+    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data){
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
