@@ -23,7 +23,7 @@ import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
 import { RouteLocation } from "../../../map/route-map/RouteLocation";
 import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
-import { getNearbyTrucks } from "../../../../api/Truck";
+import { getNearbyTruckLocations } from "../../../../api/Truck";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -59,10 +59,11 @@ class UserDashboardComponent extends Component<
   async componentDidMount() {
     // Load
     try {
+      let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
+      this.setState({ inError: null, nearbyTrucks: trucks });
       await this.props.loadUserFromBackend();
-      await getNearbyTrucks(DEFAULT_ERR_RESP);
-      this.setState({ inError: null });
     } catch (err) {
+      console.log(err);
       this.setState({ inError: err });
     }
   }

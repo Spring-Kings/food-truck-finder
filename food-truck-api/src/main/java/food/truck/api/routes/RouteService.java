@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.time.Instant;
+import java.time.*;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -16,6 +19,10 @@ import java.util.Set;
 @Service
 @Transactional
 public class RouteService {
+
+    /** Number of seconds in a day */
+    private static final long SECONDS_IN_DAY = 60L * 60L * 24L;
+
     @Autowired
     private RouteRepository routeRepository;
 
@@ -79,7 +86,7 @@ public class RouteService {
         return true;
     }
 
-    public RouteLocation createLocation(long routeId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public RouteLocation createLocation(long routeId, double lat, double lng, LocalTime arrivalTime, LocalTime exitTime) {
         RouteLocation routeLoc = new RouteLocation();
         routeLoc.setRoute(routeRepository.getOne(routeId)); // .getOne() uses lazy loading, so it doesn't really load the whole route here
         routeLoc.setPosition(new Position(lat, lng));
@@ -88,7 +95,7 @@ public class RouteService {
         return routeLocationRepository.save(routeLoc);
     }
 
-    public boolean addOrUpdateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public boolean addOrUpdateLocation(long routeId, Long locId, double lat, double lng, LocalTime arrivalTime, LocalTime exitTime) {
         // If the location doesn't exist, make a new one
         if (locId == null) {
             createLocation(routeId, lat, lng, arrivalTime, exitTime);
@@ -126,9 +133,12 @@ public class RouteService {
         if (route.isEmpty())
             return Optional.empty();
         var r = route.get();
-        var now = Instant.now();
+
+        // TODO figure out how to handle time zones
+        var now = LocalTime.now();
         return r.getLocations().stream().filter(
-                loc -> now.isAfter(loc.arrivalTime) && now.isBefore(loc.exitTime)
+                loc -> now.isAfter(LocalTime.from(loc.arrivalTime))
+                        && now.isBefore(LocalTime.from(loc.exitTime))
         ).findFirst();
     }
 
@@ -142,5 +152,17 @@ public class RouteService {
     public boolean userOwnsLocation(User u, long locationId) {
         var loc = routeLocationRepository.findById(locationId);
         return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
+    }
+
+    /**
+     * Translates an instant into its specified time on the day of the epoch. Allows
+     * comparison of instants.
+     *
+     * @param time The instant to translate
+     * @return The instant, standardized to today
+     */
+    private Instant translateInstant(Instant time) {
+        LocalTime.from(time);
+        return Instant.ofEpochSecond(time.getLong(ChronoField.INSTANT_SECONDS) % SECONDS_IN_DAY);
     }
 }

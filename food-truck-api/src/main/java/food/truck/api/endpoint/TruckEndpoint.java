@@ -25,6 +25,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +50,16 @@ public class TruckEndpoint {
     public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
         // TODO: Should radius be configurable?
         return truckService.getTrucksCloseToLocation(u.getPosition(), 10.0);
+    }
+
+    @PostMapping("/truck/locations")
+    public List<Truck> getTruckLocations(@AuthenticationPrincipal AbstractUser u, @RequestBody List<Long> truckIds) {
+        List<Truck> trucks = new ArrayList<>();
+        for (Long id : truckIds) {
+            if (id != null)
+                trucks.add(truckService.findTruck(id).get(0));
+        }
+        return trucks;
     }
 
     @PostMapping(path = "/truck/recommended")
@@ -214,9 +226,9 @@ public class TruckEndpoint {
         Long routeLocationId;
         long routeId;
         @NonNull
-        Instant arrivalTime;
+        LocalTime arrivalTime;
         @NonNull
-        Instant exitTime;
+        LocalTime exitTime;
         double lng;
         double lat;
     }

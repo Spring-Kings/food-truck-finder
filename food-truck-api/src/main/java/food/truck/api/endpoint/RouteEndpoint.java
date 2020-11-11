@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -81,8 +82,8 @@ public class RouteEndpoint {
         double lat;
         double lng;
         Long routeId;
-        Instant arrivalTime;
-        Instant exitTime;
+        LocalTime arrivalTime;
+        LocalTime exitTime;
     }
 
     @PostMapping("/route/create-location")
