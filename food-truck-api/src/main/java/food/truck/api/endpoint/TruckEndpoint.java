@@ -16,17 +16,21 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Log4j2
 @RestController
@@ -122,14 +126,11 @@ public class TruckEndpoint {
         @Nullable
         Long priceRating;
         @Nullable
-        String foodCategory;
-        // TODO What about menu/schedule?
+        Set<String> tags;
         @Nullable
         byte[] menu;
         @Nullable
         String textMenu;
-        @Nullable
-        byte[] schedule;
     }
 
     @Secured({"ROLE_OWNER"})
@@ -141,12 +142,9 @@ public class TruckEndpoint {
         return Optional.of(truckService.updateTruck(
                 data.truckId,
                 Optional.ofNullable(data.name),
-                Optional.ofNullable(data.menu),
-                Optional.ofNullable(data.textMenu),
                 Optional.ofNullable(data.priceRating),
                 Optional.ofNullable(data.description),
-                Optional.ofNullable(data.schedule),
-                Optional.ofNullable(data.foodCategory)
+                Optional.ofNullable(data.tags)
         ));
     }
 
@@ -300,12 +298,39 @@ public class TruckEndpoint {
         var truck = t.get();
         var subs = subscriptionService.findSubsByUser(u);
         var filteredSubs = subs
-            .stream()
-            .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
-            .iterator();
+                .stream()
+                .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
+                .iterator();
         if (filteredSubs.hasNext()) {
             var sub = filteredSubs.next();
             subscriptionService.deleteSubscription(sub);
         }
+    }
+
+    @GetMapping("/truck/{truckId}/menu")
+    public ResponseEntity<byte[]> getMenu(@PathVariable long truckId) {
+        var truck = truckService.findTruckById(truckId);
+        if (truck.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var t = truck.get();
+
+        var menu = t.getMenu();
+        if (menu.length == 0)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        var headers = new HttpHeaders();
+        headers.setContentType(t.getMenuContentType());
+        return new ResponseEntity<>(menu, headers, HttpStatus.OK);
+    }
+
+    @Secured("ROLE_OWNER")
+    @PostMapping("/truck/{truckId}/upload-menu")
+    public void uploadMenu(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestParam("file") MultipartFile file) {
+        if (!truckService.userOwnsTruck(u, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        var result = truckService.tryUploadMenu(truckId, file);
+        if (result != HttpStatus.OK)
+            throw new ResponseStatusException(result);
     }
 }

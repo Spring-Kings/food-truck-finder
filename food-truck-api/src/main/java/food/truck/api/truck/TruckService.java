@@ -6,18 +6,27 @@ import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
 import food.truck.api.user.User;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.InvalidMediaTypeException;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@Log4j2
 public class TruckService {
     @Autowired
     private TruckRepository truckRepository;
@@ -51,6 +60,8 @@ public class TruckService {
         var t = new Truck();
         t.setName(name);
         t.setUserId(userId);
+        t.setDescription("");
+        t.setMenuTags(new HashSet<>());
         return saveTruck(t);
     }
 
@@ -67,24 +78,18 @@ public class TruckService {
     public Truck updateTruck(
             long truckId,
             Optional<String> name,
-            Optional<byte[]> menu,
-            Optional<String> textMenu,
             Optional<Long> priceRating,
             Optional<String> description,
-            Optional<byte[]> schedule,
-            Optional<String> foodCategory
+            Optional<Set<String>> tags
     ) {
         var t = findTruckById(truckId);
         if (t.isEmpty())
             return null;
         var truck = t.get();
         name.ifPresent(truck::setName);
-        truck.setMenu(menu.orElse(null));
-        truck.setTextMenu(textMenu.orElse(null));
         truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
-        truck.setSchedule(schedule.orElse(null));
-        truck.setFoodCategory(foodCategory.orElse(null));
+        truck.setMenuTags(tags.orElse(null));
         return saveTruck(truck);
     }
 
@@ -122,5 +127,41 @@ public class TruckService {
     public boolean userOwnsTruck(User u, long truckId) {
         var t = findTruckById(truckId);
         return t.isPresent() && t.get().getUserId().equals(u.getId());
+    }
+
+    public HttpStatus tryUploadMenu(long truckId, MultipartFile file) {
+        var truck = findTruckById(truckId);
+        if (truck.isEmpty())
+            return HttpStatus.NOT_FOUND;
+
+        var t = truck.get();
+
+        if (file.getContentType() == null || !file.getContentType().startsWith("image/"))
+            return HttpStatus.BAD_REQUEST;
+
+        MediaType mediaType;
+        try {
+            mediaType = MediaType.parseMediaType(file.getContentType());
+        } catch (InvalidMediaTypeException e) {
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        if (file.getSize() == 0)
+            return HttpStatus.BAD_REQUEST;
+        if (file.getSize() > 10 * 1024 * 1024) {
+            return HttpStatus.PAYLOAD_TOO_LARGE;
+        }
+
+        try {
+            t.setMenu(file.getBytes());
+        } catch (IOException e) {
+            log.info("Couldn't upload menu", e);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        t.setMenuContentType(mediaType);
+
+        saveTruck(t);
+        return HttpStatus.OK;
     }
 }

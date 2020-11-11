@@ -8,7 +8,9 @@ type Props = {
     submitMethod?: "POST" | "PUT" | "DELETE",
     onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
     onFailedSubmit?: (formData: any, response: any) => void, // TODO: Figure out type of response
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    customSubmitHandler?: Function,
+    formProps?: any
 }
 
 type State = {
@@ -43,7 +45,7 @@ class Form extends Component<Props, State> {
 
     render() {
         return (
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={this.onSubmit} {...this.props.formProps}>
                 <Grid container direction="column" alignItems="center" spacing={2}>
                     {/* For each child, shove it in a Grid and add the onChange event callback */}
                     {React.Children.map(this.props.children,
@@ -66,10 +68,16 @@ class Form extends Component<Props, State> {
     }
 
     onSubmit(event: React.FormEvent) {
+        if (this.props.customSubmitHandler) {
+            this.props.customSubmitHandler(event, this.state.formData);
+            event.preventDefault();
+            return;
+        }
+
         api.request({
             url: this.props.submitUrl,
             data: this.state.formData,
-            method: this.props.submitMethod,
+            method: this.props.submitMethod
         })
             .then(response => {
                 if (this.props.onSuccessfulSubmit)

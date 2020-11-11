@@ -1,8 +1,11 @@
 package food.truck.api.truck;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.springframework.http.MediaType;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Entity
@@ -19,12 +22,13 @@ public class Truck {
     @Column(name = "name", nullable = false)
     String name;
 
-    // TODO: store actual menu, potentially an image?
     @Column(name = "menu")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
     byte[] menu;
 
-    @Column(name = "text_menu")
-    String textMenu;
+    @Column(name = "menu_content_type")
+    MediaType menuContentType;
 
     @Column(name = "price_rating")
     Long priceRating;
@@ -32,10 +36,12 @@ public class Truck {
     @Column(name = "description")
     String description;
 
-    // TODO: use an actual schedule
-    @Column(name = "schedule")
-    byte[] schedule;
+    @ElementCollection
+    Set<String> menuTags;
 
-    @Column(name = "foodCategory")
-    String foodCategory;
+    @JsonIgnore
+    public boolean hasTag(String tag) {
+        tag = tag.toLowerCase().strip();
+        return menuTags.contains(tag);
+    }
 }
