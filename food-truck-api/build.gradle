@@ -83,12 +83,9 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     compile group: 'org.springframework.security', name: 'spring-security-test'
-    //compile group: 'org.springframework.security', name: 'spring-security-core'
     compile group: 'org.springframework.security', name: 'spring-security-crypto'
-    //compile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
-    //compile group: 'org.springframework.security', name: 'spring-security-config'
-//    compile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
     compile group: 'org.springframework', name: 'spring-context-support'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     compile 'mysql:mysql-connector-java'
@@ -111,6 +108,8 @@ dependencies {
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    compile 'com.maxmind.geoip2:geoip2:2.15.0'
 }
 
 configurations.all {

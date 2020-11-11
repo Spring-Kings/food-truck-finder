@@ -2,6 +2,7 @@ package food.truck.api.endpoint;
 
 import food.truck.api.reviews_and_subscriptions.Review;
 import food.truck.api.reviews_and_subscriptions.ReviewService;
+import food.truck.api.recommendation.StrategySelector;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.reviews_and_subscriptions.SubscriptionView;
@@ -10,7 +11,9 @@ import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
+import food.truck.api.user.UserPreferences;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -25,40 +28,65 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
 public class TruckEndpoint {
-    @Autowired
-    private TruckService truckService;
+    private final TruckService truckService;
+    private final RouteService routeService;
+    private final SubscriptionService subscriptionService;
+    private final StrategySelector ss;
 
     @Autowired
-    private RouteService routeService;
-
-    @Autowired
-    private SubscriptionService subscriptionService;
-
-    @GetMapping("/nearby-trucks")
-    public String getNearbyTrucks(@RequestParam String location) {
-        return ""; //TODO
+    public TruckEndpoint(TruckService truckService, RouteService routeService, SubscriptionService subscriptionService) {
+        this.truckService = truckService;
+        this.routeService = routeService;
+        this.subscriptionService = subscriptionService;
+        this.ss = new StrategySelector(truckService);
     }
 
-    @GetMapping(path = "/recommended-trucks")
-    public String getRecommendedTrucks(
-            @AuthenticationPrincipal @Nullable User user,
-            @RequestParam String location
+    @GetMapping("/truck/nearby")
+    public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
+        // TODO: Should radius be configurable?
+        return truckService.getTrucksCloseToLocation(u.getPosition(), 10.0);
+    }
+
+    @PostMapping(path = "/truck/recommended")
+    public List<Truck> getRecommendedTrucks(
+            @AuthenticationPrincipal AbstractUser u,
+            @RequestBody UserPreferences prefs
     ) {
-        return ""; // TODO
+        var strategy = ss.selectStrategy(u, prefs);
+
+        return strategy.selectTrucks().subList(0, prefs.getNumRequested());
     }
 
     @GetMapping(path = "/truck/{id}")
     public Optional<Truck> getTruckInfo(@PathVariable long id) {
         return truckService.findTruckById(id);
+    }
+
+    @GetMapping(path = "/truck/search")
+    public List<Truck> searchTrucks(@RequestParam String search){ return truckService.findTrucks(search);}
+
+    @GetMapping("/truck/{truckId}/reviews")
+    public String getTruckReviews(@PathVariable long truckId) {
+        return ""; // TODO
+    }
+
+    @Value
+    private static class PostReviewParams {
+        int score;
+        int costRating;
+        @Nullable
+        String reviewText;
+    }
+
+    @PostMapping("/truck/{truckId}/reviews")
+    public String postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
+        return ""; // TODO
     }
 
     @Value
@@ -67,21 +95,24 @@ public class TruckEndpoint {
         String truckName;
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
         return truckService.createTruck(u.getId(), data.truckName);
     }
 
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @DeleteMapping("/truck/delete/{truckId}")
     public void deleteTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
-        var t = truckService.findTruckById(truckId);
-        t.ifPresent(truck -> {
-            if (truck.getUserId().equals(u.getId())) {
-                truckService.deleteTruck(truckId);
-            }
-        });
+        if (!truckService.userOwnsTruck(u, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        truckService.deleteTruck(truckId);
+    }
+
+    @GetMapping("/truck/owner")
+    @Secured("ROLE_OWNER")
+    public List<Truck> getTruckByUser(@AuthenticationPrincipal User u) {
+        return truckService.findTruck(u.getId());
     }
 
     @Value
@@ -104,59 +135,59 @@ public class TruckEndpoint {
         byte[] schedule;
     }
 
-    @GetMapping("/truck/owner")
-    public List<Truck> getTruckByUser(@AuthenticationPrincipal User u) {
-        return truckService.findTruck(u.getId());
-    }
-
-    @Secured({"ROLE_USER"})
+    @Secured({"ROLE_OWNER"})
     @PutMapping("/truck/update")
     public Optional<Truck> updateTruck(@AuthenticationPrincipal User u, @RequestBody UpdateTruckParams data) {
-        var t = truckService.findTruckById(data.truckId);
-        if (t.isPresent()) {
-            var truck = t.get();
-            if (!u.getId().equals(truck.getUserId())) {
-                return Optional.empty();
-            }
-            return Optional.of(truckService.updateTruck(
-                    truck,
-                    Optional.ofNullable(data.name),
-                    Optional.ofNullable(data.menu),
-                    Optional.ofNullable(data.textMenu),
-                    Optional.ofNullable(data.priceRating),
-                    Optional.ofNullable(data.description),
-                    Optional.ofNullable(data.schedule),
-                    Optional.ofNullable(data.foodCategory)
-            ));
-        }
-        return Optional.empty();
+        if (!truckService.userOwnsTruck(u, data.truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        return Optional.of(truckService.updateTruck(
+                data.truckId,
+                Optional.ofNullable(data.name),
+                Optional.ofNullable(data.menu),
+                Optional.ofNullable(data.textMenu),
+                Optional.ofNullable(data.priceRating),
+                Optional.ofNullable(data.description),
+                Optional.ofNullable(data.schedule),
+                Optional.ofNullable(data.foodCategory)
+        ));
     }
 
     @GetMapping("/truck/{truckId}/routes")
     public List<Route> getRoutes(@PathVariable long truckId) {
         Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck == null || truck.isEmpty()) {
-            return new LinkedList<Route>();
+        if (truck.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
         return routeService.findRouteByTruck(truck.get());
     }
 
+    @Secured("ROLE_OWNER")
     @DeleteMapping("/truck/routes-delete/{routeId}")
     public void deleteRoute(@AuthenticationPrincipal User u, @PathVariable long routeId) {
+        if (!routeService.userOwnsRoute(u, routeId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
         routeService.deleteRoute(routeId);
     }
 
     @Value
-    private static class UpdateRouteParams {
+    public static class UpdateRouteParams {
         long routeId;
-        Optional<String> newName;
-        Optional<Boolean> newActive;
+        @Nullable
+        String newName;
+        @Nullable
+        Boolean newActive;
     }
 
     @PutMapping("/truck/{truckId}/update-route")
+    @Secured("ROLE_OWNER")
     public boolean updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
-        return routeService.updateRoute(data.routeId, data.newName, data.newActive);
+        if (!routeService.userOwnsRoute(u, data.routeId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        return routeService.updateRoute(data.routeId, Optional.ofNullable(data.newName), Optional.ofNullable(data.newActive));
     }
 
     @Value
@@ -166,15 +197,16 @@ public class TruckEndpoint {
     }
 
     @PostMapping("/truck/{truckId}/create-route")
+    @Secured("ROLE_OWNER")
     public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
-        Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck.isEmpty()) {
-            return new Route();
-        }
-        return routeService.createRoute(truck.get(), data.routeName, Character.toUpperCase(data.active) == 'Y'); // TODO
+        if (!truckService.userOwnsTruck(user, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        return routeService.createRoute(truckService.findTruckById(truckId).get(), data.routeName, Character.toUpperCase(data.active) == 'Y');
     }
 
 
+    // TODO: Should all users be able to see route locations?
     @GetMapping("/truck/route/locations/{routeId}")
     public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
         return routeService.findRouteLocationByRouteId(routeId);
@@ -193,24 +225,29 @@ public class TruckEndpoint {
     }
 
     @PostMapping("/truck/route/locations/{routeId}")
+    @Secured("ROLE_OWNER")
     public boolean updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
-        // TODO check permissions
         boolean good = true;
         for (var d : data) {
-            if (!routeService.updateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+            if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
                 good = false;
         }
         return good;
     }
 
     @DeleteMapping("/truck/route/locations")
+    @Secured("ROLE_OWNER")
     public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @RequestBody @NonNull List<Long> locationIds) {
-        // TODO check permissions
         for (long l : locationIds) {
+            if (!routeService.userOwnsLocation(user, l))
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
             routeService.deleteLocation(l);
         }
     }
 
+    // TODO: Should this be public?
     @GetMapping("truck/owner/{userId}")
     public List<Truck> getTrucksByUser(@AuthenticationPrincipal User u, @PathVariable long userId) {
         return truckService.findTruck(userId);

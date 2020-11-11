@@ -1,17 +1,23 @@
 package food.truck.api.truck;
 
+import food.truck.api.Position;
 import food.truck.api.routes.Route;
+import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
-import lombok.NonNull;
+import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class TruckService {
     @Autowired
     private TruckRepository truckRepository;
@@ -26,6 +32,11 @@ public class TruckService {
 
     public List<Truck> findTruck(Long userId) {
         return truckRepository.findByUserId(userId);
+    }
+
+    public List<Truck> findTrucks(String search){ 
+        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
+            "%" + search + "%");
     }
 
     public Optional<Truck> findTruckById(Long truckId) {
@@ -54,16 +65,19 @@ public class TruckService {
     }
 
     public Truck updateTruck(
-            @NonNull
-                    Truck truck,
+            long truckId,
             Optional<String> name,
             Optional<byte[]> menu,
             Optional<String> textMenu,
             Optional<Long> priceRating,
             Optional<String> description,
-        Optional<byte[]> schedule,
-        Optional<String> foodCategory
+            Optional<byte[]> schedule,
+            Optional<String> foodCategory
     ) {
+        var t = findTruckById(truckId);
+        if (t.isEmpty())
+            return null;
+        var truck = t.get();
         name.ifPresent(truck::setName);
         truck.setMenu(menu.orElse(null));
         truck.setTextMenu(textMenu.orElse(null));
@@ -79,5 +93,34 @@ public class TruckService {
                 .filter(r -> r.isActive() && r.getDays().contains(w))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Route getActiveRoute(long truckId) {
+        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+    }
+
+    public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {
+        var route = getActiveRoute(truckId);
+        if (route == null)
+            return Optional.empty();
+
+        return routeService.getCurrentRouteLocation(route.getRouteId());
+    }
+
+    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles) {
+        return truckRepository.findAll().stream().filter(truck -> {
+                    var curLoc = getCurrentRouteLocation(truck.id);
+                    if (curLoc.isEmpty())
+                        return false;
+                    var truckLocation = curLoc.get().getPosition();
+                    double distance = loc.distanceInMiles(truckLocation);
+                    return distance < radiusMiles;
+                }
+        ).collect(Collectors.toList());
+    }
+
+    public boolean userOwnsTruck(User u, long truckId) {
+        var t = findTruckById(truckId);
+        return t.isPresent() && t.get().getUserId().equals(u.getId());
     }
 }
