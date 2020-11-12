@@ -6,12 +6,15 @@ import food.truck.api.security.SecurityConstants;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Data
 @Entity
+@Indexed
 @Table(name = "truck")
 public class Truck {
     @Id
@@ -22,6 +25,7 @@ public class Truck {
     @JoinColumn(foreignKey = @ForeignKey(name = "user_id"), nullable = false)
     Long userId;
 
+    @Field(name = "name")
     @Column(name = "name", nullable = false)
     String name;
 
@@ -42,12 +46,17 @@ public class Truck {
     @Nullable
     Long priceRating;
 
+    @Field(name = "description")
     @Column(name = "description")
     @Nullable
     String description;
 
     @ElementCollection
     Set<String> tags;
+
+    @Field(name = "foodCategory")
+    @Column(name = "foodCategory")
+    String foodCategory;
 
     @JsonIgnore
     public boolean hasTag(String tag) {

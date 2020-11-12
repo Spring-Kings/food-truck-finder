@@ -6,6 +6,7 @@ import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
 import food.truck.api.security.SecurityConstants;
+import food.truck.api.search.IndexingService;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,6 @@ public class TruckService {
 
     public List<Truck> findTruck(Long userId) {
         return truckRepository.findByUserId(userId);
-    }
-
-    public List<Truck> findTrucks(String search){ 
-        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
-            "%" + search + "%");
     }
 
     public Optional<Truck> findTruckById(Long truckId) {
