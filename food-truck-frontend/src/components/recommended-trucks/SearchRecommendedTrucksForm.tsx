@@ -6,14 +6,15 @@ import api from "../../util/api";
 import { RouteLocation } from "../map/route-map/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
+import { ReactEventAdapter } from "../Form";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
-    location: LatLng;
-    acceptibleRadius: number;
-    priceRating: number;
-    foodCategory: string;
+  location: LatLng;
+  acceptibleRadius: number;
+  priceRating: number;
   menuItems: string[];
+  tags: string[];
 
   selectedTrucks?: RouteLocation[];
 };
@@ -47,8 +48,8 @@ class RecommendedTrucksForm extends Component<
       location: { lat: 0, lng: 0 },
       acceptibleRadius: 1,
       priceRating: 3,
-      foodCategory: "",
       menuItems: [],
+      tags: []
     };
     this.setState = this.setState.bind(this);
   }
@@ -92,13 +93,8 @@ class RecommendedTrucksForm extends Component<
         />
 
         <Typography variant="h6">Food Categories</Typography>
-        <TextField
-          name="foodCategories"
-          value={this.state.foodCategory}
-          onChange={this.changeCategory}
-        />
-
-        <MultiField title="Desired Menu Items" name="menuItems" />
+        <MultiField title="Desired Menu Items" name="menuItems" onChange={this.changeItems}/>
+        <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
         <Button variant="contained" color="primary" onClick={this.submit}>
           Search Trucks
         </Button>
@@ -118,11 +114,8 @@ class RecommendedTrucksForm extends Component<
     if (newVal !== null) this.setState({ priceRating: newVal });
   };
 
-  changeCategory = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    this.setState({ foodCategory: event.target.value });
-  };
+  changeItems = (data: ReactEventAdapter) => this.setState({ menuItems: data.target.value });
+  changeTags = (data: ReactEventAdapter) => this.setState({ tags: data.target.value });
 
   submit = async () => {
     try {
@@ -131,14 +124,14 @@ class RecommendedTrucksForm extends Component<
         data: {
             acceptableRadius: this.state.acceptibleRadius,
             priceRating: this.state.priceRating,
-            foodCategory: this.state.foodCategory,
             menuItems: this.state.menuItems,
+            tags: this.state.tags,
             location: this.state.location,
             numRequested: 10
           },
         method: "POST",
       });
-      console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`));
+      console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`);
     } catch (err) {
       DEFAULT_ERR_RESP(err);
     }
