@@ -86,7 +86,8 @@ public class TruckService {
             return null;
         var truck = t.get();
         name.ifPresent(truck::setName);
-        truck.setPriceRating(priceRating.orElse(null));
+        if (truck.getPriceRating() == null)
+            truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
         truck.setTags(tags.orElse(null));
         return saveTruck(truck);

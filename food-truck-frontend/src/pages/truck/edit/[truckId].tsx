@@ -7,6 +7,7 @@ import {AxiosResponse} from "axios";
 import Router, {useRouter} from "next/router";
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
+import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 
 interface EditTruckState {
     message: string;
@@ -136,17 +137,4 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
   }
 }
 
-function EditTruckPage() {
-  const router = useRouter();
-  if (router.query.truckId) {
-    let truckId: number = router.query.truckId as unknown as number;
-    return (
-      <EditTruck truckId={truckId}/>
-    );
-  }
-  return (
-    <NotFound/>
-  );
-}
-
-export default EditTruckPage;
+export default RouterSelectable<number>((truckId: number) => <EditTruck truckId={truckId}/>, "truckId");

@@ -1,5 +1,7 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.reviews_and_subscriptions.Review;
+import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.recommendation.StrategySelector;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
@@ -23,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -157,7 +160,7 @@ public class TruckEndpoint {
         @Nullable
         String description;
         @Nullable
-        Long priceRating;
+        Double priceRating;
         @Nullable
         Set<String> tags;
     }

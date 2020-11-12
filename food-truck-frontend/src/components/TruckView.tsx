@@ -142,7 +142,7 @@ class TruckView extends Component<TruckProps, State> {
                 {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
               </Button>
             }
-            {userCanEditTruck(this.state.userId) &&
+            {userCanEditTruck(this.state.userId)?
               <>
                 <Button variant="outlined"
                         color="primary"
@@ -153,8 +153,14 @@ class TruckView extends Component<TruckProps, State> {
                   {"Send Notification To Subscribers:"}
                   <SendNotificationComponent truckId={this.state.id}/>
                 </Grid>
-              </>
+              </> :
+              <Grid item>
+                <Button variant="outlined" color="primary" onClick={this.reviewTruck}>Leave Review</Button>
+              </Grid>
             }
+            <Grid>
+              <Button variant="outlined" color="primary" onClick={this.readReviews}>Read Reviews</Button>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs>
@@ -166,6 +172,14 @@ class TruckView extends Component<TruckProps, State> {
 
   editTruck = () => {
     Router.replace(`/truck/edit/${this.state.id}`);
+  };
+  
+  reviewTruck = () => {
+    Router.replace(`/truck/reviews/create/${this.state.id}`);
+  };
+
+  readReviews = () => {
+    Router.replace(`/truck/reviews/${this.state.id}`);
   };
 
   handleSubscription = () => {

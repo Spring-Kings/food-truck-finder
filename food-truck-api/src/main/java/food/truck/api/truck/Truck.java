@@ -43,8 +43,10 @@ public class Truck {
     MediaType menuContentType;
 
     @Column(name = "price_rating")
-    @Nullable
-    Long priceRating;
+    Double priceRating;
+
+    @Column(name = "star_rating")
+    Double starRating;
 
     @Field(name = "description")
     @Column(name = "description")

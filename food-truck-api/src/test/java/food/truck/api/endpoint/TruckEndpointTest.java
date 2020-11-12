@@ -103,7 +103,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateTruck() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3L, Set.of("a", "b", "c"))))
+                        3.0, Set.of("a", "b", "c"))))
                 .contentType("application/json")
                 .with(user(data.ownerA));
         String resp = mockMvc.perform(req)
@@ -112,7 +112,7 @@ public class TruckEndpointTest extends EndpointTest {
         Truck t = fromJson(resp, Truck.class);
         assertEquals("truck1337", t.getName());
         assertEquals("a cool truck", t.getDescription());
-        assertEquals(3L, t.getPriceRating());
+        assertEquals(3.0, t.getPriceRating(), 0.001);
         assertEquals(Set.of("a", "b", "c"), t.getTags());
 
         var truck = truckService.findTruck("truck1337").get(0);
@@ -123,7 +123,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateOtherOwnersTruckFail() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3L, Set.of("a", "b", "c"))))
+                        3.0, Set.of("a", "b", "c"))))
                 .contentType("application/json")
                 .with(user(data.ownerB));
         mockMvc.perform(req)

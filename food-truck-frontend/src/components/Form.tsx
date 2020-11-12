@@ -3,7 +3,7 @@ import {AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
 
-type Props = {
+export type Props = {
     submitUrl: string,
     submitMethod?: "POST" | "PUT" | "DELETE",
     onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
@@ -36,6 +36,11 @@ class Form extends Component<Props, State> {
 
         this.state = {formData: {}};
         React.Children.forEach(this.props.children, c => {
+            // Ensure a null didn't slip through (can happen in dynamic forms)
+            if (c === null)
+                return;
+            
+            // Parse child
             const child = c as ReactElement;
             if (child.props.name != null) {
                 if (child.props.value != null) {
@@ -121,6 +126,22 @@ class Form extends Component<Props, State> {
                 [name]: value
             }
         }));
+    }
+
+    static getDerivedStateFromProps(props: Props, state: State) {
+        let newFormData: any = {};
+        if (props.children)
+            React.Children.forEach(props.children, (c: any) => {
+                // Ensure a null didn't slip through (can happen in dynamic forms)
+                if (c === null)
+                    return;
+            
+                // Parse child
+                let name: string = (c as ReactElement).props.name as string;
+                newFormData[name] = state.formData[name];
+            });
+        state.formData = newFormData;
+        return state;
     }
 }
 
