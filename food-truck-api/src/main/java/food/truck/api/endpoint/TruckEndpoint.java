@@ -74,11 +74,6 @@ public class TruckEndpoint {
         return truckService.findTruckById(id);
     }
 
-    @PostMapping("/reindex")
-    public void reindex() throws InterruptedException {
-        indexingService.initiateIndexing();
-    }
-
     @GetMapping(path = "/truck/search")
     public List<Truck> searchTrucks(@RequestParam String search){
        if( search.isEmpty()){
@@ -115,7 +110,13 @@ public class TruckEndpoint {
     @Secured({"ROLE_OWNER"})
     @PostMapping("/truck/create")
     public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data){
-        return truckService.createTruck(u.getId(), data.truckName);
+        Truck truck = truckService.createTruck(u.getId(), data.truckName);
+        try {
+            indexingService.initiateIndexing();
+        }catch (InterruptedException e){
+            return truck;
+        }
+        return truck;
     }
 
     @Secured({"ROLE_OWNER"})
@@ -158,7 +159,7 @@ public class TruckEndpoint {
         if (!truckService.userOwnsTruck(u, data.truckId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
-        return Optional.of(truckService.updateTruck(
+        Optional<Truck> truck =  Optional.of(truckService.updateTruck(
                 data.truckId,
                 Optional.ofNullable(data.name),
                 Optional.ofNullable(data.menu),
@@ -168,6 +169,12 @@ public class TruckEndpoint {
                 Optional.ofNullable(data.schedule),
                 Optional.ofNullable(data.foodCategory)
         ));
+        try {
+            indexingService.initiateIndexing();
+        }catch (InterruptedException e){
+            return truck;
+        }
+        return truck;
     }
 
     @GetMapping("/truck/{truckId}/routes")
