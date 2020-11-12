@@ -28,6 +28,7 @@ import TruckListComponent from "../../TruckListComponent";
 import { RouteLocation } from "../../../map/route-map/RouteLocation";
 import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
 import { getNearbyTruckLocations, getTruckById } from "../../../../api/Truck";
+import TruckLocationMapComponent from "../../../map/truck_location_map/TruckLocationMapComponent";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -140,27 +141,11 @@ class UserDashboardComponent extends Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckRouteMapComponent
+            <TruckLocationMapComponent
               locations={this.state.nearbyTrucks}
-              isRoute={false}
-              onMarkerClick={this.selectTruck}
             />
           </GridListTile>
         </GridList>
-
-        <Dialog open={this.state.viewTruck !== undefined}>
-            <DialogTitle>{this.state.viewTruck? this.state.viewTruck.name : undefined}</DialogTitle>
-            <DialogContent>
-              <Typography variant="body1">{this.state.viewTruck?.description}</Typography>
-              <Grid container>
-                <Grid>Cost Rating: {this.state.viewTruck?.priceRating}</Grid>
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.viewSelectedTruck}>View</Button>
-              <Button onClick={this.cancelSelectedView}>Cancel</Button>
-            </DialogActions>
-        </Dialog>
       </React.Fragment>
     );
   }
@@ -176,10 +161,6 @@ class UserDashboardComponent extends Component<
   private toNotifications() {
     Router.replace("/notifications");
   }
-
-  selectTruck = async (pt: RouteLocation, _latLng: any) => this.setState({ viewTruck: await getTruckById(pt.stopId, DEFAULT_ERR_RESP) });
-  viewSelectedTruck = () => Router.replace(`/truck/${this.state.viewTruck.id}`);
-  cancelSelectedView = () => this.setState({ viewTruck: undefined });
 }
 
 export default UserDashboardComponent;
