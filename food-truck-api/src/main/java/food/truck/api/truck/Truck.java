@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import food.truck.api.MediaTypeConverter;
 import food.truck.api.security.SecurityConstants;
 import lombok.Data;
-import org.jetbrains.annotations.Nullable;
-import org.springframework.http.MediaType;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.http.MediaType;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -53,10 +53,6 @@ public class Truck {
 
     @ElementCollection
     Set<String> tags;
-
-    @Field(name = "foodCategory")
-    @Column(name = "foodCategory")
-    String foodCategory;
 
     @JsonIgnore
     public boolean hasTag(String tag) {
