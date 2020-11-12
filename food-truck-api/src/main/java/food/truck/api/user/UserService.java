@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
         u.setUsername(username);
         u.setPassword(passwordEncoder.encode(password));
         u.setEmail(email);
-        u.setIsOwner(isOwner);
+        u.setOwner(isOwner);
         u = saveUser(u);
         return u;
     }

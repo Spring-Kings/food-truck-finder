@@ -3,9 +3,9 @@ package food.truck.api.reviews_and_subscriptions;
 
 import food.truck.api.truck.Truck;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 @Data
@@ -31,7 +31,8 @@ public class Review {
     @Column(name = "cost_rating", nullable = false)
     Integer costRating;
 
-    @Column(name = "review_text", nullable = true)
+    @Column(name = "review_text")
+    @Nullable
     String reviewText;
 
     @Column(name = "date", nullable = false)

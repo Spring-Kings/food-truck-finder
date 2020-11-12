@@ -5,6 +5,7 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
+import food.truck.api.security.SecurityConstants;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,7 @@ public class TruckService {
 
         if (file.getSize() == 0)
             return HttpStatus.BAD_REQUEST;
-        if (file.getSize() > 10 * 1024 * 1024) {
+        if (file.getSize() > SecurityConstants.MAX_UPLOAD_SIZE) {
             return HttpStatus.PAYLOAD_TOO_LARGE;
         }
 

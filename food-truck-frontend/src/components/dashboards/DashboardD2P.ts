@@ -1,9 +1,9 @@
-import { Dispatch } from "redux";
+import {Dispatch} from "redux";
 import api from "../../util/api";
 import getUserInfo from "../../util/token";
-import { AxiosResponse } from "axios";
-import { UserAction, UserActionTypes } from "../../redux/user/UserActions";
-import { SimpleTruck } from "../../redux/user/UserReducer";
+import {AxiosResponse} from "axios";
+import {UserAction, UserActionTypes} from "../../redux/user/UserActions";
+import {SimpleTruck} from "../../redux/user/UserReducer";
 
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.
@@ -40,8 +40,7 @@ async function updateUser(
       async (response) => {
         // Get trucks
         var trucks: SimpleTruck[] | undefined = undefined;
-        console.log(response.data);
-        if (response.data.isOwner) trucks = await requestOwnedTrucks(id);
+        if (response.data.owner) trucks = await requestOwnedTrucks(id);
 
         // Dispatch update
         dispatch({

@@ -2,7 +2,9 @@ package food.truck.api.truck;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import food.truck.api.MediaTypeConverter;
+import food.truck.api.security.SecurityConstants;
 import lombok.Data;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
 
 import javax.persistence.*;
@@ -23,19 +25,25 @@ public class Truck {
     @Column(name = "name", nullable = false)
     String name;
 
-    @Column(name = "menu")
     @Lob
     @Basic(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Nullable
+    @Column(name = "menu", length = SecurityConstants.MAX_UPLOAD_SIZE)
     byte[] menu;
 
     @Column(name = "menu_content_type")
     @Convert(converter = MediaTypeConverter.class)
+    @Nullable
+    @JsonIgnore
     MediaType menuContentType;
 
     @Column(name = "price_rating")
+    @Nullable
     Long priceRating;
 
     @Column(name = "description")
+    @Nullable
     String description;
 
     @ElementCollection

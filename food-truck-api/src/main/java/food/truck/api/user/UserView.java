@@ -12,10 +12,10 @@ public class UserView {
     long id;
     @Nullable
     String email; // Nullable in case we decide you aren't allowed to see it
-    @Nullable
-    Boolean isOwner; // Null is considered false
+
+    boolean isOwner; // Null is considered false
 
     public static UserView of(User u) {
-        return new UserView(u.getUsername(), u.getId(), u.getEmail(), u.getIsOwner());
+        return new UserView(u.getUsername(), u.getId(), u.getEmail(), u.isOwner());
     }
 }

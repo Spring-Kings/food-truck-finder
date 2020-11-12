@@ -34,5 +34,6 @@ public class RouteLocation {
     Instant exitTime;
 
     @Convert(converter = PositionConverter.class)
+    @Column(nullable = false)
     Position position;
 }
