@@ -56,6 +56,9 @@ bootJar {
 }
 
 dependencies {
+    compile 'org.hibernate:hibernate-search-elasticsearch:5.11.5.Final'
+    compile 'org.hibernate:hibernate-search-orm:5.11.5.Final'
+
     compile group: 'com.google.guava', name: 'guava'
     compile group: 'com.gitlab.bessemer', name: 'cornerstone'
 
@@ -83,12 +86,11 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     compile group: 'org.springframework.security', name: 'spring-security-test'
-    //compile group: 'org.springframework.security', name: 'spring-security-core'
     compile group: 'org.springframework.security', name: 'spring-security-crypto'
-    //compile group: 'org.springframework.security', name: 'spring-security-oauth2-jose'
-    //compile group: 'org.springframework.security', name: 'spring-security-config'
-//    compile group: 'org.springframework.security', name: 'spring-security-oauth2-resource-server'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+    compile group: 'org.springframework', name: 'spring-context-support'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
     compile 'mysql:mysql-connector-java'
 
     compile 'io.jsonwebtoken:jjwt-api:0.11.2'
@@ -105,10 +107,14 @@ dependencies {
     testCompile group: 'org.apache.httpcomponents', name: 'httpclient'
     compile group: 'com.h2database', name: 'h2'
 
+    implementation group: 'org.hibernate', name: 'hibernate-java8'
+
     compileOnly group: 'org.projectlombok', name: 'lombok'
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
+
+    compile 'com.maxmind.geoip2:geoip2:2.15.0'
 }
 
 configurations.all {

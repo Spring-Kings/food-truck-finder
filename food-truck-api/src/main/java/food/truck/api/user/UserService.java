@@ -5,11 +5,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
@@ -23,22 +25,6 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
-    public Optional<User> findUserByUsername(String username) {
-        return userRepository.findOneByUsername(username);
-    }
-
-    public Optional<User> findUserById(Long userId) {
-        return userRepository.findById(userId);
-    }
-
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public List<User> searchUsernames(String username) {
-        return userRepository.findByUsername(username);
-    }
-
     public User createUser(String username, String password, String email, boolean isOwner) {
         var u = new User();
         u.setUsername(username);
@@ -49,6 +35,22 @@ public class UserService implements UserDetailsService {
         return u;
     }
 
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    public Optional<User> findUserByUsername(String username) {
+        return userRepository.findOneByUsername(username);
+    }
+
+    public Optional<User> findUserById(Long userId) {
+        return userRepository.findById(userId);
+    }
+
+    public List<User> searchUsernames(String username) {
+        return userRepository.findByUsername(username);
+    }
+
     public void changePassword(User u, String newPassword) {
         u.setPassword(passwordEncoder.encode(newPassword));
     }
@@ -57,4 +59,11 @@ public class UserService implements UserDetailsService {
         return passwordEncoder.matches(password, u.getPassword());
     }
 
+    public void deleteUser(long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    public boolean usernameIsTaken(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }

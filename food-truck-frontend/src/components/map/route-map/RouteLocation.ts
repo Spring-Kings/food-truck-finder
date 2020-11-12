@@ -1,4 +1,5 @@
-import { LatLngLiteral } from "@google/maps";
+import {LatLngLiteral} from "@google/maps";
+import {utcTimeStringToDate} from "../../../util/date-conversions";
 
 /**
  * CREATED: Just created, not sent to backend
@@ -28,23 +29,29 @@ export interface RouteLocation {
   readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
 }
 
-export const backendToFrontend = (pt: any, stopId: number) => ({
-  stopId: stopId,
-  routeLocationId: pt.routeLocationId,
-  coords: {
-    lat: pt.lat,
-    lng: pt.lng,
-  },
-  arrivalTime: pt.arrivalTime,
-  exitTime: pt.exitTime,
-  state: RouteLocationState.PERSISTED,
-});
+export const backendToFrontend = (pt: any, stopId: number) => {
+  return {
+    stopId: stopId,
+    routeLocationId: pt.routeLocationId,
+    coords: {
+      lat: pt.position.latitude,
+      lng: pt.position.longitude,
+    },
+    arrivalTime: utcTimeStringToDate(pt.arrivalTime),
+    exitTime: utcTimeStringToDate(pt.exitTime),
+    state: RouteLocationState.PERSISTED,
+  }
+}
 
-export const frontendToBackend = (pt: RouteLocation, routeId: number) => ({
-  routeId: routeId,
-  routeLocationId: pt.routeLocationId > 0? pt.routeLocationId : null,
-  arrivalTime: pt.arrivalTime,
-  exitTime: pt.exitTime,
-  lng: pt.coords.lng,
-  lat: pt.coords.lat,
-});
+export const frontendToBackend = (pt: RouteLocation, routeId: number) => {
+  let result: any = {
+    routeId: routeId,
+    routeLocationId: pt.routeLocationId > 0 ? pt.routeLocationId : null,
+    arrivalTime: pt.arrivalTime,
+    exitTime: pt.exitTime,
+    lat: pt.coords.lat,
+    lng: pt.coords.lng,
+  };
+  console.log(result)
+  return result;
+}

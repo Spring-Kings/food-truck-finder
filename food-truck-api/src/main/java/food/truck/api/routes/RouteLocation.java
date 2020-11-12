@@ -1,12 +1,15 @@
 package food.truck.api.routes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import food.truck.api.Position;
+import food.truck.api.PositionConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalTime;
 
 
 @Data
@@ -26,14 +29,11 @@ public class RouteLocation {
     Route route;
 
     @Column(name = "arrival_time", nullable = false)
-    Instant arrivalTime;
+    LocalTime arrivalTime;
 
     @Column(name = "exit_time", nullable = false)
-    Instant exitTime;
+    LocalTime exitTime;
 
-    @Column(name = "lng", nullable = false)
-    double lng;
-
-    @Column(name = "lat", nullable = false)
-    double lat;
+    @Convert(converter = PositionConverter.class)
+    Position position;
 }

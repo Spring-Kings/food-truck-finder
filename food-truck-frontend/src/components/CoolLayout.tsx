@@ -4,8 +4,9 @@ import SiteFooter from './SiteFooter'
 import styles from './layout.module.css'
 
 import Head from 'next/head'
-import {ReactNode} from 'react'
+import React, {ReactNode} from 'react'
 import {Container} from '@material-ui/core'
+import NotificationWatcherComponent from "./notifications/NotificationWatcher";
 
 export const siteTitle = 'Stacked Trucks'
 
@@ -14,21 +15,22 @@ type Args = {
 }
 
 function coolLayout(args: Args) {
-    return (
-        <>
-            <Head>
-                <link rel="icon" href="/favicon.ico"/>
-                <meta name="description" content="Oi mate description goes here"/>
-            </Head>
-            <div className={styles.outside}>
-                <SiteHeader/>
-                <Container maxWidth="md" className={styles.content}>
-                    <main>{args.children}</main>
-                </Container>
-                <SiteFooter/>
-            </div>
-        </>
-    );
+  return (
+    <>
+      <NotificationWatcherComponent/>
+      <Head>
+        <link rel="icon" href="/favicon.ico"/>
+        <meta name="description" content="Oi mate description goes here"/>
+      </Head>
+      <div className={styles.outside}>
+        <SiteHeader/>
+        <Container maxWidth="md" className={styles.content}>
+          <main>{args.children}</main>
+        </Container>
+        <SiteFooter/>
+      </div>
+    </>
+  );
 }
 
 export default coolLayout;

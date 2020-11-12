@@ -1,45 +1,44 @@
 package food.truck.api.endpoint;
 
 import food.truck.api.security.AuthenticationFilter;
-import org.junit.Test;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Test;
 
-import java.lang.annotation.Inherited;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.*;
-
+@Log4j2
 public class AuthenticationEndpointTest extends EndpointTest {
-    protected String token;
-
     @Test
-    public void register() {
-        String path = base + "register";
-        var data = new AuthenticationEndpoint.RegistrationData("testUser", "test@example.com", "password", true);
-        ResponseEntity<String> response = template.postForEntity(path, data, String.class);
-        System.out.println(response);
-        assertThat(response.getBody(), startsWith("Created user"));
+    public void registerSuccess() throws Exception {
+        var req = post("/register")
+                .content(asJson(new AuthenticationEndpoint.RegistrationData(
+                        "testUser", "test@example.com", "password", false
+                )))
+                .contentType("application/json");
+        var strResponse = mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertTrue(strResponse.startsWith("Created user"));
     }
 
     @Test
-    public void loginSuccess() {
-        register();
-        String path = base + "login";
-        var data = new AuthenticationFilter.AuthenticationInfo("testUser", "password");
-        ResponseEntity<String> response = template.postForEntity(path, data, String.class);
-        System.out.println(response);
-        assertNotNull(response.getHeaders().get("token"));
-        token = response.getHeaders().get("token").get(0);
+    public void loginSuccess() throws Exception {
+        var req = post("/login")
+                .content(asJson(new AuthenticationFilter.AuthenticationInfo("standardUser", "password")));
+        mockMvc.perform(req)
+                .andExpect(status().isOk())
+                .andExpect(header().exists("token"));
     }
 
     @Test
-    public void loginFail() {
-        register();
-        String path = base + "login";
-        var data = new AuthenticationFilter.AuthenticationInfo("testUser", "badpassword");
-        ResponseEntity<String> response = template.postForEntity(path, data, String.class);
-        assertNull(response.getHeaders().get("token"));
-        assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+    public void loginFail() throws Exception {
+        var req = post("/login")
+                .content(asJson(new AuthenticationFilter.AuthenticationInfo("standardUser", "badpass")));
+        mockMvc.perform(req)
+                .andExpect(status().is4xxClientError())
+                .andExpect(header().doesNotExist("token"));
     }
 }

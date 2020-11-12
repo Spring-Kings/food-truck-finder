@@ -11,6 +11,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   GridList,
   GridListTile,
   List,
@@ -21,6 +25,9 @@ import {
 import TruckRouteMapComponent from "../../../map";
 import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
+import { RouteLocation } from "../../../map/route-map/RouteLocation";
+import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
+import { getNearbyTruckLocations, getTruckById } from "../../../../api/Truck";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -30,8 +37,10 @@ interface UserDashboardProps {
 
 // Dashboard state
 interface UserDashboardState {
-  addTruck: boolean;
   inError: string | null;
+  nearbyTrucks: RouteLocation[];
+  // TODO tighten typing
+  viewTruck: any | undefined;
 }
 
 // Dashboard component
@@ -44,8 +53,9 @@ class UserDashboardComponent extends Component<
 
     // Create state
     this.state = {
-      addTruck: false,
       inError: null,
+      nearbyTrucks: [],
+      viewTruck: undefined
     };
 
     // Bind methods
@@ -53,12 +63,18 @@ class UserDashboardComponent extends Component<
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     // Load
-    this.props.loadUserFromBackend().then(
-      (_response: any) => this.setState({ inError: null }),
-      (err: any) => this.setState({ inError: err })
-    );
+    try {
+      if (this.props.data !== undefined) {
+        let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
+        this.setState({ inError: null, nearbyTrucks: trucks });
+      } else
+        await this.props.loadUserFromBackend();
+    } catch (err) {
+      console.log(err);
+      this.setState({ inError: err });
+    }
   }
 
   render() {
@@ -80,14 +96,6 @@ class UserDashboardComponent extends Component<
         >
           {/** Side list */}
           <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Image */}
-            <Card>
-              <img
-                src="../../../../resources/stacked_trucks_wheany_CCBY2,0.jpg"
-                alt="STACKED TRUCKS"
-              />
-            </Card>
-
             {/* Go to owner dashboard */}
             {this.props.data.ownedTrucks ? (
               <Card>
@@ -100,6 +108,17 @@ class UserDashboardComponent extends Component<
                 </Button>
               </Card>
             ) : null}
+
+            {/* Go to notifications page */}
+            <Card>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.toNotifications}
+              >
+                Notifications
+              </Button>
+            </Card>
 
             {/* Subscribe list */}
             <Accordion>
@@ -121,9 +140,27 @@ class UserDashboardComponent extends Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckRouteMapComponent routePts={[]} />
+            <TruckRouteMapComponent
+              locations={this.state.nearbyTrucks}
+              isRoute={false}
+              onMarkerClick={this.selectTruck}
+            />
           </GridListTile>
         </GridList>
+
+        <Dialog open={this.state.viewTruck !== undefined}>
+            <DialogTitle>{this.state.viewTruck? this.state.viewTruck.name : undefined}</DialogTitle>
+            <DialogContent>
+              <Typography variant="body1">{this.state.viewTruck?.description}</Typography>
+              <Grid container>
+                <Grid>Cost Rating: {this.state.viewTruck?.priceRating}</Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.viewSelectedTruck}>View</Button>
+              <Button onClick={this.cancelSelectedView}>Cancel</Button>
+            </DialogActions>
+        </Dialog>
       </React.Fragment>
     );
   }
@@ -135,6 +172,14 @@ class UserDashboardComponent extends Component<
   private toOwnerDashboard() {
     Router.replace("/dashboard/owner");
   }
+
+  private toNotifications() {
+    Router.replace("/notifications");
+  }
+
+  selectTruck = async (pt: RouteLocation, _latLng: any) => this.setState({ viewTruck: await getTruckById(pt.stopId, DEFAULT_ERR_RESP) });
+  viewSelectedTruck = () => Router.replace(`/truck/${this.state.viewTruck.id}`);
+  cancelSelectedView = () => this.setState({ viewTruck: undefined });
 }
 
 export default UserDashboardComponent;

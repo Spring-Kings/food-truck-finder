@@ -1,7 +1,7 @@
 package food.truck.api.user;
 
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,10 +10,11 @@ import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name = "user")
-public class User implements UserDetails {
+public class User extends AbstractUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -31,10 +32,12 @@ public class User implements UserDetails {
     @Column(name = "is_owner", nullable = true)
     Boolean isOwner;
 
-    // TODO: These overridden methods may need more functionality
+    private static List<GrantedAuthority> ownerPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_OWNER"));
+    private static List<GrantedAuthority> userPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return isOwner ? ownerPermissions : userPermissions;
     }
 
     @Override
@@ -55,5 +58,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void visit(UserVisitor v) {
+        v.accept(this);
     }
 }

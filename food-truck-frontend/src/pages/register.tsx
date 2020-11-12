@@ -1,4 +1,3 @@
-import CoolLayout from '../components/CoolLayout'
 import React from 'react'
 import Form from "../components/Form";
 import { AxiosResponse } from "axios";
@@ -64,9 +63,7 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
 function RegisterPage() {
   return (
-    <CoolLayout>
-      <RegisterPageComponent/>
-    </CoolLayout>
+    <RegisterPageComponent/>
   );
 }
 

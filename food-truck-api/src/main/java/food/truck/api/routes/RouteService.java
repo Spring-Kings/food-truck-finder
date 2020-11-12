@@ -1,20 +1,27 @@
 package food.truck.api.routes;
 
+import food.truck.api.Position;
 import food.truck.api.truck.Truck;
+import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.time.DayOfWeek;
-import java.time.Instant;
-
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class RouteService {
+
+    /** Number of seconds in a day */
+    private static final long SECONDS_IN_DAY = 60L * 60L * 24L;
+
     @Autowired
     private RouteRepository routeRepository;
 
@@ -72,23 +79,22 @@ public class RouteService {
             return false;
         var route = r.get();
         if (!route.getDays().contains(w))
-            return false;
+             return false;
         route.getDays().remove(w);
         routeRepository.save(route);
         return true;
     }
 
-    public RouteLocation createLocation(long routeId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public RouteLocation createLocation(long routeId, double lat, double lng, LocalTime arrivalTime, LocalTime exitTime) {
         RouteLocation routeLoc = new RouteLocation();
         routeLoc.setRoute(routeRepository.getOne(routeId)); // .getOne() uses lazy loading, so it doesn't really load the whole route here
-        routeLoc.setLat(lat);
-        routeLoc.setLng(lng);
+        routeLoc.setPosition(new Position(lat, lng));
         routeLoc.setArrivalTime(arrivalTime);
         routeLoc.setExitTime(exitTime);
         return routeLocationRepository.save(routeLoc);
     }
 
-    public boolean updateLocation(long routeId, Long locId, double lat, double lng, Instant arrivalTime, Instant exitTime) {
+    public boolean addOrUpdateLocation(long routeId, Long locId, double lat, double lng, LocalTime arrivalTime, LocalTime exitTime) {
         // If the location doesn't exist, make a new one
         if (locId == null) {
             createLocation(routeId, lat, lng, arrivalTime, exitTime);
@@ -100,8 +106,7 @@ public class RouteService {
         if (l.isEmpty())
             return false;
         var loc = l.get();
-        loc.setLat(lat);
-        loc.setLng(lng);
+        loc.setPosition(new Position(lat, lng));
         loc.setArrivalTime(arrivalTime);
         loc.setExitTime(exitTime);
         routeLocationRepository.save(loc);
@@ -122,5 +127,47 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
+    public Optional<RouteLocation> getCurrentRouteLocation(long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return Optional.empty();
+        var r = route.get();
 
+        var now = OffsetDateTime.now(ZoneOffset.UTC).toLocalTime();
+        return r.getLocations().stream().filter(
+                loc -> fallsOnDayInterval(now, loc.arrivalTime, loc.exitTime)
+        ).findFirst();
+    }
+
+    public boolean userOwnsRoute(User u, long routeId) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            return false;
+        return route.get().getTruck().getUserId().equals(u.getId());
+    }
+
+    public boolean userOwnsLocation(User u, long locationId) {
+        var loc = routeLocationRepository.findById(locationId);
+        return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
+    }
+
+    /**
+     * Reports whether now falls on the specified interval, assuming a wraparoung
+     * at midnight
+     *
+     * @param now The current time
+     * @param start The start of the interval
+     * @param end The end of the interval
+     * @return Whether now falls between start and end. If start is greater than end,
+     *         returns it assuming that the range wraps at midnight. If start and end
+     *         are the same time, it automatically returns false.
+     */
+    private static boolean fallsOnDayInterval(LocalTime now, LocalTime start, LocalTime end) {
+        if (start.isBefore(end))
+            return now.isAfter(start) && now.isBefore(end);
+        else if (start.isAfter(end))
+            return now.isAfter(start) || now.isBefore(end);
+        else
+            return false;
+    }
 }
