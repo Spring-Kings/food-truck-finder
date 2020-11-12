@@ -3,6 +3,7 @@ import {Button, Slider, TextField, Typography} from "@material-ui/core";
 import React, {ChangeEvent, Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
+import { RouteLocation } from "../map/route-map/RouteLocation";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import MultiField from "./multi_field";
 
@@ -13,6 +14,8 @@ type RecommendedTruckState = {
     priceRating: number;
     foodCategory: string;
   menuItems: string[];
+
+  selectedTrucks?: RouteLocation[];
 };
 
 const MARKS = [
@@ -122,8 +125,8 @@ class RecommendedTrucksForm extends Component<
   };
 
   submit = async () => {
-    await api
-      .request({
+    try {
+      let resp: any = await api.request({
         url: "/truck/recommended",
         data: {
             acceptableRadius: this.state.acceptibleRadius,
@@ -134,9 +137,11 @@ class RecommendedTrucksForm extends Component<
             numRequested: 10
           },
         method: "POST",
-      })
-      .then((resp: any) => console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`))
-      .catch(DEFAULT_ERR_RESP);
+      });
+      console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`));
+    } catch (err) {
+      DEFAULT_ERR_RESP(err);
+    }
   };
 }
 
