@@ -5,6 +5,8 @@ import food.truck.api.truck.Truck;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.*;
@@ -101,7 +103,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateTruck() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3.0, null, null, null, null)))
+                        3.0, Set.of("a", "b", "c"))))
                 .contentType("application/json")
                 .with(user(data.ownerA));
         String resp = mockMvc.perform(req)
@@ -111,10 +113,7 @@ public class TruckEndpointTest extends EndpointTest {
         assertEquals("truck1337", t.getName());
         assertEquals("a cool truck", t.getDescription());
         assertEquals(3.0, t.getPriceRating(), 0.001);
-        assertNull(t.getFoodCategory());
-        assertNull(t.getMenu());
-        assertNull(t.getTextMenu());
-        assertNull(t.getSchedule());
+        assertEquals(Set.of("a", "b", "c"), t.getTags());
 
         var truck = truckService.findTruck("truck1337").get(0);
         assertEquals(truck, t);
@@ -124,7 +123,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateOtherOwnersTruckFail() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3.0, null, null, null, null)))
+                        3.0, Set.of("a", "b", "c"))))
                 .contentType("application/json")
                 .with(user(data.ownerB));
         mockMvc.perform(req)

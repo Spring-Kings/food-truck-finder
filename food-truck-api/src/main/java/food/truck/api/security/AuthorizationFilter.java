@@ -1,5 +1,7 @@
 package food.truck.api.security;
 
+import com.maxmind.geoip2.exception.AddressNotFoundException;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
 import food.truck.api.LocationService;
 import food.truck.api.Position;
 import food.truck.api.PositionConverter;
@@ -67,7 +69,10 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         if (pos == null) {
             try {
                 pos = locationService.estimateLocation(request);
-            } catch (Exception e) {
+            } catch (AddressNotFoundException e) {
+                log.debug("IP address not in database (" + request.getRemoteAddr() + ")");
+                pos = new Position(31.546807, -97.120069);
+            } catch (GeoIp2Exception | IOException e) {
                 log.warn("Failed to estimate location", e);
                 // Fall back to some random place in Waco
                 pos = new Position(31.546807, -97.120069);
@@ -92,7 +97,7 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (JwtException e) {
-            log.info("Invalid token", e);
+            log.info("Invalid token: " + e.getClass().getSimpleName());
             return null;
         }
 

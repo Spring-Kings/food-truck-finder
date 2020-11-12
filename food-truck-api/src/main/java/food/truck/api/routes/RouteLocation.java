@@ -35,5 +35,6 @@ public class RouteLocation {
     LocalTime exitTime;
 
     @Convert(converter = PositionConverter.class)
+    @Column(nullable = false)
     Position position;
 }

@@ -1,10 +1,16 @@
 package food.truck.api.truck;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import food.truck.api.MediaTypeConverter;
+import food.truck.api.security.SecurityConstants;
 import lombok.Data;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.http.MediaType;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Entity
@@ -23,13 +29,18 @@ public class Truck {
     @Column(name = "name", nullable = false)
     String name;
 
-    // TODO: store actual menu, potentially an image?
-    @Column(name = "menu")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @Nullable
+    @Column(name = "menu", length = SecurityConstants.MAX_UPLOAD_SIZE)
     byte[] menu;
 
-    @Field( name= "text_menu")
-    @Column(name = "text_menu")
-    String textMenu;
+    @Column(name = "menu_content_type")
+    @Convert(converter = MediaTypeConverter.class)
+    @Nullable
+    @JsonIgnore
+    MediaType menuContentType;
 
     @Column(name = "price_rating")
     Double priceRating;
@@ -39,13 +50,15 @@ public class Truck {
 
     @Field(name = "description")
     @Column(name = "description")
+    @Nullable
     String description;
 
-    // TODO: use an actual schedule
-    @Column(name = "schedule")
-    byte[] schedule;
+    @ElementCollection
+    Set<String> tags;
 
-    @Field(name = "foodCategory")
-    @Column(name = "foodCategory")
-    String foodCategory;
+    @JsonIgnore
+    public boolean hasTag(String tag) {
+        tag = tag.toLowerCase().strip();
+        return tags.contains(tag);
+    }
 }

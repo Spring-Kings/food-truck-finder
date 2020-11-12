@@ -1,9 +1,9 @@
-import { Dispatch } from "redux";
+import {Dispatch} from "redux";
 import api from "../../util/api";
 import getUserInfo from "../../util/token";
-import { AxiosResponse } from "axios";
-import { UserAction, UserActionTypes } from "../../redux/user/UserActions";
-import { SimpleTruck } from "../../redux/user/UserReducer";
+import {AxiosResponse} from "axios";
+import {UserAction, UserActionTypes} from "../../redux/user/UserActions";
+import {SimpleTruck} from "../../redux/user/UserReducer";
 
 /**
  * Interface providing the actions that are used by the UserDashboard to update the store.

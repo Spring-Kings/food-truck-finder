@@ -3,8 +3,8 @@ import {Button, Slider, TextField, Typography} from "@material-ui/core";
 import React, {ChangeEvent, Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
+import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
-import MultiField from "./multi_field";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
