@@ -20,7 +20,6 @@ import { loadTodaysRoute } from "../api/RouteLocation";
 import SendNotificationComponent from "./notifications/SendNotificationComponent";
 import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from "../api/Subscription";
 import {Subscription} from "../api/Subscription";
-import {getSortedUsageRows} from "@jest/core/build/lib/watch_plugins_helpers";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
