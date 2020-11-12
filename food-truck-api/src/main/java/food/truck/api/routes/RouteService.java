@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.*;
-import java.time.chrono.ChronoLocalDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.WeekFields;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -128,16 +127,15 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
-    public Optional<RouteLocation> getCurrentRouteLocation(long routeId, LocalDateTime now) {
+    public Optional<RouteLocation> getCurrentRouteLocation(long routeId) {
         var route = findRouteById(routeId);
         if (route.isEmpty())
             return Optional.empty();
         var r = route.get();
 
-        var now_time = now.toLocalTime();
+        var now = OffsetDateTime.now(ZoneOffset.UTC).toLocalTime();
         return r.getLocations().stream().filter(
-                loc -> now_time.isAfter(LocalTime.from(loc.arrivalTime))
-                        && now_time.isBefore(LocalTime.from(loc.exitTime))
+                loc -> now.isAfter(loc.arrivalTime) && now.isBefore(loc.exitTime)
         ).findFirst();
     }
 
@@ -151,17 +149,5 @@ public class RouteService {
     public boolean userOwnsLocation(User u, long locationId) {
         var loc = routeLocationRepository.findById(locationId);
         return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
-    }
-
-    /**
-     * Translates an instant into its specified time on the day of the epoch. Allows
-     * comparison of instants.
-     *
-     * @param time The instant to translate
-     * @return The instant, standardized to today
-     */
-    private Instant translateInstant(Instant time) {
-        LocalTime.from(time);
-        return Instant.ofEpochSecond(time.getLong(ChronoField.INSTANT_SECONDS) % SECONDS_IN_DAY);
     }
 }

@@ -1,6 +1,5 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.notification.NearbyNotification;
 import food.truck.api.notification.NotificationService;
 import food.truck.api.notification.NotificationView;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
@@ -17,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Log4j2
@@ -37,9 +35,6 @@ public class NotificationEndpoint {
         long truckId;
         @NonNull
         String message;
-        @NonNull
-        LocalDateTime now;
-        // TODO: different types of notifications
     }
 
     @Secured({"ROLE_OWNER"})
@@ -58,7 +53,7 @@ public class NotificationEndpoint {
         }
         var subscriptions = subscriptionService.findSubsByTruck(truck);
         notificationService.saveNotification(subscriptions, notificationParams.message);
-        notificationService.saveNearbyNotification(truck, notificationParams.message, notificationParams.now);
+        notificationService.saveNearbyNotification(truck, notificationParams.message);
         return true;
     }
 

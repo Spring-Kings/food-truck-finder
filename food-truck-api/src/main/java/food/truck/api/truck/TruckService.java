@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -97,20 +97,20 @@ public class TruckService {
     }
 
     public Route getActiveRoute(long truckId) {
-        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+        return getActiveRoute(truckId, OffsetDateTime.now(ZoneOffset.UTC).getDayOfWeek());
     }
 
-    public Optional<RouteLocation> getCurrentRouteLocation(long truckId, LocalDateTime now) {
+    public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {
         var route = getActiveRoute(truckId);
         if (route == null)
             return Optional.empty();
 
-        return routeService.getCurrentRouteLocation(route.getRouteId(), now);
+        return routeService.getCurrentRouteLocation(route.getRouteId());
     }
 
-    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles, LocalDateTime now) {
+    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles) {
         return truckRepository.findAll().stream().filter(truck -> {
-                    var curLoc = getCurrentRouteLocation(truck.id, now);
+                    var curLoc = getCurrentRouteLocation(truck.id);
                     if (curLoc.isEmpty())
                         return false;
                     var truckLocation = curLoc.get().getPosition();

@@ -15,10 +15,8 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -142,8 +140,8 @@ public class NotificationService {
         notificationRepository.delete(notification);
     }
 
-    public void saveNearbyNotification(Truck truck, String message, LocalDateTime now) {
-        var routeLocation = truckService.getCurrentRouteLocation(truck.getId(), now);
+    public void saveNearbyNotification(Truck truck, String message) {
+        var routeLocation = truckService.getCurrentRouteLocation(truck.getId());
         routeLocation.ifPresent(loc -> {
             var n = new NearbyNotification();
             n.setTruck(truck);
