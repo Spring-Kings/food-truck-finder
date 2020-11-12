@@ -5,6 +5,7 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
+import food.truck.api.search.IndexingService;
 import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,11 +34,6 @@ public class TruckService {
 
     public List<Truck> findTruck(Long userId) {
         return truckRepository.findByUserId(userId);
-    }
-
-    public List<Truck> findTrucks(String search){ 
-        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
-            "%" + search + "%");
     }
 
     public Optional<Truck> findTruckById(Long truckId) {
