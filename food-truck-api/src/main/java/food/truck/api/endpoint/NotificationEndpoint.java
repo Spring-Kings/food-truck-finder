@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Log4j2
@@ -36,6 +37,8 @@ public class NotificationEndpoint {
         long truckId;
         @NonNull
         String message;
+        @NonNull
+        LocalDateTime now;
         // TODO: different types of notifications
     }
 
@@ -55,7 +58,7 @@ public class NotificationEndpoint {
         }
         var subscriptions = subscriptionService.findSubsByTruck(truck);
         notificationService.saveNotification(subscriptions, notificationParams.message);
-        notificationService.saveNearbyNotification(truck, notificationParams.message);
+        notificationService.saveNearbyNotification(truck, notificationParams.message, notificationParams.now);
         return true;
     }
 
