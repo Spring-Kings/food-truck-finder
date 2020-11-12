@@ -1,9 +1,11 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.notification.NearbyNotification;
 import food.truck.api.notification.NotificationService;
 import food.truck.api.notification.NotificationView;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.TruckService;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import lombok.NonNull;
 import lombok.Value;
@@ -53,6 +55,7 @@ public class NotificationEndpoint {
         }
         var subscriptions = subscriptionService.findSubsByTruck(truck);
         notificationService.saveNotification(subscriptions, notificationParams.message);
+        notificationService.saveNearbyNotification(truck, notificationParams.message);
         return true;
     }
 
@@ -73,9 +76,8 @@ public class NotificationEndpoint {
         return notificationService.findNotificationsByTruck(truck);
     }
 
-    @Secured({"ROLE_USER"})
     @GetMapping("/notifications")
-    public List<NotificationView> getNotificationsForUser(@AuthenticationPrincipal User user) {
+    public List<NotificationView> getNotificationsForUser(@AuthenticationPrincipal AbstractUser user) {
         return notificationService.findNotificationsByUser(user);
     }
 
