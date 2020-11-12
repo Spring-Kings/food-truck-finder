@@ -21,13 +21,28 @@ public class NotificationView {
 
     boolean isRead;
 
+    @NonNull
+    String type;
+
     public static NotificationView of(Notification notif) {
         return new NotificationView(
             notif.getId(),
             notif.getSubscription().getTruck(),
             notif.getMessage(),
             notif.getTime(),
-            notif.isRead()
+            notif.isRead(),
+            "SUBSCRIPTION"
+        );
+    }
+
+    public static NotificationView of(NearbyNotification notif) {
+        return new NotificationView(
+            notif.getId(),
+            notif.getTruck(),
+            notif.getMessage(),
+            notif.getTime(),
+            true,
+            "LOCATION"
         );
     }
 }

@@ -265,7 +265,7 @@ public class TruckEndpoint {
         var truck = t.get();
 
         // Prevent an owner from subscribing to their own truck.
-        if (!u.getId().equals(truck.getUserId())) {
+        if (!truckService.userOwnsTruck(u, truck.getId())) {
             var sub = new Subscription();
             sub.setTruck(truck);
             sub.setUser(u);

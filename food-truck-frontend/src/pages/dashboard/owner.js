@@ -2,10 +2,10 @@ import React from 'react'
 
 import OwnerDashboardComponent from '../../components/dashboards/owner';
 
-function OwnerDashboard(){
+function OwnerDashboard() {
   return (
-  <OwnerDashboardComponent/>
-  )
+    <OwnerDashboardComponent/>
+  );
 }
 
 export default OwnerDashboard;

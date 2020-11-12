@@ -4,7 +4,7 @@ import UserDashboardComponent from '../../components/dashboards/user/UserDashboa
 
 function UserDashboard(){
   return(
-      <UserDashboardComponent/>
+    <UserDashboardComponent/>
   )
 }
 
