@@ -78,6 +78,7 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
   }
 
   onSubmit = (formData: any, response: AxiosResponse) => {
+    api.post(`/reindex`).catch();
     Router.replace(`/truck/${this.state.id}`);
   }
 
@@ -97,6 +98,8 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
           message: `Failed to update truck details: ${JSON.stringify(err)}`
         })
       });
+
+    api.post(`/reindex`).catch();
   }
 }
 
