@@ -1,5 +1,6 @@
 package food.truck.api.user;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.NonNull;
 import lombok.Value;
 import org.springframework.lang.Nullable;
@@ -13,6 +14,7 @@ public class UserView {
     @Nullable
     String email; // Nullable in case we decide you aren't allowed to see it
 
+    @JsonProperty("owner")
     boolean isOwner; // Null is considered false
 
     public static UserView of(User u) {
