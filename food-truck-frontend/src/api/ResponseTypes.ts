@@ -1,0 +1,1 @@
+export type ClientResponseAction = (resp: any) => void;

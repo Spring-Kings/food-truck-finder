@@ -1,6 +1,6 @@
 import jwt_decode from 'jwt-decode'
 
-type UserInfo = {
+export type UserInfo = {
     readonly username: string,
     readonly userID: number
 };

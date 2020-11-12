@@ -1,21 +1,16 @@
 package food.truck.api.search;
 
 import food.truck.api.truck.Truck;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.apache.lucene.search.Query;
-
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.stereotype.Component;
 
-
-
 import javax.persistence.EntityManager;
-
 import java.util.List;
 
 @Component
@@ -36,7 +31,7 @@ public class TruckSearchService {
 
         Query truckQuery = qb.keyword()
                 .fuzzy().withEditDistanceUpTo(2)
-                .onFields("name", "text_menu", "description", "foodCategory")
+                .onFields("name", "description") // TODO: Search in tags, as well
                 .matching(text)
                 .createQuery();
 

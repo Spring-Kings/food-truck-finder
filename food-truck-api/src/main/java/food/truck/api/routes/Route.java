@@ -24,7 +24,7 @@ public class Route {
     @JoinColumn(name = "truck_id", nullable = false)
     Truck truck;
 
-    @Column(name = "route_name", nullable = true)
+    @Column(name = "route_name", nullable = false)
     String routeName;
 
     @Column(name = "active", nullable = false)

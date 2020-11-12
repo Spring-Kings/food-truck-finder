@@ -3,17 +3,28 @@ import {AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
 
-type Props = {
+export type Props = {
     submitUrl: string,
     submitMethod?: "POST" | "PUT" | "DELETE",
     onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
     onFailedSubmit?: (formData: any, response: any) => void, // TODO: Figure out type of response
-    children?: React.ReactNode
+    children?: React.ReactNode,
+    customSubmitHandler?: Function,
+    formProps?: any
 }
 
 type State = {
     formData: any
 };
+
+/* Allow passing information other than a ReactEvent, under odd circumstances */
+export interface ReactEventAdapter {
+    target: {
+        type: undefined;
+        value: any;
+        name: string;
+    };
+}
 
 class Form extends Component<Props, State> {
     static defaultProps = {
@@ -25,11 +36,16 @@ class Form extends Component<Props, State> {
 
         this.state = {formData: {}};
         React.Children.forEach(this.props.children, c => {
+            // Ensure a null didn't slip through (can happen in dynamic forms)
+            if (c === null)
+                return;
+            
+            // Parse child
             const child = c as ReactElement;
-            if (typeof (child.props.name) !== 'undefined') {
-                if (typeof (child.props.value) !== 'undefined') {
+            if (child.props.name != null) {
+                if (child.props.value != null) {
                     this.state.formData[child.props.name] = child.props.value;
-                } else if (typeof (child.props.defaultValue) !== 'undefined') {
+                } else if (child.props.defaultValue != null) {
                     this.state.formData[child.props.name] = child.props.defaultValue;
                 } else {
                     this.state.formData[child.props.name] = "";
@@ -41,24 +57,26 @@ class Form extends Component<Props, State> {
         this.onValueChanged = this.onValueChanged.bind(this);
     }
 
+    mapChild = (child: React.ReactNode) => {
+        const c = child as ReactElement;
+        if (c === null || c.props.name === undefined)
+            return child;
+        return (
+            <Grid item>
+                {React.cloneElement(c, {
+                    onChange: this.onValueChanged,
+                    value: this.state.formData[c.props.name],
+                    defaultValue: undefined
+                })}
+            </Grid>
+        );
+    }
+
     render() {
         return (
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={this.onSubmit} {...this.props.formProps}>
                 <Grid container direction="column" alignItems="center" spacing={2}>
-                    {/* For each child, shove it in a Grid and add the onChange event callback */}
-                    {React.Children.map(this.props.children,
-                        child => {
-                            const c = child as ReactElement;
-                            if (typeof (c.props.name) === 'undefined')
-                                return c;
-                            return (<Grid item>
-                                {React.cloneElement(c, {
-                                    onChange: this.onValueChanged,
-                                    value: this.state.formData[c.props.name]
-                                })}
-                            </Grid>);
-                        }
-                    )}
+                    {React.Children.map(this.props.children, this.mapChild)}
                     <Button variant="contained" type="submit">Submit</Button>
                 </Grid>
             </form>
@@ -66,10 +84,16 @@ class Form extends Component<Props, State> {
     }
 
     onSubmit(event: React.FormEvent) {
+        if (this.props.customSubmitHandler) {
+            this.props.customSubmitHandler(event, this.state.formData);
+            event.preventDefault();
+            return;
+        }
+
         api.request({
             url: this.props.submitUrl,
             data: this.state.formData,
-            method: this.props.submitMethod,
+            method: this.props.submitMethod
         })
             .then(response => {
                 if (this.props.onSuccessfulSubmit)
@@ -91,7 +115,7 @@ class Form extends Component<Props, State> {
         event.preventDefault();
     }
 
-    onValueChanged(event: React.ChangeEvent<HTMLInputElement>) {
+    onValueChanged(event: React.ChangeEvent<HTMLInputElement> | ReactEventAdapter) {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
@@ -102,6 +126,22 @@ class Form extends Component<Props, State> {
                 [name]: value
             }
         }));
+    }
+
+    static getDerivedStateFromProps(props: Props, state: State) {
+        let newFormData: any = {};
+        if (props.children)
+            React.Children.forEach(props.children, (c: any) => {
+                // Ensure a null didn't slip through (can happen in dynamic forms)
+                if (c === null)
+                    return;
+            
+                // Parse child
+                let name: string = (c as ReactElement).props.name as string;
+                newFormData[name] = state.formData[name];
+            });
+        state.formData = newFormData;
+        return state;
     }
 }
 
