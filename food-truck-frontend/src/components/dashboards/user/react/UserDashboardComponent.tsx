@@ -105,7 +105,7 @@ class UserDashboardComponent extends Component<
                   color="primary"
                   onClick={this.toOwnerDashboard}
                 >
-                  OWNER DASHBOARD
+                  Owner Dashboard
                 </Button>
               </Card>
             ) : null}
@@ -118,6 +118,17 @@ class UserDashboardComponent extends Component<
                 onClick={this.toNotifications}
               >
                 Notifications
+              </Button>
+            </Card>
+
+            {/* Go to notifications page */}
+            <Card>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.toSearchTrucks}
+              >
+                Search Trucks
               </Button>
             </Card>
 
@@ -160,6 +171,10 @@ class UserDashboardComponent extends Component<
 
   private toNotifications() {
     Router.replace("/notifications");
+  }
+
+  private toSearchTrucks() {
+    Router.replace("/search/truck");
   }
 }
 
