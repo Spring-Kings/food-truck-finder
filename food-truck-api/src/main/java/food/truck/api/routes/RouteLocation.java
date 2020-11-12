@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalTime;
 
 
 @Data
@@ -28,10 +29,10 @@ public class RouteLocation {
     Route route;
 
     @Column(name = "arrival_time", nullable = false)
-    Instant arrivalTime;
+    LocalTime arrivalTime;
 
     @Column(name = "exit_time", nullable = false)
-    Instant exitTime;
+    LocalTime exitTime;
 
     @Convert(converter = PositionConverter.class)
     Position position;

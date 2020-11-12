@@ -13,24 +13,17 @@ export type NotificationListProps = {
 function NotificationListComponent(props: NotificationListProps) {
   const [notifications, setNotifications]: [Notification[], any] = useState([]);
   const [initialized, setInitialized]: [boolean, any] = useState(false);
+  const reloadNotifications = () => {
+    props.loadNotificationsFromBackend().then();
+    setNotifications(props.data.notifications);
+  };
   useEffect(() => {
-    var id: number | undefined = getUserInfo()?.userID;
     if (!initialized) {
       // Load
-      if (id !== undefined && id !== 0) {
-        props.loadNotificationsFromBackend().then();
-        setNotifications(props.data.notifications);
-      }
-      // updateNotifications().then();
+      reloadNotifications();
       setInitialized(true);
     } else {
-      const timer = setInterval(() => {
-        let id: number | undefined = getUserInfo()?.userID;
-        if (id !== undefined && id !== 0) {
-          props.loadNotificationsFromBackend().then();
-          setNotifications(props.data.notifications);
-        }
-      }, 5000);
+      const timer = setInterval(reloadNotifications, 5000);
       return () => clearInterval(timer);
     }
     return () => {};

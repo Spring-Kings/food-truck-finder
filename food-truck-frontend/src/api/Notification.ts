@@ -7,6 +7,7 @@ export interface Notification {
   truck: TruckState;
   time: Date;
   read: boolean;
+  type: string;
 }
 
 export const getNotifications = async () => {
@@ -29,7 +30,7 @@ export const sendNotification = async (
 ) => {
   let config = {
     truckId: truckId,
-    message: message
+    message: message,
   };
   await api.post(`/truck/notification`, config)
     .catch(onFail);

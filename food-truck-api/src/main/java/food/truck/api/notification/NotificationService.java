@@ -3,6 +3,8 @@ package food.truck.api.notification;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionRepository;
 import food.truck.api.truck.Truck;
+import food.truck.api.truck.TruckService;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,13 @@ public class NotificationService {
     NotificationRepository notificationRepository;
 
     @Autowired
+    NearbyNotificationRepository nearbyNotificationRepository;
+
+    @Autowired
     SubscriptionRepository subscriptionRepository;
+
+    @Autowired
+    TruckService truckService;
 
     @Autowired
     JavaMailSender mailSender;
@@ -40,6 +48,28 @@ public class NotificationService {
             .collect(Collectors.toList());
     }
 
+    public List<NotificationView> findNotificationsByUser(AbstractUser user) {
+        var notifications = findNearbyNotifications(user, 30);
+        if (user instanceof User) {
+            var authenticatedUser = (User)user;
+            notifications.addAll(findNotificationsByUser(authenticatedUser));
+            notifications = notifications
+                .stream()
+                .filter(notification -> !truckService.userOwnsTruck(authenticatedUser, notification.getTruck().getId()))
+                .filter(notification -> {
+                    if (notification.getType().equals("LOCATION")) {
+                        var subscriptions = subscriptionRepository.findByUser(authenticatedUser);
+                        return subscriptions
+                            .stream()
+                            .noneMatch(sub -> sub.getTruck().getId().equals(notification.getTruck().getId()));
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+        }
+        return notifications;
+    }
+
     public List<NotificationView> findNotificationsByUser(User user) {
         var subscriptions = subscriptionRepository.findByUser(user);
         return subscriptions.stream()
@@ -52,6 +82,16 @@ public class NotificationService {
         var subscriptions = subscriptionRepository.findByTruck(truck);
         return subscriptions.stream()
             .flatMap(sub -> findNotificationsBySubscriptionId(sub.getId()).stream())
+            .map(NotificationView::of)
+            .collect(Collectors.toList());
+    }
+
+    public List<NotificationView> findNearbyNotifications(AbstractUser user, double milesThreshold) {
+        var notifications = nearbyNotificationRepository.findAll();
+        return notifications.stream()
+            .filter(notif -> user
+                .getPosition()
+                .distanceInMiles(notif.getPosition()) < milesThreshold)
             .map(NotificationView::of)
             .collect(Collectors.toList());
     }
@@ -98,5 +138,17 @@ public class NotificationService {
 
     public void deleteNotification(Notification notification) {
         notificationRepository.delete(notification);
+    }
+
+    public void saveNearbyNotification(Truck truck, String message) {
+        var routeLocation = truckService.getCurrentRouteLocation(truck.getId());
+        routeLocation.ifPresent(loc -> {
+            var n = new NearbyNotification();
+            n.setTruck(truck);
+            n.setMessage(message);
+            n.setTime(Instant.now());
+            n.setPosition(loc.getPosition());
+            nearbyNotificationRepository.save(n);
+        });
     }
 }

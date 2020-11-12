@@ -112,9 +112,7 @@ class EditRouteStopDialogComponent extends React.Component<
         value={this.state[propName]}
         onChange={(date) => {
           if (date != null) {
-            var dateTwo: Date = this.state[propName];
-            dateTwo.setTime(date.getTime());
-            this.setState({ [propName]: dateTwo });
+            this.setState({ [propName]: date as Date });
           }
         }}
       />
