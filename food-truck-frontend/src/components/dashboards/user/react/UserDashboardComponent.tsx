@@ -11,6 +11,10 @@ import {
   Card,
   CardContent,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   GridList,
   GridListTile,
   List,
@@ -23,7 +27,7 @@ import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
 import { RouteLocation } from "../../../map/route-map/RouteLocation";
 import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
-import { getNearbyTruckLocations } from "../../../../api/Truck";
+import { getNearbyTruckLocations, getTruckById } from "../../../../api/Truck";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -35,6 +39,8 @@ interface UserDashboardProps {
 interface UserDashboardState {
   inError: string | null;
   nearbyTrucks: RouteLocation[];
+  // TODO tighten typing
+  viewTruck: any | undefined;
 }
 
 // Dashboard component
@@ -49,6 +55,7 @@ class UserDashboardComponent extends Component<
     this.state = {
       inError: null,
       nearbyTrucks: [],
+      viewTruck: undefined
     };
 
     // Bind methods
@@ -71,7 +78,6 @@ class UserDashboardComponent extends Component<
   }
 
   render() {
-    console.log(this.state.nearbyTrucks);
     // Ensure the state is OK
     if (this.state.inError)
       return <Typography variant="h1">ERROR: not logged in</Typography>;
@@ -137,10 +143,24 @@ class UserDashboardComponent extends Component<
             <TruckRouteMapComponent
               locations={this.state.nearbyTrucks}
               isRoute={false}
-              onMarkerClick={(pt, _latLng) => alert(pt)}
+              onMarkerClick={this.selectTruck}
             />
           </GridListTile>
         </GridList>
+
+        <Dialog open={this.state.viewTruck !== undefined}>
+            <DialogTitle>{this.state.viewTruck? this.state.viewTruck.name : undefined}</DialogTitle>
+            <DialogContent>
+              <Typography variant="body1">{this.state.viewTruck?.description}</Typography>
+              <Grid container>
+                <Grid>Cost Rating: {this.state.viewTruck?.priceRating}</Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.viewSelectedTruck}>View</Button>
+              <Button onClick={this.cancelSelectedView}>Cancel</Button>
+            </DialogActions>
+        </Dialog>
       </React.Fragment>
     );
   }
@@ -156,6 +176,10 @@ class UserDashboardComponent extends Component<
   private toNotifications() {
     Router.replace("/notifications");
   }
+
+  selectTruck = async (pt: RouteLocation, _latLng: any) => this.setState({ viewTruck: await getTruckById(pt.stopId, DEFAULT_ERR_RESP) });
+  viewSelectedTruck = () => Router.replace(`/truck/${this.state.viewTruck.id}`);
+  cancelSelectedView = () => this.setState({ viewTruck: undefined });
 }
 
 export default UserDashboardComponent;

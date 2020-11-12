@@ -78,32 +78,36 @@ class TruckView extends Component<TruckProps, State> {
   }
 
   async componentDidMount() {
-    await api
-      .get(`/truck/${this.props.truckId}`, {})
-      .then((res) => this.setState(res ? res.data : null))
-      .catch((err) => {
-        if (err.response) {
-          console.log("Got error response code");
-        } else if (err.request) {
-          console.log("Did not receive Truck response");
-        } else {
-          console.log(err);
-        }
-        this.setState(null);
+    try {
+      await api
+        .get(`/truck/${this.props.truckId}`, {})
+        .then((res) => this.setState(res ? res.data : null))
+        .catch((err) => {
+          if (err.response) {
+            console.log("Got error response code");
+          } else if (err.request) {
+            console.log("Did not receive Truck response");
+          } else {
+            console.log(err);
+          }
+          this.setState(null);
+        });
+
+      await getSubscriptionForTruck(this.props.truckId).then((sub) => {
+        this.setState({
+          ...this.state,
+          subscription: sub
+        })
       });
 
-    await getSubscriptionForTruck(this.props.truckId).then((sub) => {
+      // Load today's route
       this.setState({
         ...this.state,
-        subscription: sub
-      })
-    });
-
-    // Load today's route
-    this.setState({
-      ...this.state,
-      routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP),
-    });
+        routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP),
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   render() {
