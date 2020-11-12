@@ -114,6 +114,7 @@ public class TruckEndpoint {
         try {
             indexingService.initiateIndexing();
         }catch (InterruptedException e){
+            log.warn(e);
             return truck;
         }
         return truck;
@@ -172,6 +173,7 @@ public class TruckEndpoint {
         try {
             indexingService.initiateIndexing();
         }catch (InterruptedException e){
+            log.warn(e);
             return truck;
         }
         return truck;
