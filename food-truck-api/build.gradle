@@ -104,6 +104,8 @@ dependencies {
     testCompile group: 'org.apache.httpcomponents', name: 'httpclient'
     compile group: 'com.h2database', name: 'h2'
 
+    implementation group: 'org.hibernate', name: 'hibernate-java8'
+
     compileOnly group: 'org.projectlombok', name: 'lombok'
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
