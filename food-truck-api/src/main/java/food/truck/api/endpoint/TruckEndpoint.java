@@ -1,7 +1,5 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.reviews_and_subscriptions.Review;
-import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.recommendation.StrategySelector;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
@@ -25,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +31,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +49,7 @@ public class TruckEndpoint {
         this.truckService = truckService;
         this.routeService = routeService;
         this.subscriptionService = subscriptionService;
-        this.ss = new StrategySelector(truckService);
+        this.ss = new StrategySelector(truckService, subscriptionService);
     }
 
     @Autowired
