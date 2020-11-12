@@ -81,7 +81,7 @@ public class TruckService {
         name.ifPresent(truck::setName);
         truck.setMenu(menu.orElse(null));
         truck.setTextMenu(textMenu.orElse(null));
-        if (truck.getPriceRating() != null)
+        if (truck.getPriceRating() == null)
             truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
         truck.setSchedule(schedule.orElse(null));

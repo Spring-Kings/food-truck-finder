@@ -110,7 +110,7 @@ public class TruckEndpointTest extends EndpointTest {
         Truck t = fromJson(resp, Truck.class);
         assertEquals("truck1337", t.getName());
         assertEquals("a cool truck", t.getDescription());
-        assertEquals(3L, t.getPriceRating());
+        assertEquals(3.0, t.getPriceRating(), 0.001);
         assertNull(t.getFoodCategory());
         assertNull(t.getMenu());
         assertNull(t.getTextMenu());
