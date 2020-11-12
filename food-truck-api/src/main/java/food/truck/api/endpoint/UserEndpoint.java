@@ -31,10 +31,10 @@ public class UserEndpoint {
     private UserService userService;
 
     @Autowired
-    private ReviewService reviewService;
+    private SubscriptionService subscriptionService;
 
     @Autowired
-    private SubscriptionService subscriptionService;
+    private ReviewService reviewService;
 
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {

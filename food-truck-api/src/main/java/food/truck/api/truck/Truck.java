@@ -32,7 +32,10 @@ public class Truck {
     String textMenu;
 
     @Column(name = "price_rating")
-    Long priceRating;
+    Double priceRating;
+
+    @Column(name = "star_rating")
+    Double starRating;
 
     @Field(name = "description")
     @Column(name = "description")
