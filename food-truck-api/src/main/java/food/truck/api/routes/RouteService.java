@@ -135,7 +135,7 @@ public class RouteService {
 
         var now = OffsetDateTime.now(ZoneOffset.UTC).toLocalTime();
         return r.getLocations().stream().filter(
-                loc -> now.isAfter(loc.arrivalTime) && now.isBefore(loc.exitTime)
+                loc -> fallsOnDayInterval(now, loc.arrivalTime, loc.exitTime)
         ).findFirst();
     }
 
@@ -149,5 +149,25 @@ public class RouteService {
     public boolean userOwnsLocation(User u, long locationId) {
         var loc = routeLocationRepository.findById(locationId);
         return loc.isPresent() && loc.get().getRoute().getTruck().getUserId().equals(u.getId());
+    }
+
+    /**
+     * Reports whether now falls on the specified interval, assuming a wraparoung
+     * at midnight
+     *
+     * @param now The current time
+     * @param start The start of the interval
+     * @param end The end of the interval
+     * @return Whether now falls between start and end. If start is greater than end,
+     *         returns it assuming that the range wraps at midnight. If start and end
+     *         are the same time, it automatically returns false.
+     */
+    private static boolean fallsOnDayInterval(LocalTime now, LocalTime start, LocalTime end) {
+        if (start.isBefore(end))
+            return now.isAfter(start) && now.isBefore(end);
+        else if (start.isAfter(end))
+            return now.isAfter(start) || now.isBefore(end);
+        else
+            return false;
     }
 }
