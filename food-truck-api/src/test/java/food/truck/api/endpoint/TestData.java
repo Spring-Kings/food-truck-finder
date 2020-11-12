@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Log4j2
 @Profile({"test", "dev"})
@@ -63,7 +64,7 @@ public class TestData {
         testTruckA = truckService.createTruck(ownerA.getId(), "testTruckA");
         testRouteA = routeService.createRoute(testTruckA, "testRouteA", true);
         routeService.addDayToRoute(testRouteA.getRouteId(), LocalDateTime.now().getDayOfWeek());
-        routeService.createLocation(testRouteA.getRouteId(), 1.23, 1.23, Instant.now(), Instant.now().plusSeconds(1000));
+        routeService.createLocation(testRouteA.getRouteId(), 1.23, 1.23, LocalTime.now(), LocalTime.now().plusSeconds(1000));
 
         ownerB = userService.createUser("ownerB", "password", "yeetarino", true);
         testTruckB = truckService.createTruck(ownerB.getId(), "testTruckB");

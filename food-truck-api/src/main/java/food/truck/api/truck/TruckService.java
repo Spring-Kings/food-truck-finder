@@ -5,13 +5,15 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
+import food.truck.api.search.IndexingService;
 import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,11 +34,6 @@ public class TruckService {
 
     public List<Truck> findTruck(Long userId) {
         return truckRepository.findByUserId(userId);
-    }
-
-    public List<Truck> findTrucks(String search){ 
-        return truckRepository.findByNameLikeOrDescriptionLike("%" + search + "%",
-            "%" + search + "%");
     }
 
     public Optional<Truck> findTruckById(Long truckId) {
@@ -97,7 +94,7 @@ public class TruckService {
     }
 
     public Route getActiveRoute(long truckId) {
-        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+        return getActiveRoute(truckId, OffsetDateTime.now(ZoneOffset.UTC).getDayOfWeek());
     }
 
     public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {

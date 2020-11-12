@@ -11,7 +11,8 @@ import {
 import { RouteLocation } from "../route-map/RouteLocation";
 
 interface MapProps {
-  routePts: RouteLocation[];
+  locations: RouteLocation[];
+  isRoute?: boolean;
   onDrag?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
   onMarkerClick?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
   onMapClick?: (latLng: LatLngLiteral) => void;
@@ -61,7 +62,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
               if (this.props.onMapClick) this.props.onMapClick(e);
             }}
           >
-            {this.props.routePts.flatMap((pt) => (
+            {this.props.locations.flatMap((pt) => (
               <Marker
                 key={pt.stopId}
                 draggable={this.props.onDrag !== undefined}
@@ -70,7 +71,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
                 onClick={(e) => this.trigger(this.props.onMarkerClick, pt, e)}
               />
             ))}
-            <Polyline path={this.props.routePts.flatMap((pt) => pt.coords)} />
+            {this.props.isRoute && <Polyline path={this.props.locations.flatMap((pt) => pt.coords)} />}
           </GoogleMap>
         </LoadScript>
       </Container>

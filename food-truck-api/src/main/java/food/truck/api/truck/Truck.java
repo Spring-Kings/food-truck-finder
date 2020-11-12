@@ -1,11 +1,14 @@
 package food.truck.api.truck;
 
 import lombok.Data;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 
 @Data
 @Entity
+@Indexed
 @Table(name = "truck")
 public class Truck {
     @Id
@@ -16,6 +19,7 @@ public class Truck {
     @JoinColumn(foreignKey = @ForeignKey(name = "user_id"), nullable = false)
     Long userId;
 
+    @Field(name = "name")
     @Column(name = "name", nullable = false)
     String name;
 
@@ -23,6 +27,7 @@ public class Truck {
     @Column(name = "menu")
     byte[] menu;
 
+    @Field( name= "text_menu")
     @Column(name = "text_menu")
     String textMenu;
 
@@ -32,6 +37,7 @@ public class Truck {
     @Column(name = "star_rating")
     Double starRating;
 
+    @Field(name = "description")
     @Column(name = "description")
     String description;
 
@@ -39,6 +45,7 @@ public class Truck {
     @Column(name = "schedule")
     byte[] schedule;
 
+    @Field(name = "foodCategory")
     @Column(name = "foodCategory")
     String foodCategory;
 }

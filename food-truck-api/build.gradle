@@ -56,6 +56,9 @@ bootJar {
 }
 
 dependencies {
+    compile 'org.hibernate:hibernate-search-elasticsearch:5.11.5.Final'
+    compile 'org.hibernate:hibernate-search-orm:5.11.5.Final'
+
     compile group: 'com.google.guava', name: 'guava'
     compile group: 'com.gitlab.bessemer', name: 'cornerstone'
 
@@ -103,6 +106,8 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testCompile group: 'org.apache.httpcomponents', name: 'httpclient'
     compile group: 'com.h2database', name: 'h2'
+
+    implementation group: 'org.hibernate', name: 'hibernate-java8'
 
     compileOnly group: 'org.projectlombok', name: 'lombok'
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
