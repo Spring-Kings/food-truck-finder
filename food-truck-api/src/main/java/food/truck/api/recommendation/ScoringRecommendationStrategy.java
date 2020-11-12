@@ -49,7 +49,7 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             double distScore = ScoreWeights.DistWeight.val * (1 - distRatio);
 
             double priceScore;
-            if (truck.getPriceRating() > prefs.getPriceRating())
+            if (truck.getPriceRating() != null && truck.getPriceRating() > prefs.getPriceRating())
                 priceScore = -ScoreWeights.PriceWeight.val * (truck.getPriceRating() - prefs.getPriceRating());
             else
                 priceScore = 0;

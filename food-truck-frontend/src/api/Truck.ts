@@ -11,13 +11,24 @@ export const getNearbyTruckLocations = async (onFail: (err: any) => void) => {
         method: "POST",
       })
     ).data.map((truck: any) => truck.id);
+    result = getNearbyTruckLocationsById(trucks, onFail);
+  } catch (err) {
+    result = [];
+    onFail(err);
+  }
+  return result;
+};
+
+export const getNearbyTruckLocationsById = async (ids: number[], onFail: (err: any) => void) => {
+  let result: RouteLocation[] = [];
+  try {
     result = (
       await api.request({
           url: `/truck/locations`,
-          data: trucks,
+          data: ids,
           method: "POST",
       })
-    ).data.map((pt: any, ndx: number) => backendToFrontend(pt, trucks[ndx]));
+    ).data.map((pt: any, ndx: number) => backendToFrontend(pt, ids[ndx]));
   } catch (err) {
     result = [];
     onFail(err);

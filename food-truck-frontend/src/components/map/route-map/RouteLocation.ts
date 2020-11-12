@@ -29,6 +29,15 @@ export interface RouteLocation {
   readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
 }
 
+export const blankRouteLocation = () => ({
+  routeLocationId: -1,
+  arrivalTime: new Date(),
+  exitTime: new Date(),
+  stopId: 0,
+  coords: { lat: 0, lng: 0},
+  state: RouteLocationState.CREATED,
+})
+
 export const backendToFrontend = (pt: any, stopId: number) => {
   return {
     stopId: stopId,
