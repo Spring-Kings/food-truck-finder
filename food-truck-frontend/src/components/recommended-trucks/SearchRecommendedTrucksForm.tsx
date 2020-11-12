@@ -7,6 +7,8 @@ import { RouteLocation } from "../map/route-map/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import { ReactEventAdapter } from "../Form";
+import { getNearbyTruckLocationsById } from "../../api/Truck";
+import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
@@ -66,6 +68,9 @@ class RecommendedTrucksForm extends Component<
   }
 
   render() {
+    if (this.state.selectedTrucks != undefined)
+      return <TruckLocationMapComponent locations={this.state.selectedTrucks} />;
+
     return (
       <>
         <Typography variant="h6">Acceptable Radius</Typography>
@@ -131,7 +136,10 @@ class RecommendedTrucksForm extends Component<
           },
         method: "POST",
       });
-      console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`);
+      if (resp.data !== undefined) {
+        this.setState({ selectedTrucks: await getNearbyTruckLocationsById(resp.data.map(t => t.id), DEFAULT_ERR_RESP) })
+      }
+
     } catch (err) {
       DEFAULT_ERR_RESP(err);
     }

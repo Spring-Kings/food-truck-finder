@@ -44,7 +44,7 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             double distScore = ScoreWeights.DistWeight.val * (1 - distRatio);
 
             double priceScore;
-            if (truck.getPriceRating() > prefs.getPriceRating())
+            if (truck.getPriceRating() != null && truck.getPriceRating() > prefs.getPriceRating())
                 priceScore = -ScoreWeights.PriceWeight.val * (truck.getPriceRating() - prefs.getPriceRating());
             else
                 priceScore = 0;
@@ -65,7 +65,8 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
 
             // We don't have ratings yet
             double ratingScore = 0.0;
-            //double ratingScore = ScoreWeights.RatingWeight.val * (truck.getAverageRating() - 3);
+            if (truck.getStarRating() != null)
+                ratingScore = ScoreWeights.RatingWeight.val * (truck.getStarRating() - 3);
 
             scores.put(truck, distScore + priceScore + tagScore + menuScore + ratingScore);
         }

@@ -85,7 +85,11 @@ public class TruckEndpoint {
     ) {
         var strategy = ss.selectStrategy(u, prefs);
 
-        return strategy.selectTrucks().subList(0, prefs.getNumRequested());
+        // Get the desired trucks
+        var truckList = strategy.selectTrucks();
+        if (truckList.size() > prefs.getNumRequested())
+            truckList = truckList.subList(0, prefs.getNumRequested());
+        return truckList;
     }
 
     @GetMapping(path = "/truck/{id}")
