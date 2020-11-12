@@ -123,7 +123,7 @@ public class TruckEndpoint {
         @Nullable
         String description;
         @Nullable
-        Long priceRating;
+        Double priceRating;
         @Nullable
         String foodCategory;
         // TODO What about menu/schedule?

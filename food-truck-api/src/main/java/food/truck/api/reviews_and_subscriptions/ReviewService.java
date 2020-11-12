@@ -76,16 +76,16 @@ public class ReviewService {
         var coll = reviewRepository.findByTruckId(truck.getId());
 
         // Get new average cost and star ratings
-        Long cost = null;
-        Long star = null;
+        Double cost = null;
+        Double star = null;
 
         if (coll.size() != 0) {
             cost = coll.stream()
-                    .collect(Collectors.averagingInt(Review::getCostRating))
-                    .longValue();
+                    .collect(Collectors.averagingDouble(Review::getCostRating))
+                    .doubleValue();
             star = coll.stream()
-                    .collect(Collectors.averagingInt(Review::getStarRating))
-                    .longValue();
+                    .collect(Collectors.averagingDouble(Review::getStarRating))
+                    .doubleValue();
         }
 
         // Persist new rating

@@ -94,11 +94,11 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     <Grid container item={item} xs key={`${id}/ratings`}>
       <Grid item xs key={"star"}>
         <Typography variant="h6">Quality:</Typography>
-        <StarRating disabled value={starRating} />
+        <StarRating precision={0.1} disabled value={starRating} />
       </Grid>
       <Grid item xs key={"`cost"}>
         <Typography variant="h6">Value:</Typography>
-        <MoneyRating disabled value={costRating} />
+        <MoneyRating precision={0.1} disabled value={costRating} />
       </Grid>
     </Grid>)
 

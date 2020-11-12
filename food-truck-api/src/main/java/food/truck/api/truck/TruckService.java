@@ -69,7 +69,7 @@ public class TruckService {
             Optional<String> name,
             Optional<byte[]> menu,
             Optional<String> textMenu,
-            Optional<Long> priceRating,
+            Optional<Double> priceRating,
             Optional<String> description,
             Optional<byte[]> schedule,
             Optional<String> foodCategory
@@ -81,7 +81,8 @@ public class TruckService {
         name.ifPresent(truck::setName);
         truck.setMenu(menu.orElse(null));
         truck.setTextMenu(textMenu.orElse(null));
-        truck.setPriceRating(priceRating.orElse(null));
+        if (truck.getPriceRating() != null)
+            truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
         truck.setSchedule(schedule.orElse(null));
         truck.setFoodCategory(foodCategory.orElse(null));
