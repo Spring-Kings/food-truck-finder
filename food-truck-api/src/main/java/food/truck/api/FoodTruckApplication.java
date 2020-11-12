@@ -35,4 +35,6 @@ public class FoodTruckApplication {
 
         return mailSender;
     }
+
+
 }

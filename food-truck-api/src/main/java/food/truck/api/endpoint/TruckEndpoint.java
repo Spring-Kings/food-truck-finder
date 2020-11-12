@@ -7,6 +7,8 @@ import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteService;
+import food.truck.api.search.IndexingService;
+import food.truck.api.search.TruckSearchService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
@@ -25,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +46,12 @@ public class TruckEndpoint {
         this.subscriptionService = subscriptionService;
         this.ss = new StrategySelector(truckService);
     }
+
+    @Autowired
+    private IndexingService indexingService;
+
+    @Autowired
+    private TruckSearchService truckSearchService;
 
     @GetMapping("/truck/nearby")
     public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
@@ -66,7 +75,13 @@ public class TruckEndpoint {
     }
 
     @GetMapping(path = "/truck/search")
-    public List<Truck> searchTrucks(@RequestParam String search){ return truckService.findTrucks(search);}
+    public List<Truck> searchTrucks(@RequestParam String search){
+       if( search.isEmpty()){
+           return new ArrayList<Truck>();
+       }
+       
+        return truckSearchService.getTruckBaseOnText(search);
+    }
 
     @GetMapping("/truck/{truckId}/reviews")
     public String getTruckReviews(@PathVariable long truckId) {
@@ -94,8 +109,14 @@ public class TruckEndpoint {
 
     @Secured({"ROLE_OWNER"})
     @PostMapping("/truck/create")
-    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data) {
-        return truckService.createTruck(u.getId(), data.truckName);
+    public Truck createTruck(@AuthenticationPrincipal User u, @RequestBody CreateTruckParams data){
+        Truck truck = truckService.createTruck(u.getId(), data.truckName);
+        try {
+            indexingService.initiateIndexing();
+        }catch (InterruptedException e){
+            log.warn(e);
+        }
+        return truck;
     }
 
     @Secured({"ROLE_OWNER"})
@@ -138,7 +159,7 @@ public class TruckEndpoint {
         if (!truckService.userOwnsTruck(u, data.truckId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
-        return Optional.of(truckService.updateTruck(
+        Optional<Truck> truck =  Optional.of(truckService.updateTruck(
                 data.truckId,
                 Optional.ofNullable(data.name),
                 Optional.ofNullable(data.menu),
@@ -148,6 +169,12 @@ public class TruckEndpoint {
                 Optional.ofNullable(data.schedule),
                 Optional.ofNullable(data.foodCategory)
         ));
+        try {
+            indexingService.initiateIndexing();
+        }catch (InterruptedException e){
+            log.warn(e);
+        }
+        return truck;
     }
 
     @GetMapping("/truck/{truckId}/routes")
@@ -155,6 +182,7 @@ public class TruckEndpoint {
         Optional<Truck> truck = truckService.findTruckById(truckId);
         if (truck.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
         }
 
         return routeService.findRouteByTruck(truck.get());
