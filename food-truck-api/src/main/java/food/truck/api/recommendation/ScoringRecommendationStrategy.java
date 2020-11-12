@@ -1,5 +1,6 @@
 package food.truck.api.recommendation;
 
+import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
@@ -9,11 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 
 enum ScoreWeights {
-    DistWeight(1.0),
-    PriceWeight(1.0),
-    TagWeight(1.0),
-    MenuWeight(1.0),
-    RatingWeight(1.0);
+    DistWeight(3.0),
+    PriceWeight(1.5),
+    TagWeight(10.0),
+    RatingWeight(5.0),
+    SubscriptionWeight(10.0);
 
     public final double val;
 
@@ -24,17 +25,21 @@ enum ScoreWeights {
 
 public class ScoringRecommendationStrategy implements TruckRecommendationStrategy {
     private final TruckService truckSvc;
+    private final SubscriptionService subscriptionService;
     private final User user;
     private final UserPreferences prefs;
 
-    public ScoringRecommendationStrategy(TruckService truckSvc, User user, UserPreferences prefs) {
+    public ScoringRecommendationStrategy(TruckService truckSvc, SubscriptionService subscriptionService, User user, UserPreferences prefs) {
         this.truckSvc = truckSvc;
+        this.subscriptionService = subscriptionService;
         this.user = user;
         this.prefs = prefs;
     }
 
     @Override
     public List<Truck> selectTrucks() {
+        var userSubs = subscriptionService.findSubsByUser(user);
+
         var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
         var scores = new HashMap<Truck, Double>();
         for (var truck : trucks) {
@@ -49,26 +54,30 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             else
                 priceScore = 0;
 
-            double tagScore = 0;
-            for (String tag : prefs.getTags()) {
-                if (truck.hasTag(tag))
-                    tagScore += ScoreWeights.TagWeight.val;
+            double tagScore;
+            if (prefs.getTags().size() != 0) {
+                int numMatchingTags = 0;
+                for (String tag : prefs.getTags()) {
+                    if (truck.hasTag(tag))
+                        ++numMatchingTags;
+                }
+                tagScore = ScoreWeights.TagWeight.val * ((double) (numMatchingTags) / prefs.getTags().size());
+            } else {
+                tagScore = 0;
             }
 
-            double menuScore = 0;
-            /*
-            for (String item : prefs.getMenuItems()) {
-                // For now, very simple and error-prone implementation for whether truck has item
-                if (truck.getTextMenu().toLowerCase().contains(item.toLowerCase()))
-                    menuScore += ScoreWeights.MenuWeight.val;
-            }*/
-
-            // We don't have ratings yet
-            double ratingScore = 0.0;
-            if (truck.getStarRating() != null)
+            double ratingScore;
+            if (truck.getStarRating() != null) {
                 ratingScore = ScoreWeights.RatingWeight.val * (truck.getStarRating() - 3);
+            } else {
+                ratingScore = 0;
+            }
 
-            scores.put(truck, distScore + priceScore + tagScore + menuScore + ratingScore);
+            double subScore = 0;
+            if (userSubs.stream().anyMatch(sub -> sub.getTruck().getId().equals(truck.getId())))
+                subScore = ScoreWeights.SubscriptionWeight.val;
+
+            scores.put(truck, distScore + priceScore + tagScore + ratingScore + subScore);
         }
 
         trucks.sort((a, b) -> Double.compare(scores.get(b), scores.get(a)));
