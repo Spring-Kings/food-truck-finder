@@ -77,7 +77,7 @@ public class TruckService {
     public Truck updateTruck(
             long truckId,
             Optional<String> name,
-            Optional<Long> priceRating,
+            Optional<Double> priceRating,
             Optional<String> description,
             Optional<Set<String>> tags
     ) {
