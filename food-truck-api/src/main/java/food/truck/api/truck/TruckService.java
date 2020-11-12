@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -99,17 +100,17 @@ public class TruckService {
         return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
     }
 
-    public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {
+    public Optional<RouteLocation> getCurrentRouteLocation(long truckId, LocalDateTime now) {
         var route = getActiveRoute(truckId);
         if (route == null)
             return Optional.empty();
 
-        return routeService.getCurrentRouteLocation(route.getRouteId());
+        return routeService.getCurrentRouteLocation(route.getRouteId(), now);
     }
 
-    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles) {
+    public List<Truck> getTrucksCloseToLocation(Position loc, double radiusMiles, LocalDateTime now) {
         return truckRepository.findAll().stream().filter(truck -> {
-                    var curLoc = getCurrentRouteLocation(truck.id);
+                    var curLoc = getCurrentRouteLocation(truck.id, now);
                     if (curLoc.isEmpty())
                         return false;
                     var truckLocation = curLoc.get().getPosition();

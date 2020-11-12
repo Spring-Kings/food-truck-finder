@@ -17,6 +17,9 @@ export const loadTodaysRoute = async (
     .request({
       url: `/truck/${truckId}/active-route`,
       method: "GET",
+      params: {
+        now: new Date()
+      }
     })
     .then((response) => {
       if (response.data)

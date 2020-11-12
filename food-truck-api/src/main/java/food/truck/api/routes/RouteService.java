@@ -80,7 +80,7 @@ public class RouteService {
             return false;
         var route = r.get();
         if (!route.getDays().contains(w))
-            return false;
+             return false;
         route.getDays().remove(w);
         routeRepository.save(route);
         return true;
@@ -128,17 +128,16 @@ public class RouteService {
         return routeLocationRepository.findByRoute_routeId(routeId);
     }
 
-    public Optional<RouteLocation> getCurrentRouteLocation(long routeId) {
+    public Optional<RouteLocation> getCurrentRouteLocation(long routeId, LocalDateTime now) {
         var route = findRouteById(routeId);
         if (route.isEmpty())
             return Optional.empty();
         var r = route.get();
 
-        // TODO figure out how to handle time zones
-        var now = LocalTime.now();
+        var now_time = now.toLocalTime();
         return r.getLocations().stream().filter(
-                loc -> now.isAfter(LocalTime.from(loc.arrivalTime))
-                        && now.isBefore(LocalTime.from(loc.exitTime))
+                loc -> now_time.isAfter(LocalTime.from(loc.arrivalTime))
+                        && now_time.isBefore(LocalTime.from(loc.exitTime))
         ).findFirst();
     }
 

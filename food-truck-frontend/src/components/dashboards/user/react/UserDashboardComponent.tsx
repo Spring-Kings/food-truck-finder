@@ -48,7 +48,7 @@ class UserDashboardComponent extends Component<
     // Create state
     this.state = {
       inError: null,
-      nearbyTrucks: []
+      nearbyTrucks: [],
     };
 
     // Bind methods
@@ -59,9 +59,11 @@ class UserDashboardComponent extends Component<
   async componentDidMount() {
     // Load
     try {
-      let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
-      this.setState({ inError: null, nearbyTrucks: trucks });
-      await this.props.loadUserFromBackend();
+      if (this.props.data !== undefined) {
+        let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
+        this.setState({ inError: null, nearbyTrucks: trucks });
+      } else
+        await this.props.loadUserFromBackend();
     } catch (err) {
       console.log(err);
       this.setState({ inError: err });
@@ -69,6 +71,7 @@ class UserDashboardComponent extends Component<
   }
 
   render() {
+    console.log(this.state.nearbyTrucks);
     // Ensure the state is OK
     if (this.state.inError)
       return <Typography variant="h1">ERROR: not logged in</Typography>;
@@ -134,9 +137,7 @@ class UserDashboardComponent extends Component<
             <TruckRouteMapComponent
               locations={this.state.nearbyTrucks}
               isRoute={false}
-              onMarkerClick={(pt, latLng) => {
-                alert(pt);
-              }}
+              onMarkerClick={(pt, _latLng) => alert(pt)}
             />
           </GridListTile>
         </GridList>

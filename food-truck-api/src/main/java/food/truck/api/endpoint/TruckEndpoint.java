@@ -27,9 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Log4j2
 @RestController
@@ -47,30 +45,44 @@ public class TruckEndpoint {
         this.ss = new StrategySelector(truckService);
     }
 
-    @GetMapping("/truck/nearby")
-    public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
+    @PostMapping("/truck/nearby")
+    public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u, @RequestBody LocalDateTime now) {
         // TODO: Should radius be configurable?
-        return truckService.getTrucksCloseToLocation(u.getPosition(), 10.0);
+        return truckService.getTrucksCloseToLocation(u.getPosition(), 10.0, now);
+    }
+
+    @Value
+    static class GetTruckLocationParams {
+        List<Long> truckIds;
+        LocalDateTime now;
     }
 
     @PostMapping("/truck/locations")
-    public List<Truck> getTruckLocations(@AuthenticationPrincipal AbstractUser u, @RequestBody List<Long> truckIds) {
-        List<Truck> trucks = new ArrayList<>();
-        for (Long id : truckIds) {
+    public List<RouteLocation> getTruckLocations(@AuthenticationPrincipal AbstractUser u, @RequestBody GetTruckLocationParams gtlp) {
+        List<RouteLocation> trucks = new ArrayList<>();
+        for (Long id : gtlp.truckIds) {
             if (id != null)
-                trucks.add(truckService.findTruck(id).get(0));
+                truckService.getCurrentRouteLocation(id, gtlp.now).ifPresent(trucks::add);
         }
         return trucks;
+    }
+
+    @Value
+    static class RecommendationParams {
+        @NonNull
+        UserPreferences prefs;
+        @NonNull
+        LocalDateTime now;
     }
 
     @PostMapping(path = "/truck/recommended")
     public List<Truck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
-            @RequestBody UserPreferences prefs
+            @RequestBody RecommendationParams rp
     ) {
-        var strategy = ss.selectStrategy(u, prefs);
+        var strategy = ss.selectStrategy(u, rp.prefs);
 
-        return strategy.selectTrucks().subList(0, prefs.getNumRequested());
+        return strategy.selectTrucks(rp.now).subList(0, rp.prefs.getNumRequested());
     }
 
     @GetMapping(path = "/truck/{id}")
@@ -227,9 +239,9 @@ public class TruckEndpoint {
         Long routeLocationId;
         long routeId;
         @NonNull
-        Instant arrivalTime;
+        LocalDateTime arrivalTime;
         @NonNull
-        Instant exitTime;
+        LocalDateTime exitTime;
         double lng;
         double lat;
     }
@@ -243,8 +255,8 @@ public class TruckEndpoint {
             if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
-            LocalTime arrival = LocalTime.from(d.arrivalTime.atOffset(ZoneOffset.UTC));
-            LocalTime exit = LocalTime.from(d.exitTime.atOffset(ZoneOffset.UTC));
+            LocalTime arrival = d.arrivalTime.toLocalTime();
+            LocalTime exit = d.exitTime.toLocalTime();
             if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
                 good = false;
         }
@@ -268,8 +280,8 @@ public class TruckEndpoint {
     }
 
     @GetMapping("/truck/{truckId}/active-route")
-    public Route getTodaysRoute(@PathVariable long truckId) {
-        return truckService.getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+    public Route getTodaysRoute(@PathVariable long truckId, @RequestParam LocalDateTime now) {
+        return truckService.getActiveRoute(truckId, now.getDayOfWeek());
     }
 
     @Secured({"ROLE_USER"})

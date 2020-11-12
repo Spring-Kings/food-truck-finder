@@ -43,11 +43,15 @@ export const backendToFrontend = (pt: any, stopId: number) => {
   }
 }
 
-export const frontendToBackend = (pt: RouteLocation, routeId: number) => ({
-  routeId: routeId,
-  routeLocationId: pt.routeLocationId > 0 ? pt.routeLocationId : null,
-  arrivalTime: pt.arrivalTime,
-  exitTime: pt.exitTime,
-  lat: pt.coords.lat,
-  lng: pt.coords.lng,
-});
+export const frontendToBackend = (pt: RouteLocation, routeId: number) => {
+  let result: any = {
+    routeId: routeId,
+    routeLocationId: pt.routeLocationId > 0 ? pt.routeLocationId : null,
+    arrivalTime: pt.arrivalTime,
+    exitTime: pt.exitTime,
+    lat: pt.coords.lat,
+    lng: pt.coords.lng,
+  };
+  console.log(result)
+  return result;
+}

@@ -5,6 +5,7 @@ import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
 import food.truck.api.user.UserPreferences;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,12 +35,12 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
     }
 
     @Override
-    public List<Truck> selectTrucks() {
-        var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
+    public List<Truck> selectTrucks(LocalDateTime now) {
+        var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius(), now);
         var scores = new HashMap<Truck, Double>();
         for (var truck : trucks) {
             // I think this .get() is okay because .getTrucksCloseToLocation already filtered it to trucks with a valid current location
-            var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId()).get().getPosition();
+            var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId(), now).get().getPosition();
             double distRatio = user.getPosition().distanceInMiles(truckLocation) / prefs.getAcceptableRadius();
             double distScore = ScoreWeights.DistWeight.val * (1 - distRatio);
 

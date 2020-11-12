@@ -127,12 +127,15 @@ class RecommendedTrucksForm extends Component<
       .request({
         url: "/truck/recommended",
         data: {
-          acceptableRadius: this.state.acceptibleRadius,
-          priceRating: this.state.priceRating,
-          foodCategory: this.state.foodCategory,
-          menuItems: this.state.menuItems,
-          location: this.state.location,
-          numRequested: 10
+          prefs: {
+            acceptableRadius: this.state.acceptibleRadius,
+            priceRating: this.state.priceRating,
+            foodCategory: this.state.foodCategory,
+            menuItems: this.state.menuItems,
+            location: this.state.location,
+            numRequested: 10
+          },
+          now: new Date().toISOString()
         },
         method: "POST",
       })
