@@ -16,7 +16,6 @@ public class StrategySelector {
         if (u instanceof User) {
             return new ScoringRecommendationStrategy(truckSvc, (User) u, prefs);
         }
-
-        throw new IllegalStateException("Not implemented"); // TODO
+        return new GuestRecommendationStrategy(truckSvc, u.getPosition());
     }
 }
