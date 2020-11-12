@@ -1,42 +1,36 @@
 import React from 'react'
 import Form from "../components/Form";
-import { AxiosResponse } from "axios";
-import {
-  FormControlLabel,
-  Grid,
-  Switch,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import {AxiosResponse} from "axios";
+import {Grid, Switch, TextField, Typography,} from "@material-ui/core";
 
 type State = {
   resultText: string;
-  isOwner: boolean;
+  owner: boolean;
 };
 
 class RegisterPageComponent extends React.Component<{}, State> {
   constructor(props: {}) {
     super(props);
-    this.state = { resultText: "", isOwner: false };
+    this.state = {resultText: "", owner: false};
     this.toggleOwner = this.toggleOwner.bind(this);
   }
 
   render() {
     return (
-      <Grid container direction="column" justify="center" xs={4}>
-        <h1>Register</h1>
-        <Form submitUrl={"/register"} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-          <TextField label="Username" name="username" variant="outlined" />
-          <TextField
-            label="Password"
-            name="password"
-            type="password"
-            variant="outlined"
-          />
-          <TextField label="Email" name="email" variant="outlined" />
+        <Grid container direction="column" justify="center">
+          <h1>Register</h1>
+          <Form submitUrl={"/register"} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
+            <TextField label="Username" name="username" variant="outlined"/>
+            <TextField
+                label="Password"
+                name="password"
+                type="password"
+                variant="outlined"
+            />
+            <TextField label="Email" name="email" variant="outlined"/>
           <br/>
-          <Typography>Owner Account?</Typography>
-          <Switch value={this.state.isOwner} onChange={this.toggleOwner} name="isOwner" />
+            <Typography>Owner Account?</Typography>
+            <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
         </Form>
 
         <p>{this.state.resultText}</p>
@@ -56,8 +50,8 @@ class RegisterPageComponent extends React.Component<{}, State> {
   }
 
   private toggleOwner() {
-    var isOwner: boolean = this.state.isOwner;
-    this.setState({ isOwner });
+    var isOwner: boolean = this.state.owner;
+    this.setState({owner: isOwner});
   }
 }
 

@@ -25,12 +25,11 @@ public class AuthenticationEndpoint {
         @JsonProperty("password")
         @NonNull String password;
 
-        @JsonProperty("isOwner")
-        Boolean isOwner;
+        boolean isOwner;
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegistrationData data) {
+    public String register(@RequestBody @NonNull RegistrationData data) {
         var u = userService.findUserByUsername(data.username);
         if (u.isPresent()) {
             return "Error: Username " + data.username + " already taken";

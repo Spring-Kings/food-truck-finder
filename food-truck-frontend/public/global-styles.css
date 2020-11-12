@@ -8,6 +8,10 @@ body {
     text-align: justify
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* Stuff from MaterialUI CssBaseline: */
 
 html {

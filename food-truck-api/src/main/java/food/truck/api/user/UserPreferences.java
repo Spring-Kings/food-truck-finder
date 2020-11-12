@@ -2,13 +2,13 @@ package food.truck.api.user;
 
 import lombok.Value;
 
-import java.util.List;
+import java.util.Set;
 
 @Value
 public class UserPreferences {
     double acceptableRadius;
     double priceRating;
     int numRequested;
-    String foodCategory; // TODO: Consider string or enum
-    List<String> menuItems;
+    Set<String> menuItems;
+    Set<String> tags;
 }

@@ -11,7 +11,7 @@ import java.util.List;
 enum ScoreWeights {
     DistWeight(1.0),
     PriceWeight(1.0),
-    CategoryWeight(1.0),
+    TagWeight(1.0),
     MenuWeight(1.0),
     RatingWeight(1.0);
 
@@ -49,21 +49,25 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             else
                 priceScore = 0;
 
-            double categoryScore = truck.getFoodCategory().equals(prefs.getFoodCategory())
-                    ? ScoreWeights.CategoryWeight.val : 0;
+            double tagScore = 0;
+            for (String tag : prefs.getTags()) {
+                if (truck.hasTag(tag))
+                    tagScore += ScoreWeights.TagWeight.val;
+            }
 
             double menuScore = 0;
+            /*
             for (String item : prefs.getMenuItems()) {
                 // For now, very simple and error-prone implementation for whether truck has item
                 if (truck.getTextMenu().toLowerCase().contains(item.toLowerCase()))
                     menuScore += ScoreWeights.MenuWeight.val;
-            }
+            }*/
 
             // We don't have ratings yet
             double ratingScore = 0.0;
             //double ratingScore = ScoreWeights.RatingWeight.val * (truck.getAverageRating() - 3);
 
-            scores.put(truck, distScore + priceScore + categoryScore + menuScore + ratingScore);
+            scores.put(truck, distScore + priceScore + tagScore + menuScore + ratingScore);
         }
 
         trucks.sort((a, b) -> Double.compare(scores.get(b), scores.get(a)));

@@ -29,8 +29,8 @@ public class User extends AbstractUser implements UserDetails {
     @Column(name = "hashed_password", nullable = false)
     String password;
 
-    @Column(name = "is_owner", nullable = true)
-    Boolean isOwner;
+    @Column(name = "is_owner", nullable = false)
+    boolean isOwner;
 
     private static List<GrantedAuthority> ownerPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_OWNER"));
     private static List<GrantedAuthority> userPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"));

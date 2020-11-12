@@ -12,4 +12,6 @@ public class SecurityConstants {
     public static final SecretKey SECRET_KEY = Keys.secretKeyFor(SIGNATURE_ALGORITHM);
     public static final String HEADER_NAME = "Authorization";
     public static final Duration EXPIRATION_DURATION = Duration.ofHours(1);
+
+    public static final int MAX_UPLOAD_SIZE = 10 * 1024 * 1024; // 10 MB
 }
