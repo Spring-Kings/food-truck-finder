@@ -101,7 +101,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateTruck() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3L, null, null, null, null)))
+                        3.0, null, null, null, null)))
                 .contentType("application/json")
                 .with(user(data.ownerA));
         String resp = mockMvc.perform(req)
@@ -124,7 +124,7 @@ public class TruckEndpointTest extends EndpointTest {
     public void updateOtherOwnersTruckFail() throws Exception {
         var req = put("/truck/update")
                 .content(asJson(new TruckEndpoint.UpdateTruckParams(data.testTruckA.getId(), "truck1337", "a cool truck",
-                        3L, null, null, null, null)))
+                        3.0, null, null, null, null)))
                 .contentType("application/json")
                 .with(user(data.ownerB));
         mockMvc.perform(req)
