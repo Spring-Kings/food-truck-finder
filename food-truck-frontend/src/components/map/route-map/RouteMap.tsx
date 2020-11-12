@@ -89,7 +89,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
           delete={this.delete}
         />
         <TruckRouteMapComponent
-          routePts={this.state.routePts}
+          locations={this.state.routePts}
+          isRoute={true}
           onDrag={this.editPointLoc}
           onMarkerClick={this.initiateEditPointTimes}
           onMapClick={(e: any) => this.addPoint(e)}

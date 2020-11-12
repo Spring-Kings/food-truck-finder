@@ -30,7 +30,7 @@ export const sendNotification = async (
 ) => {
   let config = {
     truckId: truckId,
-    message: message
+    message: message,
   };
   await api.post(`/truck/notification`, config)
     .catch(onFail);

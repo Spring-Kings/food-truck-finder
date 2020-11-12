@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,7 +93,7 @@ public class TruckService {
     }
 
     public Route getActiveRoute(long truckId) {
-        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+        return getActiveRoute(truckId, OffsetDateTime.now(ZoneOffset.UTC).getDayOfWeek());
     }
 
     public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {
