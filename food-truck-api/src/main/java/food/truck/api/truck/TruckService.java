@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -98,7 +100,7 @@ public class TruckService {
     }
 
     public Route getActiveRoute(long truckId) {
-        return getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+        return getActiveRoute(truckId, OffsetDateTime.now(ZoneOffset.UTC).getDayOfWeek());
     }
 
     public Optional<RouteLocation> getCurrentRouteLocation(long truckId) {

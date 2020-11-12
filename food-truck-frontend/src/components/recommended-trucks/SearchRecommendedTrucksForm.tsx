@@ -1,18 +1,17 @@
-import { LatLng } from "@google/maps";
-import { Button, Slider, TextField, Typography } from "@material-ui/core";
-import React, { ChangeEvent, Component } from "react";
-import { DEFAULT_ERR_KICK, DEFAULT_ERR_RESP } from "../../api/DefaultResponses";
+import {LatLng} from "@google/maps";
+import {Button, Slider, TextField, Typography} from "@material-ui/core";
+import React, {ChangeEvent, Component} from "react";
+import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
-import Form from "../Form";
-import { MoneyRating } from "../truck/rate_and_review/ratings";
 import MultiField from "../util/multi_field";
+import {MoneyRating} from "../truck/rate_and_review/ratings";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
-  location: LatLng;
-  acceptibleRadius: number;
-  priceRating: number;
-  foodCategory: string;
+    location: LatLng;
+    acceptibleRadius: number;
+    priceRating: number;
+    foodCategory: string;
   menuItems: string[];
 };
 
@@ -127,13 +126,13 @@ class RecommendedTrucksForm extends Component<
       .request({
         url: "/truck/recommended",
         data: {
-          acceptableRadius: this.state.acceptibleRadius,
-          priceRating: this.state.priceRating,
-          foodCategory: this.state.foodCategory,
-          menuItems: this.state.menuItems,
-          location: this.state.location,
-          numRequested: 10
-        },
+            acceptableRadius: this.state.acceptibleRadius,
+            priceRating: this.state.priceRating,
+            foodCategory: this.state.foodCategory,
+            menuItems: this.state.menuItems,
+            location: this.state.location,
+            numRequested: 10
+          },
         method: "POST",
       })
       .then((resp: any) => console.log(`SUCCESS:\n${resp.data.map((truck: any) => JSON.stringify(truck))}`))

@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -84,13 +85,13 @@ public class RouteEndpoint {
         Instant arrivalTime;
         Instant exitTime;
     }
-
     @PostMapping("/route/create-location")
     @Secured("ROLE_OWNER")
     public RouteLocation createRouteLocation(@AuthenticationPrincipal User u, @RequestBody PostLocationParams l) {
         if (!routeService.userOwnsRoute(u, l.routeId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-        return routeService.createLocation(l.routeId, l.lat, l.lng, l.arrivalTime, l.exitTime);
+        var arrival = l.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
+        var exit = l.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();
+        return routeService.createLocation(l.routeId, l.lat, l.lng, arrival, exit);
     }
 }

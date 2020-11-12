@@ -29,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,16 +59,26 @@ public class TruckEndpoint {
     @Autowired
     private TruckSearchService truckSearchService;
 
-    @GetMapping("/truck/nearby")
+    @PostMapping("/truck/nearby")
     public List<Truck> getNearbyTrucks(@AuthenticationPrincipal AbstractUser u) {
         // TODO: Should radius be configurable?
         return truckService.getTrucksCloseToLocation(u.getPosition(), 10.0);
     }
 
+    @PostMapping("/truck/locations")
+    public List<RouteLocation> getTruckLocations(@AuthenticationPrincipal AbstractUser u, @RequestBody @NonNull List<Long> truckIds) {
+        List<RouteLocation> trucks = new ArrayList<>();
+        for (Long id : truckIds) {
+            if (id != null)
+                truckService.getCurrentRouteLocation(id).ifPresent(trucks::add);
+        }
+        return trucks;
+    }
+
     @PostMapping(path = "/truck/recommended")
     public List<Truck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
-            @RequestBody UserPreferences prefs
+            @RequestBody @NonNull UserPreferences prefs
     ) {
         var strategy = ss.selectStrategy(u, prefs);
 
@@ -247,10 +259,14 @@ public class TruckEndpoint {
     @Secured("ROLE_OWNER")
     public boolean updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
         boolean good = true;
+
         for (var d : data) {
             if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, d.arrivalTime, d.exitTime))
+
+            LocalTime arrival = d.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
+            LocalTime exit = d.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
                 good = false;
         }
         return good;
@@ -274,7 +290,7 @@ public class TruckEndpoint {
 
     @GetMapping("/truck/{truckId}/active-route")
     public Route getTodaysRoute(@PathVariable long truckId) {
-        return truckService.getActiveRoute(truckId, LocalDateTime.now().getDayOfWeek());
+        return truckService.getActiveRoute(truckId);
     }
 
     @Secured({"ROLE_USER"})

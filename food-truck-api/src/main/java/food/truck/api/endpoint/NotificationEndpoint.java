@@ -1,6 +1,5 @@
 package food.truck.api.endpoint;
 
-import food.truck.api.notification.NearbyNotification;
 import food.truck.api.notification.NotificationService;
 import food.truck.api.notification.NotificationView;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
@@ -36,7 +35,6 @@ public class NotificationEndpoint {
         long truckId;
         @NonNull
         String message;
-        // TODO: different types of notifications
     }
 
     @Secured({"ROLE_OWNER"})
