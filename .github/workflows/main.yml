@@ -75,8 +75,10 @@ jobs:
         run: |
           cd ./food-truck-api
           docker build -t "spring-kings:web" -f Dockerfile.web -m 512M .
+          docker push registry.heroku.com/sprig-kings/web
           heroku container:release -a spring-kings web
           heroku ps:scale -a spring-kings web=1
           cd ../food-truck-frontend
           docker build -t "spring-kings-frontend:web" -f Dockerfile.web -m 512M .
+          docker push registry.heroku.com/sprig-kings-frontend/web
           heroku container:release -a spring-kings-frontend web
