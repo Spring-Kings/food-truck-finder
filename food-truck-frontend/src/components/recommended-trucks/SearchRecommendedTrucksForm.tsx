@@ -137,7 +137,7 @@ class RecommendedTrucksForm extends Component<
         method: "POST",
       });
       if (resp.data !== undefined) {
-        this.setState({ selectedTrucks: await getNearbyTruckLocationsById(resp.data.map(t => t.id), DEFAULT_ERR_RESP) })
+        this.setState({ selectedTrucks: await getNearbyTruckLocationsById(resp.data.map((t: any) => t.id), DEFAULT_ERR_RESP) })
       }
 
     } catch (err) {

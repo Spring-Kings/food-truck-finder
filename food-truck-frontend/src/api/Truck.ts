@@ -11,7 +11,7 @@ export const getNearbyTruckLocations = async (onFail: (err: any) => void) => {
         method: "POST",
       })
     ).data.map((truck: any) => truck.id);
-    result = getNearbyTruckLocationsById(trucks, onFail);
+    result = await getNearbyTruckLocationsById(trucks, onFail);
   } catch (err) {
     result = [];
     onFail(err);
