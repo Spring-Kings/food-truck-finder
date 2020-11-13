@@ -2,7 +2,7 @@ import React from "react";
 
 import {
   MuiPickersUtilsProvider,
-  KeyboardTimePicker,
+  TimePicker,
 } from "@material-ui/pickers";
 import {
   Dialog,
@@ -107,7 +107,7 @@ class EditRouteStopDialogComponent extends React.Component<
 
   private getPicker(propName: string) {
     return (
-      <KeyboardTimePicker
+      <TimePicker
         label={propName.toLocaleUpperCase()}
         value={this.state[propName]}
         onChange={(date) => {
