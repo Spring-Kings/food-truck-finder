@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=build /build/build/libs/build*.jar app.jar
 
 # Running the app exec $JAVA_OPTS
-ENTRYPOINT java\ -jar\ -XX:+UseContainerSupport\ -XX:+PrintGCDetails\ -XX:+PrintHeapAtGC\ -XX:+PrintGCDateStamps\ app.jar
+ENTRYPOINT java\ -jar\ $JAVA_OPTS\ app.jar
