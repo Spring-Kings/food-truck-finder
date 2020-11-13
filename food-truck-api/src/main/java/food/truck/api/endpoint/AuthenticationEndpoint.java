@@ -25,6 +25,7 @@ public class AuthenticationEndpoint {
         @JsonProperty("password")
         @NonNull String password;
 
+        @JsonProperty("owner")
         boolean isOwner;
     }
 
