@@ -15,9 +15,10 @@ function HomePage() {
             
             <br/>
 
-            <Typography variant="h5">Anyone Zone</Typography>
+            <Typography variant="h5">Guest Zone</Typography>
             <Link href="/recommended-trucks" passHref><a>Truck Recommendation Search</a></Link><br/>
             <Link href="/search/truck" passHref><a>Truck Search</a></Link><br/>
+            <Link href="/interactive-map" passHref><a>Trucks Nearby</a></Link><br/>
             
             <br />
 
