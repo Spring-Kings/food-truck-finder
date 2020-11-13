@@ -12,4 +12,4 @@ WORKDIR /app
 COPY --from=build /build/build/libs/build*.jar app.jar
 
 # Running the app exec $JAVA_OPTS
-ENTRYPOINT java\ -jar\ -Xmx512M\ app.jar
+ENTRYPOINT java\ -jar\ -Xmx512M\ -XX:+UseContainerSupport\ app.jar
