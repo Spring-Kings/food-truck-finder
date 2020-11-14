@@ -3,25 +3,27 @@ import SiteFooter from '../SiteFooter'
 
 import Head from 'next/head'
 import React, {ReactNode} from 'react'
-import {Box, Container, Grid, Paper} from '@material-ui/core'
+import {Box, Container, createStyles, Grid, Paper, Theme} from '@material-ui/core'
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
-import withStyles from "@material-ui/core/styles/withStyles";
+import {makeStyles} from "@material-ui/core/styles";
 
 export const siteTitle = 'Stacked Trucks'
 
 type Args = {
-    children: ReactNode
+  children: ReactNode
 }
 
-const layoutStyles = {
-  root: {
-
-  }
-}
+const useLayoutStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    paper: {
+      minHeight: '100vh',
+      flexGrow: 1,
+    },
+  }),
+);
 
 function coolLayout(args: Args) {
-  // <div className={styles.outside}>
-  // <Container maxWidth="md" className={styles.content}>
+  const classes = useLayoutStyles();
   return (
     <>
       <NotificationWatcherComponent/>
@@ -37,9 +39,11 @@ function coolLayout(args: Args) {
         </Grid>
         <Grid item>
           <Container maxWidth="xl">
-            <Paper>
+            <Paper className={classes.paper}>
               <Box p={4}>
-                <main>{args.children}</main>
+                <Container>
+                  <main>{args.children}</main>
+                </Container>
               </Box>
             </Paper>
           </Container>
@@ -54,4 +58,4 @@ function coolLayout(args: Args) {
   );
 }
 
-export default withStyles(layoutStyles)(coolLayout);
+export default coolLayout;
