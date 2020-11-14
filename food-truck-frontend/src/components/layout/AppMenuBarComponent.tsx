@@ -53,10 +53,41 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     loadUser();
   });
 
+  let dashboardUrl = props.data.ownedTrucks !== undefined ? 'owner' : 'user';
+
   return (
     <AppBar className={classes.root}>
       <Toolbar>
         <Grid container direction="row" alignItems="center" justify="center" alignContent="space-between" spacing={2}>
+          <Grid item>
+            <Avatar src="/logo.png" alt="logo" variant="rounded"/>
+          </Grid>
+          <Grid item>
+            <Typography variant="h6">Stacked Trucks</Typography>
+          </Grid>
+          <Grid item>
+            <MenuBarLink url="/" text="Home"/>
+          </Grid>
+          <Grid item>
+            <MenuBarLink url={`/dashboard/${dashboardUrl}`} text="Dashboard"/>
+          </Grid>
+          <Grid item>
+            <MenuBarLink url="/search/truck" text="Search Trucks"/>
+          </Grid>
+          <Grid item>
+            <MenuBarLink url="/interactive-map" text="Nearby Trucks"/>
+          </Grid>
+          <Grid item>
+            <MenuBarLink url="/recommended-trucks" text="Recommended Trucks"/>
+          </Grid>
+          {props.data.username === "" &&
+            <Grid item>
+              <MenuBarLink url="/login" text="Login"/>
+            </Grid>
+          }
+          <Grid item>
+            <NotificationWatcherComponent/>
+          </Grid>
           <Grid item>
             <IconButton edge="end"
                         color="inherit"
@@ -79,38 +110,6 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
               }
             </Menu>
           </Grid>
-          <Grid item>
-            <NotificationWatcherComponent/>
-          </Grid>
-          <Grid item>
-            <Avatar src="/logo.png" alt="logo" variant="rounded"/>
-          </Grid>
-          <Grid item>
-            <Typography variant="h6">Stacked Trucks</Typography>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/" text="Home"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/dashboard/user" text="User Dashboard"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/dashboard/owner" text="Owner Dashboard"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/search/truck" text="Search Trucks"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/interactive-map" text="Nearby Trucks"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/recommended-trucks" text="Recommended Trucks"/>
-          </Grid>
-          {props.data.username === "" &&
-            <Grid item>
-              <MenuBarLink url="/login" text="Login"/>
-            </Grid>
-          }
         </Grid>
       </Toolbar>
     </AppBar>
