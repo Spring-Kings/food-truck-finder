@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import {createMuiTheme, jssPreset, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, jssPreset, StylesProvider, ThemeOptions, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
-import CoolLayout from "../components/layout/CoolLayout"
+import CoolLayout, {Args} from "../layout/CoolLayout"
 import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import grey from "@material-ui/core/colors/grey";
@@ -126,8 +126,10 @@ let themeOptions = {
   }
 };
 
-export const FoodTruckThemeProvider = (args) => {
+export const FoodTruckThemeProvider = (args: Args) => {
   const [isDark, setIsDark] = useState(true);
+
+  // @ts-ignore
   let theme = responsiveFontSizes(createMuiTheme({
     ...themeOptions,
     palette: {
@@ -136,6 +138,7 @@ export const FoodTruckThemeProvider = (args) => {
       type: isDark ? 'dark' : 'light'
     }
   }));
+
   const switchTheme = () => setIsDark(!isDark);
 
   return (

@@ -8,7 +8,7 @@ import {makeStyles} from "@material-ui/core/styles";
 
 export const siteTitle = 'Stacked Trucks'
 
-type Args = {
+export type Args = {
   children: ReactNode
 }
 
