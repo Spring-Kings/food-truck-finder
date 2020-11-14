@@ -1,4 +1,4 @@
-import CoolLayout from '../components/CoolLayout'
+import CoolLayout from '../components/layout/CoolLayout'
 import React from 'react'
 
 import ManageTrucksComponent from "../components/manage-trucks/ManageTrucksComponent"

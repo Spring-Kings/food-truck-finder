@@ -1,7 +1,6 @@
 import React from "react";
 import { useRouter } from "next/router";
 
-import CoolLayout from "../CoolLayout";
 import NotFound from "../NotFound";
 
 function RouterSelectableComponent<T>(

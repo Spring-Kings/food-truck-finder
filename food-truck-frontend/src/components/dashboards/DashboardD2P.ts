@@ -59,6 +59,13 @@ async function updateUser(
     );
 }
 
+export function logout(dispatch: Dispatch<UserAction>) {
+  localStorage.removeItem("authToken");
+  dispatch({
+    type: UserActionTypes.LOGOUT_USER_ACTION,
+  });
+}
+
 // Create a constant set of methods to dispatch on
 const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
   return {
@@ -77,6 +84,9 @@ const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
           throw "No user logged in!";
         }
       });
+    },
+    logoutUser: () => {
+      logout(dispatch);
     },
     dispatch,
   };
