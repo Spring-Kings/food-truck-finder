@@ -59,11 +59,18 @@ async function updateUser(
     );
 }
 
-export function logout(dispatch: Dispatch<UserAction>) {
-  localStorage.removeItem("authToken");
+function logout(dispatch: Dispatch<UserAction>) {
+  console.log('dispatching logout');
   dispatch({
     type: UserActionTypes.LOGOUT_USER_ACTION,
+    payload: {
+      username: "",
+      pfp: undefined,
+      subscribedTrucks: undefined,
+      ownedTrucks: undefined
+    }
   });
+  localStorage.removeItem("authToken");
 }
 
 // Create a constant set of methods to dispatch on
@@ -86,7 +93,10 @@ const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
       });
     },
     logoutUser: () => {
-      logout(dispatch);
+      return new Promise<void>(() => {
+        console.log('logging out');
+        logout(dispatch);
+      });
     },
     dispatch,
   };

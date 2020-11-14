@@ -42,12 +42,12 @@ const muiButton = {
   },
   color: 'primary',
   variant: 'contained',
-  outlinedPrimary: {
-    border: '2px solid'
-  },
-  outlinedSecondary: {
-    border: '2px solid'
-  },
+  // outlinedPrimary: {
+  //   border: '2px solid'
+  // },
+  // outlinedSecondary: {
+  //   border: '2px solid'
+  // },
 };
 
 const shape = {

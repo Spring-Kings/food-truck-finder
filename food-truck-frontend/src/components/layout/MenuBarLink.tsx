@@ -3,7 +3,7 @@ import {MenuItem} from "@material-ui/core";
 import Router from "next/router";
 
 interface ButtonLinkProps {
-  href: string;
+  url: string;
   text: string;
   action?: () => void;
 }
@@ -14,7 +14,7 @@ function MenuBarLink(props: ButtonLinkProps) {
       if (props.action) {
         props.action();
       }
-      Router.replace(props.href)
+      Router.replace(props.url);
     }}>
       {props.text}
     </MenuItem>

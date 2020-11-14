@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
   AppBar, Avatar,
   createStyles,
@@ -15,7 +15,8 @@ import {UserData} from "../../redux/user/UserReducer";
 
 export type AppMenuBarProps = {
   data: UserData,
-  logoutUser: () => void;
+  logoutUser: () => Promise<void>;
+  loadUserFromBackend: () => Promise<void>;
 };
 
 const useAppBarStyles = makeStyles((theme: Theme) =>
@@ -32,6 +33,22 @@ const useAppBarStyles = makeStyles((theme: Theme) =>
 export function AppMenuBarComponent(props: AppMenuBarProps) {
   const classes = useAppBarStyles();
   const [menuOpen, setMenuOpen]: [boolean, any] = useState(false);
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  }
+
+  const loadUser = () => {
+    if (localStorage.getItem("authToken") !== undefined && props.data.username === "") {
+      props.loadUserFromBackend().then(
+        (_response: any) => console.log('Loaded user'),
+        (err: any) => console.log(err)
+      );
+    }
+  }
+  useEffect(() => {
+    loadUser();
+  });
+
   return (
     <AppBar className={classes.root}>
       <Toolbar>
@@ -40,12 +57,15 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
                     className={classes.menuButton}
                     aria-controls="simple-menu"
                     aria-haspopup="true"
-                    onClick={() => setMenuOpen(!menuOpen)}>
+                    onClick={toggleMenu}>
           <MenuIcon/>
-          <Menu open={menuOpen} keepMounted>
-            <MenuBarLink href="/account" text="Account"/>
+          <Menu open={menuOpen} keepMounted={false}>
+            <MenuBarLink url="/account" text="Account" action={toggleMenu}/>
             {props.data.username !== "" &&
-              <MenuBarLink href="/logout" text="Logout" action={() => props.logoutUser()}/>
+              <MenuBarLink url="/" text="Logout" action={() => {
+                toggleMenu();
+                props.logoutUser().catch(err => console.log(err));
+              }}/>
             }
           </Menu>
         </IconButton>
@@ -57,26 +77,26 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
             <Typography variant="h6">Stacked Trucks</Typography>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/" text="Home"/>
+            <MenuBarLink url="/" text="Home"/>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/dashboard/user" text="User Dashboard"/>
+            <MenuBarLink url="/dashboard/user" text="User Dashboard"/>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/dashboard/user" text="Owner Dashboard"/>
+            <MenuBarLink url="/dashboard/owner" text="Owner Dashboard"/>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/truck/search" text="Search Trucks"/>
+            <MenuBarLink url="/truck/search" text="Search Trucks"/>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/interactive-map" text="Nearby Trucks"/>
+            <MenuBarLink url="/interactive-map" text="Nearby Trucks"/>
           </Grid>
           <Grid item>
-            <MenuBarLink href="/recommended-trucks" text="Recommended Trucks"/>
+            <MenuBarLink url="/recommended-trucks" text="Recommended Trucks"/>
           </Grid>
           {props.data.username === "" &&
             <Grid item>
-              <MenuBarLink href="/login" text="Login"/>
+              <MenuBarLink url="/login" text="Login"/>
             </Grid>
           }
         </Grid>
