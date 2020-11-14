@@ -2,7 +2,6 @@ import React from 'react';
 import {Button, Divider, FormGroup, Grid, List, ListItem, TextField} from "@material-ui/core";
 import api from "../../util/api";
 import SearchTruckRow from "../../components/search/SearchRow";
-import jssPluginPropsSort from "jss-plugin-props-sort";
 
 const truck = [{
     id: -1,

@@ -3,7 +3,7 @@ import SiteFooter from '../SiteFooter'
 
 import Head from 'next/head'
 import React, {ReactNode} from 'react'
-import {Container} from '@material-ui/core'
+import {Box, Container, Grid, Paper} from '@material-ui/core'
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 import withStyles from "@material-ui/core/styles/withStyles";
 
@@ -29,13 +29,27 @@ function coolLayout(args: Args) {
         <link rel="icon" href="/favicon.ico"/>
         <meta name="description" content="Oi mate description goes here"/>
       </Head>
-      <>
-        <AppMenuBarComponent/>
-        <Container maxWidth="xl">
-          <main>{args.children}</main>
-        </Container>
-        <SiteFooter/>
-      </>
+      <Grid direction="row">
+        <Grid item>
+          <Box mb={4}>
+            <AppMenuBarComponent/>
+          </Box>
+        </Grid>
+        <Grid item>
+          <Container maxWidth="xl">
+            <Paper>
+              <Box p={4}>
+                <main>{args.children}</main>
+              </Box>
+            </Paper>
+          </Container>
+        </Grid>
+        <Grid item>
+          <Box p={2}>
+            <SiteFooter/>
+          </Box>
+        </Grid>
+      </Grid>
     </>
   );
 }

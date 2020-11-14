@@ -86,7 +86,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
             <MenuBarLink url="/dashboard/owner" text="Owner Dashboard"/>
           </Grid>
           <Grid item>
-            <MenuBarLink url="/truck/search" text="Search Trucks"/>
+            <MenuBarLink url="/search/truck" text="Search Trucks"/>
           </Grid>
           <Grid item>
             <MenuBarLink url="/interactive-map" text="Nearby Trucks"/>
