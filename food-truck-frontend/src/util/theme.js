@@ -1,17 +1,15 @@
 import React, {useState} from 'react';
-import {createMuiTheme, ThemeProvider, StylesProvider, jssPreset, withStyles} from '@material-ui/core/styles';
+import {createMuiTheme, jssPreset, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
 import CoolLayout from "../components/layout/CoolLayout"
 import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import grey from "@material-ui/core/colors/grey";
-import lightBlue from "@material-ui/core/colors/lightBlue";
 import red from "@material-ui/core/colors/red";
 // import darkBaseTheme from '@material-ui/styles/baseThemes/darkBaseTheme';
-import darkBaseTheme from "material-ui/styles/baseThemes/darkBaseTheme";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import { Switch } from '@material-ui/core';
+import {Switch} from '@material-ui/core';
 
 const jss = create({plugins: [...jssPreset().plugins, rtl()]});
 
@@ -59,13 +57,21 @@ const dense = {
   padding: 'dense'
 }
 
+const lightBackground = {
+  paper: grey[200],
+  'default': blueGrey[200],
+}
+
+const darkBackground = {
+  paper: '#181d1f',
+  'default': '#1e272b',
+}
+
 const palette = {
   type: 'dark',
-  // background: {
-  //   paper: grey[800],
-  //   'default': grey[900], // blueGrey[900]
-  // },
-  primary: {
+  background: darkBackground,
+  /*
+    primary: {
     light: lightBlue[400],
     main: lightBlue[500],
     dark: lightBlue[600],
@@ -75,6 +81,19 @@ const palette = {
     light: blueGrey[900],
     main: blueGrey[800],
     dark: blueGrey[700],
+    contrastText: grey[50],
+  },
+   */
+  primary: {
+    light: blueGrey[800],
+    main: blueGrey[900],
+    dark: blueGrey[700],
+    contrastText: grey[50],
+  },
+  secondary: {
+    light: red[300],
+    main: red[500],
+    dark: red[400],
     contrastText: grey[50],
   },
 };
@@ -91,7 +110,10 @@ let themeOptions = {
     MuiFormHelperText: dense,
     MuiIconButton: dense,
     MuiInputBase: dense,
-    MuiInputLabel: dense
+    MuiInputLabel: dense,
+    MuiTextField: {
+      variant: 'filled'
+    }
   },
   overrides: {
     MuiCssBaseline: {
@@ -104,19 +126,26 @@ let themeOptions = {
   }
 };
 
-export const FoodTruckThemeProvider = ({children}) => {
+export const FoodTruckThemeProvider = (args) => {
   const [isDark, setIsDark] = useState(true);
-  const paletteType = isDark ? 'dark' : 'light';
-  let options = themeOptions;
-  options.palette.type = paletteType;
-  let theme = responsiveFontSizes(createMuiTheme(options));
+  let theme = responsiveFontSizes(createMuiTheme({
+    ...themeOptions,
+    palette: {
+      ...themeOptions.palette,
+      background: isDark ? darkBackground : lightBackground,
+      type: isDark ? 'dark' : 'light'
+    }
+  }));
+  const switchTheme = () => setIsDark(!isDark);
+
   return (
     <StylesProvider jss={jss}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <CoolLayout>
-          {children}
+          {args.children}
         </CoolLayout>
+        <Switch value={isDark} defaultChecked={isDark} onChange={switchTheme} name="Dark Mode"/>
       </ThemeProvider>
     </StylesProvider>
   );

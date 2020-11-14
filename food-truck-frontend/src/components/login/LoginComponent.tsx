@@ -30,8 +30,8 @@ class LoginComponent extends React.Component<LoginProps, State> {
       <Grid container direction="column" justify="center" xs={4}>
         <Typography variant="h1">Login</Typography>
         <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-          <TextField label="Username" variant="outlined" name="username"/>
-          <TextField label="Password" variant="outlined" name="password" type="password"/>
+          <TextField label="Username" name="username"/>
+          <TextField label="Password" name="password" type="password"/>
         </Form>
 
         <p>{this.state.resultText}</p>

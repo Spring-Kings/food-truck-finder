@@ -4,7 +4,6 @@ import SiteFooter from '../SiteFooter'
 import Head from 'next/head'
 import React, {ReactNode} from 'react'
 import {Box, Container, createStyles, Grid, Paper, Theme} from '@material-ui/core'
-import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 import {makeStyles} from "@material-ui/core/styles";
 
 export const siteTitle = 'Stacked Trucks'
@@ -26,7 +25,6 @@ function coolLayout(args: Args) {
   const classes = useLayoutStyles();
   return (
     <>
-      <NotificationWatcherComponent/>
       <Head>
         <link rel="icon" href="/favicon.ico"/>
         <meta name="description" content="Oi mate description goes here"/>

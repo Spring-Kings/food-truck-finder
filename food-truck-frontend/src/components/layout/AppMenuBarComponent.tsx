@@ -12,6 +12,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import MenuIcon from '@material-ui/icons/Menu';
 import MenuBarLink from "./MenuBarLink";
 import {UserData} from "../../redux/user/UserReducer";
+import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -24,17 +25,20 @@ const useAppBarStyles = makeStyles((theme: Theme) =>
     root: {
       flexGrow: 1,
     },
-    menuButton: {
-      marginRight: theme.spacing(2)
-    },
+    // menuButton: {
+    //   marginRight: theme.spacing(2)
+    // },
   }),
 );
 
 export function AppMenuBarComponent(props: AppMenuBarProps) {
   const classes = useAppBarStyles();
-  const [menuOpen, setMenuOpen]: [boolean, any] = useState(false);
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const [anchorEl, setAnchorEl]: [HTMLElement | null, any] = useState(null);
+  const openMenu = (event: React.MouseEvent) => {
+    setAnchorEl(event.currentTarget);
+  }
+  const closeMenu = () => {
+    setAnchorEl(null);
   }
 
   const loadUser = () => {
@@ -52,24 +56,32 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
   return (
     <AppBar className={classes.root}>
       <Toolbar>
-        <IconButton edge="start"
-                    color="inherit"
-                    className={classes.menuButton}
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={toggleMenu}>
-          <MenuIcon/>
-          <Menu open={menuOpen} keepMounted={false}>
-            <MenuBarLink url="/account" text="Account" action={toggleMenu}/>
-            {props.data.username !== "" &&
+        <Grid container direction="row" alignItems="center" justify="center" alignContent="space-between" spacing={2}>
+          <Grid item>
+            <IconButton edge="end"
+                        color="inherit"
+                        aria-controls="bar-menu"
+                        aria-haspopup="true"
+                        onClick={openMenu}>
+              <MenuIcon/>
+            </IconButton>
+            <Menu id="bar-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={closeMenu}>
+              <MenuBarLink url="/account" text="Account" action={closeMenu}/>
+              {props.data.username !== "" &&
               <MenuBarLink url="/" text="Logout" action={() => {
-                toggleMenu();
+                closeMenu();
                 props.logoutUser().catch(err => console.log(err));
               }}/>
-            }
-          </Menu>
-        </IconButton>
-        <Grid container direction="row" alignItems="center" alignContent="space-between" spacing={2}>
+              }
+            </Menu>
+          </Grid>
+          <Grid item>
+            <NotificationWatcherComponent/>
+          </Grid>
           <Grid item>
             <Avatar src="/logo.png" alt="logo" variant="rounded"/>
           </Grid>

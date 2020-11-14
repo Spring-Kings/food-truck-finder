@@ -56,7 +56,7 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
                 <FormGroup row>
                     <Grid container spacing={2}>
                         <Grid item xs={8}>
-                            <TextField fullWidth label="Search" variant="outlined" onChange={(event) => {
+                            <TextField fullWidth label="Search" onChange={(event) => {
                                 this.setState({search: event.target.value.toLowerCase()})
                             }} onKeyDown={event => {
                                 if(event.key === 'Enter'){

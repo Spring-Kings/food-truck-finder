@@ -23,7 +23,7 @@ class CreateTruckForm extends Component<{}, State> {
         <Form submitUrl={'/truck/create'}
               onSuccessfulSubmit={this.onSubmit}
               onFailedSubmit={this.onFail}>
-          <TextField label="Truck Name" variant="outlined" name="truckName"/>
+          <TextField label="Truck Name" name="truckName"/>
         </Form>
         <br/>
         {this.state.result}

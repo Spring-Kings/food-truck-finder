@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Grid } from "@material-ui/core";
+import {Box, Grid, Typography} from "@material-ui/core";
 import NotificationComponent from "./NotificationComponent";
 import { Notification, getNotifications } from "../../api/Notification";
 import { NotificationData } from "../../redux/notifications/NotificationReducer";
@@ -38,11 +38,17 @@ function NotificationListComponent(props: NotificationListProps) {
 
   return (
     <Grid container direction="column" style={{ overflow: "auto" }}>
-      {
+      <Typography variant="h4">Notifications</Typography>
+      { notifications.length > 0 ?
         notifications?.map((notification: Notification) => <NotificationComponent
           notification={notification}
           deletedCallback={deleteNotification}
         />)
+        : (
+          <Box p={4}>
+            <Typography variant="h6">Oops! Looks like you don't have any notifications.</Typography>
+          </Box>
+        )
       }
     </Grid>
   );

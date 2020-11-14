@@ -20,14 +20,14 @@ class RegisterPageComponent extends React.Component<{}, State> {
         <Grid container direction="column" justify="center">
           <h1>Register</h1>
           <Form submitUrl={"/register"} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-            <TextField label="Username" name="username" variant="outlined"/>
+            <TextField label="Username" name="username"/>
             <TextField
                 label="Password"
                 name="password"
                 type="password"
                 variant="outlined"
             />
-            <TextField label="Email" name="email" variant="outlined"/>
+            <TextField label="Email" name="email"/>
           <br/>
             <Typography>Owner Account?</Typography>
             <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
