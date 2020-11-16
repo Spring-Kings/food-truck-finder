@@ -1,7 +1,8 @@
 import React from 'react'
 import Form from "../components/Form";
 import {AxiosResponse} from "axios";
-import {Grid, Switch, TextField, Typography,} from "@material-ui/core";
+import {Box, Grid, Switch, TextField, Typography,} from "@material-ui/core";
+import LinkButton from "../components/layout/LinkButton";
 
 type State = {
   resultText: string;
@@ -17,23 +18,41 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
   render() {
     return (
-        <Grid container direction="column" justify="center">
-          <h1>Register</h1>
+      <Grid container direction="column" justify="center">
+        <Grid item>
+          <Typography variant="h2">Register</Typography>
+        </Grid>
+        <Grid item>
           <Form submitUrl={"/register"} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
             <TextField label="Username" name="username"/>
             <TextField
-                label="Password"
-                name="password"
-                type="password"
-                variant="outlined"
+              label="Password"
+              name="password"
+              type="password"
             />
             <TextField label="Email" name="email"/>
-          <br/>
-            <Typography>Owner Account?</Typography>
-            <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
-        </Form>
-
-        <p>{this.state.resultText}</p>
+            <Box pb={1}>
+              <Grid container direction="row">
+                <Grid item>
+                  <Typography>Owner Account?</Typography>
+                </Grid>
+                <Grid item>
+                  <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
+                </Grid>
+              </Grid>
+            </Box>
+          </Form>
+          <Grid item>
+            <Box py={2}>
+              <LinkButton url="/login" text="Already have an account? Login here."/>
+            </Box>
+          </Grid>
+          <Grid item>
+            <Box py={2}>
+              <Typography variant="h6">{this.state.resultText}</Typography>
+            </Box>
+          </Grid>
+        </Grid>
       </Grid>
     );
   }

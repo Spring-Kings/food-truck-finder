@@ -1,6 +1,8 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import {
-  AppBar, Avatar,
+  AppBar,
+  Avatar,
+  Box,
   createStyles,
   Grid,
   Theme,
@@ -8,10 +10,11 @@ import {
   Typography
 } from '@material-ui/core'
 import {makeStyles} from "@material-ui/core/styles";
-import MenuBarLink from "./MenuBarLink";
+import LinkButton from "./LinkButton";
 import {UserData} from "../../redux/user/UserReducer";
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
-import MenuDropdownComponent from "./menu/MenuDropdown";
+import ThemeSwitchComponent from "./theme/ThemeSwitch";
+import MenuDropdownComponent from "./MenuDropdownComponent";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -19,14 +22,11 @@ export type AppMenuBarProps = {
   loadUserFromBackend: () => Promise<void>;
 };
 
-const useAppBarStyles = makeStyles((theme: Theme) =>
+const useAppBarStyles = makeStyles((_theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
     },
-    // menuButton: {
-    //   marginRight: theme.spacing(2)
-    // },
   }),
 );
 
@@ -45,44 +45,42 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     loadUser();
   });
 
-  let dashboardUrl = props.data.ownedTrucks !== undefined ? 'owner' : 'user';
+  const dashboardUrl = props.data.ownedTrucks !== undefined ? 'owner' : 'user';
+
+  const menuBarItems = [
+    <Avatar src="/logo.png" alt="logo" variant="rounded"/>,
+    <Typography variant="h6">Stacked Trucks</Typography>,
+    <LinkButton url="/" text="Home"/>,
+    <LinkButton url="/search/truck" text="Search Trucks"/>,
+    <LinkButton url="/interactive-map" text="Nearby Trucks"/>,
+    <LinkButton url="/recommended-trucks" text="Recommended Trucks"/>,
+  ];
+
+  const menuDropdown = (
+    <Box>
+      <NotificationWatcherComponent/>
+      <ThemeSwitchComponent/>
+      {props.data.username !== "" && <MenuDropdownComponent logoutUser={props.logoutUser}/>}
+    </Box>
+  );
 
   return (
     <AppBar className={classes.root}>
       <Toolbar>
-        <Grid container direction="row" alignItems="center" justify="center" alignContent="space-between" spacing={2}>
-          <Grid item>
-            <Avatar src="/logo.png" alt="logo" variant="rounded"/>
-          </Grid>
-          <Grid item>
-            <Typography variant="h6">Stacked Trucks</Typography>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/" text="Home"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url={`/dashboard/${dashboardUrl}`} text="Dashboard"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/search/truck" text="Search Trucks"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/interactive-map" text="Nearby Trucks"/>
-          </Grid>
-          <Grid item>
-            <MenuBarLink url="/recommended-trucks" text="Recommended Trucks"/>
-          </Grid>
-          {props.data.username === "" &&
+        <Grid container direction="row" alignContent="space-between">
+          {menuBarItems.map(item => (
             <Grid item>
-              <MenuBarLink url="/login" text="Login"/>
+              {item}
             </Grid>
-          }
+          ))}
           <Grid item>
-            <NotificationWatcherComponent/>
+            {props.data.username === "" ? (
+              <LinkButton url="/login" text="Login"/>
+            ) : (
+              <LinkButton url={`/dashboard/${dashboardUrl}`} text="Dashboard"/>
+            )}
           </Grid>
-          <Grid item>
-            <MenuDropdownComponent logoutUser={props.logoutUser} username={props.data.username}/>
-          </Grid>
+          {menuDropdown}
         </Grid>
       </Toolbar>
     </AppBar>

@@ -36,8 +36,7 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   });
   return (
     <>
-      <IconButton edge="start"
-                  color="inherit"
+      <IconButton color="inherit"
                   onClick={() => Router.replace('/notifications')}>
         { initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/> }
       </IconButton>

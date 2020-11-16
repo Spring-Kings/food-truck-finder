@@ -94,7 +94,6 @@ const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
     },
     logoutUser: () => {
       return new Promise<void>(() => {
-        console.log('logging out');
         logout(dispatch);
       });
     },

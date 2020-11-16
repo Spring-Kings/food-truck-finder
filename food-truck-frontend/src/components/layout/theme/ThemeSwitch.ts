@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 
-import MenuDropdownComponent from "./MenuDropdownComponent";
+import ThemeSwitchComponent from "./ThemeSwitchComponent";
 import mapDispatchToProps from "../../theme/ThemeD2P";
 
 export function mapStateToProps(state: any, myProps: any) {
@@ -12,4 +12,4 @@ export function mapStateToProps(state: any, myProps: any) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(MenuDropdownComponent);
+)(ThemeSwitchComponent);

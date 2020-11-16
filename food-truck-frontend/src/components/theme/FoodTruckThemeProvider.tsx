@@ -7,15 +7,13 @@ import responsiveFontSizes from "@material-ui/core/styles/responsiveFontSizes";
 import blueGrey from "@material-ui/core/colors/blueGrey";
 import grey from "@material-ui/core/colors/grey";
 import red from "@material-ui/core/colors/red";
-// import darkBaseTheme from '@material-ui/styles/baseThemes/darkBaseTheme';
 import CssBaseline from "@material-ui/core/CssBaseline";
-import {Switch} from '@material-ui/core';
 import {ThemeData} from "../../redux/theme/ThemeReducer";
 
 const jss = create({plugins: [...jssPreset().plugins, rtl()]});
 
 const fontThemeOptions = {
-  fontFamily: 'Noto Sans, sans-serif',
+  fontFamily: 'Roboto, Overpass, Noto Sans, sans-serif',
   fontStyle: 'normal',
   fontWeight: 600,
   fontSize: 14,
@@ -41,12 +39,6 @@ const muiButton = {
   },
   color: 'primary',
   variant: 'contained',
-  // outlinedPrimary: {
-  //   border: '2px solid'
-  // },
-  // outlinedSecondary: {
-  //   border: '2px solid'
-  // },
 };
 
 const shape = {
@@ -68,23 +60,16 @@ const darkBackground = {
   'default': '#1e272b',
 }
 
+const gridOptions = {
+  direction: 'column',
+  justify: 'center',
+  alignItems: 'center',
+  spacing: 2
+};
+
 const palette = {
   type: 'dark',
   background: darkBackground,
-  /*
-    primary: {
-    light: lightBlue[400],
-    main: lightBlue[500],
-    dark: lightBlue[600],
-    contrastText: grey[50],
-  },
-  secondary: {
-    light: blueGrey[900],
-    main: blueGrey[800],
-    dark: blueGrey[700],
-    contrastText: grey[50],
-  },
-   */
   primary: {
     light: blueGrey[800],
     main: blueGrey[900],
@@ -114,7 +99,8 @@ let themeOptions = {
     MuiInputLabel: dense,
     MuiTextField: {
       variant: 'filled'
-    }
+    },
+    MuiGrid: gridOptions
   },
   overrides: {
     MuiCssBaseline: {
@@ -134,6 +120,8 @@ export interface ThemeProps {
 }
 
 export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
+  let [themeLoaded, setThemeLoaded]: [boolean, any] = useState(false);
+
   // @ts-ignore
   let theme = responsiveFontSizes(createMuiTheme({
     ...themeOptions,
@@ -145,7 +133,11 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
   }));
 
   useEffect(() => {
-    props.loadTheme();
+    // Prevent infinitely loading the theme, causing the site to be unresponsive.
+    if (!themeLoaded) {
+      setThemeLoaded(true);
+      props.loadTheme();
+    }
   });
 
   return (

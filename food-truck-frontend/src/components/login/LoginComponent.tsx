@@ -3,6 +3,9 @@ import Form from "../Form";
 import {AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
 import {UserData} from "../../redux/user/UserReducer";
+import NextLink from 'next/link'
+import LinkButton from "../layout/LinkButton";
+import Router from "next/router";
 
 type State = {
   resultText: string;
@@ -27,14 +30,22 @@ class LoginComponent extends React.Component<LoginProps, State> {
 
   render() {
     return (
-      <Grid container direction="column" justify="center" xs={4}>
-        <Typography variant="h1">Login</Typography>
-        <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-          <TextField label="Username" name="username"/>
-          <TextField label="Password" name="password" type="password"/>
-        </Form>
-
-        <p>{this.state.resultText}</p>
+      <Grid container>
+        <Grid item>
+          <Typography variant="h2">Login</Typography>
+        </Grid>
+        <Grid item>
+          <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
+            <TextField label="Username" name="username"/>
+            <TextField label="Password" name="password" type="password"/>
+          </Form>
+        </Grid>
+        <Grid item>
+          <LinkButton url="/register" text="Create an account here."/>
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">{this.state.resultText}</Typography>
+        </Grid>
       </Grid>
     )
   }
@@ -47,6 +58,7 @@ class LoginComponent extends React.Component<LoginProps, State> {
       resultText: `Set token to ${token}`
     });
     this.state.loadUserFromBackend().catch(err => console.log(err));
+    Router.replace('/');
   }
   // TODO: change this once we find the type for the error response
   onFail = (formData: any, response: any) => {

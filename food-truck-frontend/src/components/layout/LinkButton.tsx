@@ -8,7 +8,7 @@ interface ButtonLinkProps {
   action?: () => void;
 }
 
-function MenuBarLink(props: ButtonLinkProps) {
+function LinkButton(props: ButtonLinkProps) {
   return (
     <MenuItem onClick={() => {
       if (props.action) {
@@ -21,4 +21,4 @@ function MenuBarLink(props: ButtonLinkProps) {
   );
 }
 
-export default MenuBarLink;
+export default LinkButton;
