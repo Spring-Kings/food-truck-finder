@@ -115,8 +115,8 @@ let themeOptions = {
 
 export interface ThemeProps {
   data: ThemeData;
-  loadTheme: () => Promise<void>;
-  switchTheme: () => Promise<void>;
+  loadTheme: () => void;
+  switchTheme: () => void;
 }
 
 export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {

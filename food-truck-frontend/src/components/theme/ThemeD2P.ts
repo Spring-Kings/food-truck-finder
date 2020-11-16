@@ -31,14 +31,10 @@ function loadTheme(
 const mapDispatchToProps = (dispatch: Dispatch<ThemeAction>) => {
   return {
     switchTheme: () => {
-      return new Promise<void>(() => {
-        switchTheme(dispatch);
-      });
+      switchTheme(dispatch);
     },
     loadTheme: () => {
-      return new Promise<void>(() => {
-        loadTheme(dispatch);
-      });
+      loadTheme(dispatch);
     },
     dispatch,
   };
