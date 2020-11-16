@@ -6,7 +6,7 @@ import {Provider} from 'react-redux';
 import {buildStore} from '../util/redux';
 
 import Head from 'next/head';
-import {FoodTruckThemeProvider} from '../components/theme/FoodTruckThemeProvider';
+import FoodTruckThemeProvider from '../components/theme/Theme';
 
 let initialState = {};
 let store = buildStore(initialState);

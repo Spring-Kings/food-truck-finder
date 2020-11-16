@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {createMuiTheme, jssPreset, StylesProvider, ThemeOptions, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
@@ -10,6 +10,7 @@ import red from "@material-ui/core/colors/red";
 // import darkBaseTheme from '@material-ui/styles/baseThemes/darkBaseTheme';
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {Switch} from '@material-ui/core';
+import {ThemeData} from "../../redux/theme/ThemeReducer";
 
 const jss = create({plugins: [...jssPreset().plugins, rtl()]});
 
@@ -126,29 +127,36 @@ let themeOptions = {
   }
 };
 
-export const FoodTruckThemeProvider = (args: Args) => {
-  const [isDark, setIsDark] = useState(true);
+export interface ThemeProps {
+  data: ThemeData;
+  loadTheme: () => Promise<void>;
+  switchTheme: () => Promise<void>;
+}
 
+export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
   // @ts-ignore
   let theme = responsiveFontSizes(createMuiTheme({
     ...themeOptions,
     palette: {
       ...themeOptions.palette,
-      background: isDark ? darkBackground : lightBackground,
-      type: isDark ? 'dark' : 'light'
+      background: props.data.isDark ? darkBackground : lightBackground,
+      type: props.data.isDark ? 'dark' : 'light'
     }
   }));
 
-  const switchTheme = () => setIsDark(!isDark);
+  useEffect(() => {
+    props.loadTheme();
+  });
+
+  // <Switch value={props.data.isDark} defaultChecked={props.data.isDark} onChange={props.switchTheme} name="Dark Mode"/>
 
   return (
     <StylesProvider jss={jss}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <CoolLayout>
-          {args.children}
+          {props.children}
         </CoolLayout>
-        <Switch value={isDark} defaultChecked={isDark} onChange={switchTheme} name="Dark Mode"/>
       </ThemeProvider>
     </StylesProvider>
   );
