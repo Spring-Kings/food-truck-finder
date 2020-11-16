@@ -60,13 +60,12 @@ async function updateUser(
 }
 
 function logout(dispatch: Dispatch<UserAction>) {
-  console.log('dispatching logout');
   dispatch({
     type: UserActionTypes.LOGOUT_USER_ACTION,
     payload: {
       username: "",
       pfp: undefined,
-      subscribedTrucks: undefined,
+      subscribedTrucks: [],
       ownedTrucks: undefined
     }
   });

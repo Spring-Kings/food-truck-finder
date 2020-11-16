@@ -16,4 +16,5 @@ export interface LoadUserAction {
 
 export interface LogoutUserAction {
   type: UserActionTypes.LOGOUT_USER_ACTION;
+  payload: UserData;
 }

@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { LoadUserAction, UserActionTypes, userReduxName } from './UserActions';
+import {LoadUserAction, LogoutUserAction, UserActionTypes, userReduxName} from './UserActions';
 
 // Simple representation of a Truck, just what's needed here
 export interface SimpleTruck {
@@ -29,6 +29,10 @@ const userSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(UserActionTypes.LOAD_USER_ACTION, (state: any, action: LoadUserAction) => {
+            state.data = action.payload;
+            return state;
+        });
+        builder.addCase(UserActionTypes.LOGOUT_USER_ACTION, (state: any, action: LogoutUserAction) => {
             state.data = action.payload;
             return state;
         });

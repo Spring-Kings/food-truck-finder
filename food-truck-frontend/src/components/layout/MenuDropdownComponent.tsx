@@ -31,7 +31,6 @@ function MenuDropdownComponent(props: MenuProps) {
             onClose={closeMenu}>
         <LinkButton url="/account" text="Account" action={() => closeMenu()}/>
         <LinkButton url="/" text="Logout" action={() => {
-          console.log('logging out');
           closeMenu();
           props.logoutUser().catch(err => console.log(err));
         }}/>
