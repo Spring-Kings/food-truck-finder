@@ -148,8 +148,6 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
     props.loadTheme();
   });
 
-  // <Switch value={props.data.isDark} defaultChecked={props.data.isDark} onChange={props.switchTheme} name="Dark Mode"/>
-
   return (
     <StylesProvider jss={jss}>
       <ThemeProvider theme={theme}>

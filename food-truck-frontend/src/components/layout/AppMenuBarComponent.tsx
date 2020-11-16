@@ -3,16 +3,15 @@ import {
   AppBar, Avatar,
   createStyles,
   Grid,
-  IconButton, Menu,
   Theme,
   Toolbar,
   Typography
 } from '@material-ui/core'
 import {makeStyles} from "@material-ui/core/styles";
-import MenuIcon from '@material-ui/icons/Menu';
 import MenuBarLink from "./MenuBarLink";
 import {UserData} from "../../redux/user/UserReducer";
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
+import MenuDropdownComponent from "./menu/MenuDropdown";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -33,13 +32,6 @@ const useAppBarStyles = makeStyles((theme: Theme) =>
 
 export function AppMenuBarComponent(props: AppMenuBarProps) {
   const classes = useAppBarStyles();
-  const [anchorEl, setAnchorEl]: [HTMLElement | null, any] = useState(null);
-  const openMenu = (event: React.MouseEvent) => {
-    setAnchorEl(event.currentTarget);
-  }
-  const closeMenu = () => {
-    setAnchorEl(null);
-  }
 
   const loadUser = () => {
     if (localStorage.getItem("authToken") !== undefined && props.data.username === "") {
@@ -89,26 +81,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
             <NotificationWatcherComponent/>
           </Grid>
           <Grid item>
-            <IconButton edge="end"
-                        color="inherit"
-                        aria-controls="bar-menu"
-                        aria-haspopup="true"
-                        onClick={openMenu}>
-              <MenuIcon/>
-            </IconButton>
-            <Menu id="bar-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={closeMenu}>
-              <MenuBarLink url="/account" text="Account" action={closeMenu}/>
-              {props.data.username !== "" &&
-              <MenuBarLink url="/" text="Logout" action={() => {
-                closeMenu();
-                props.logoutUser().catch(err => console.log(err));
-              }}/>
-              }
-            </Menu>
+            <MenuDropdownComponent logoutUser={props.logoutUser} username={props.data.username}/>
           </Grid>
         </Grid>
       </Toolbar>
