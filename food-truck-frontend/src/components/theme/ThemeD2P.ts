@@ -1,7 +1,7 @@
 import {Dispatch} from "redux";
 import {ThemeAction, ThemeActionTypes} from "../../redux/theme/ThemeActions";
 
-function getStoredTheme(): boolean {
+function storedThemeIsDark(): boolean {
   const theme: string | null = localStorage.getItem("ftfTheme");
   return theme === "DARK";
 }
@@ -9,7 +9,7 @@ function getStoredTheme(): boolean {
 function switchTheme(
   dispatch: Dispatch<ThemeAction>,
 ) {
-  const isDark: boolean = getStoredTheme();
+  const isDark: boolean = storedThemeIsDark();
   dispatch({
     type: ThemeActionTypes.SWITCH_THEME,
     payload: { isDark: !isDark }
@@ -21,7 +21,7 @@ function switchTheme(
 function loadTheme(
   dispatch: Dispatch<ThemeAction>,
 ) {
-  const isDark: boolean = getStoredTheme();
+  const isDark: boolean = storedThemeIsDark();
   dispatch({
     type: ThemeActionTypes.SWITCH_THEME,
     payload: { isDark: isDark }
