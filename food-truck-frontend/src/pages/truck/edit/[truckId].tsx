@@ -41,10 +41,10 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
                   onFailedSubmit={this.onFail}>
                 <TextField className={"hidden"} disabled label="Truck ID" name="truckId" defaultValue={this.state.id}/>
 
-                <TextField label="Truck Name" variant="outlined" name="name" defaultValue={this.state.name}/>
-                <TextField label="Description" variant="outlined" name="description"
+                <TextField label="Truck Name" name="name" defaultValue={this.state.name}/>
+                <TextField label="Description" name="description"
                            defaultValue={this.state.description}/>
-                <TextField label="Price Rating" variant="outlined" name="priceRating"
+                <TextField label="Price Rating" name="priceRating"
                            defaultValue={this.state.priceRating}/>
                 <MultiField
                   title="Truck Tags"
@@ -56,13 +56,12 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
 
             <Typography variant={'h4'}>Upload Menu</Typography>
             <form encType="multipart/form-data">
-                <Button variant="contained" component="label">Upload Menu
+                <Button component="label">Upload Menu
                     <input className="hidden" type="file" id="fileInput" name="file" onChange={this.onMenuChange}/>
                 </Button>
             </form>
 
-            <Button variant="outlined"
-                    color="secondary"
+            <Button color="secondary"
                     onClick={this.deleteTruck}>
                 Delete Truck
             </Button>

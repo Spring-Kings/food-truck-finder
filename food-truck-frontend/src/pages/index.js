@@ -1,8 +1,6 @@
-import logout from "../util/logout";
 import { Typography } from "@material-ui/core";
-
 import React from 'react';
-import Link from 'next/link'
+import NextLink from 'next/link'
 
 require('dotenv').config();
 
@@ -10,30 +8,29 @@ function HomePage() {
     return (
         <>
             <Typography variant="h4">Food Truck Finder</Typography>
-            <Link href="/login" passHref><a>Login</a></Link><br/>
-            <Link href="#" passHref><a onClick={logout}>Log Out</a></Link><br/>
-            
+            <NextLink href="/login" passHref>Login</NextLink><br/>
+
             <br/>
 
             <Typography variant="h5">Guest Zone</Typography>
-            <Link href="/recommended-trucks" passHref><a>Truck Recommendation Search</a></Link><br/>
-            <Link href="/search/truck" passHref><a>Truck Search</a></Link><br/>
-            <Link href="/interactive-map" passHref><a>Trucks Nearby</a></Link><br/>
+            <NextLink href="/recommended-trucks" passHref>Truck Recommendation Search</NextLink><br/>
+            <NextLink href="/search/truck" passHref>Truck Search</NextLink><br/>
+            <NextLink href="/interactive-map" passHref>Trucks Nearby</NextLink><br/>
             
             <br />
 
             <Typography variant="h5">User Zone</Typography>
-            <Link href="/dashboard/user" passHref><a>User Dashboard</a></Link><br/>
-            <Link href="/account" passHref><a>Account</a></Link><br/>
-            <Link href="/reviews" passHref><a>Reviews</a></Link><br/>
-            <Link href="/notifications" passHref><a>Notifications Page</a></Link><br/>
+            <NextLink href="/dashboard/user" passHref>User Dashboard</NextLink><br/>
+            <NextLink href="/account" passHref>Account</NextLink><br/>
+            <NextLink href="/reviews" passHref>Reviews</NextLink><br/>
+            <NextLink href="/notifications" passHref>Notifications Page</NextLink><br/>
 
             <br />
 
             <Typography variant="h5">Truck Owner Zone</Typography>
-            <Link href="/dashboard/owner" passHref><a>Owner Dashboard</a></Link><br/>
-            <Link href="/manage-trucks" passHref><a>Manage Trucks</a></Link><br/>
-            <Link href="/create-truck" passHref><a>Create Truck Page</a></Link><br/><br/>
+            <NextLink href="/dashboard/owner" passHref>Owner Dashboard</NextLink><br/>
+            <NextLink href="/manage-trucks" passHref>Manage Trucks</NextLink><br/>
+            <NextLink href="/create-truck" passHref>Create Truck Page</NextLink><br/><br/>
         </>
     )
 }

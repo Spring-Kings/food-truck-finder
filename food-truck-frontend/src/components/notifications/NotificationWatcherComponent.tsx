@@ -1,10 +1,9 @@
-import React, {ReactElement, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {NotificationListProps} from "./NotificationListComponent";
 import Router, {useRouter} from "next/router";
-import getUserInfo from "../../util/token";
-import CreateRouteDialog from "../route/CreateRouteDialog";
-import {Button, Dialog, DialogContent, DialogTitle, Grid, TextField} from "@material-ui/core";
-import Form from "../Form";
+import {Button, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@material-ui/core";
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 
 function NotificationWatcherComponent(props: NotificationListProps) {
   const router = useRouter();
@@ -36,15 +35,21 @@ function NotificationWatcherComponent(props: NotificationListProps) {
     return () => {};
   });
   return (
-    <Dialog open={notify && !notified}>
-      <DialogTitle>You have unread notifications!</DialogTitle>
-      <DialogContent>
-        <Grid container direction="column" alignItems="center">
-          <Button variant="contained" onClick={() => setNotified(true)}>OK</Button>
-          <Button variant="contained" onClick={redirectToNotifications}>See Notifications</Button>
-        </Grid>
-      </DialogContent>
-    </Dialog>
+    <>
+      <IconButton color="inherit"
+                  onClick={() => Router.replace('/notifications')}>
+        { initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/> }
+      </IconButton>
+      <Dialog open={notify && !notified}>
+        <DialogTitle>You have unread notifications!</DialogTitle>
+        <DialogContent>
+          <Grid container direction="column" alignItems="center">
+            <Button onClick={() => setNotified(true)}>OK</Button>
+            <Button onClick={redirectToNotifications}>See Notifications</Button>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

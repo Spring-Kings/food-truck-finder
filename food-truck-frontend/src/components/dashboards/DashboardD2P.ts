@@ -59,6 +59,19 @@ async function updateUser(
     );
 }
 
+function logout(dispatch: Dispatch<UserAction>) {
+  dispatch({
+    type: UserActionTypes.LOGOUT_USER_ACTION,
+    payload: {
+      username: "",
+      pfp: undefined,
+      subscribedTrucks: [],
+      ownedTrucks: undefined
+    }
+  });
+  localStorage.removeItem("authToken");
+}
+
 // Create a constant set of methods to dispatch on
 const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
   return {
@@ -76,6 +89,11 @@ const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
         } else {
           throw "No user logged in!";
         }
+      });
+    },
+    logoutUser: () => {
+      return new Promise<void>(() => {
+        logout(dispatch);
       });
     },
     dispatch,

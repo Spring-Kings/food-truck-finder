@@ -4,8 +4,9 @@ import {Grid} from '@material-ui/core'
 
 const siteFooter = () => {
     return (
-        <Grid className={styles.footer}>&copy; Spring Kings 2020</Grid>
-    )
+        <Grid>&copy; Spring Kings 2020</Grid>
+    );
+    // className={styles.footer}
 }
 
 export default siteFooter;

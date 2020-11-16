@@ -2,7 +2,6 @@ import React from 'react';
 import {Button, Divider, FormGroup, Grid, List, ListItem, TextField} from "@material-ui/core";
 import api from "../../util/api";
 import SearchTruckRow from "../../components/search/SearchRow";
-import jssPluginPropsSort from "jss-plugin-props-sort";
 
 const truck = [{
     id: -1,
@@ -57,7 +56,7 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
                 <FormGroup row>
                     <Grid container spacing={2}>
                         <Grid item xs={8}>
-                            <TextField fullWidth label="Search" variant="outlined" onChange={(event) => {
+                            <TextField fullWidth label="Search" onChange={(event) => {
                                 this.setState({search: event.target.value.toLowerCase()})
                             }} onKeyDown={event => {
                                 if(event.key === 'Enter'){
