@@ -4,15 +4,13 @@ import {ThemeProps} from "../../theme/FoodTruckThemeProvider";
 import {Brightness4, BrightnessHigh} from "@material-ui/icons";
 
 function ThemeSwitchComponent(props: ThemeProps) {
-  const [isDark, setIsDark]: [boolean, any] = useState(props.data.isDark);
   const switchTheme = () => {
-    setIsDark(!isDark);
     props.switchTheme();
   }
   return (
     <IconButton color="inherit"
                 onClick={switchTheme}>
-      {isDark ? <BrightnessHigh fontSize="small"/> : <Brightness4 fontSize="small"/>}
+      {props.data.isDark ? <BrightnessHigh fontSize="small"/> : <Brightness4 fontSize="small"/>}
     </IconButton>
   );
 }
