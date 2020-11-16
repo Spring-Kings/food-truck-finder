@@ -3,14 +3,11 @@ import Form from "../Form";
 import {AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
 import {UserData} from "../../redux/user/UserReducer";
-import NextLink from 'next/link'
 import LinkButton from "../layout/LinkButton";
 import Router from "next/router";
 
-type State = {
+type State = LoginProps & {
   resultText: string;
-  data: UserData;
-  loadUserFromBackend: () => Promise<void>;
 }
 
 interface LoginProps {

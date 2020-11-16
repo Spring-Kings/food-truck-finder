@@ -20,7 +20,7 @@ const fontThemeOptions = {
   lineHeight: 19,
   marginTop: 2,
   marginBottom: 2,
-  body2: {
+  body: {
     fontSize: 14
   }
 }

@@ -44,8 +44,8 @@ function NotificationWatcherComponent(props: NotificationListProps) {
         <DialogTitle>You have unread notifications!</DialogTitle>
         <DialogContent>
           <Grid container direction="column" alignItems="center">
-            <Button variant="contained" onClick={() => setNotified(true)}>OK</Button>
-            <Button variant="contained" onClick={redirectToNotifications}>See Notifications</Button>
+            <Button onClick={() => setNotified(true)}>OK</Button>
+            <Button onClick={redirectToNotifications}>See Notifications</Button>
           </Grid>
         </DialogContent>
       </Dialog>
