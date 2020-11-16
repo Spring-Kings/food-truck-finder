@@ -11,7 +11,8 @@ FROM openjdk:14
 WORKDIR /app
 COPY --from=build /build/build/libs/build*.jar app.jar
 
-ENV JAVA_OPTS "${JAVA_OPTS}"
+ENV JAVA_TOOL_OPTIONS "${JAVA_TOOL_OPTIONS}"
+ENV PORT "${PORT}"
 
-# Running the app exec $JAVA_OPTS
-ENTRYPOINT java\ -jar\ $JAVA_OPTS\ app.jar
+# Running the app exec
+ENTRYPOINT java\ -jar\ app.jar
