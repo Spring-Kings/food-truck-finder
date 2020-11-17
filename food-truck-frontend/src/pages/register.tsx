@@ -31,16 +31,8 @@ class RegisterPageComponent extends React.Component<{}, State> {
               type="password"
             />
             <TextField label="Email" name="email"/>
-            <Box pb={1}>
-              <Grid container direction="row">
-                <Grid item>
-                  <Typography>Owner Account?</Typography>
-                </Grid>
-                <Grid item>
-                  <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
-                </Grid>
-              </Grid>
-            </Box>
+            <Typography>Owner Account?</Typography>
+            <Switch value={this.state.owner} onChange={this.toggleOwner} name="owner"/>
           </Form>
           <Grid item>
             <Box py={2}>
