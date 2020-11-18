@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.PostConstruct;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -54,6 +55,15 @@ public class TruckEndpoint {
 
     @Autowired
     private IndexingService indexingService;
+
+    @PostConstruct
+    public void init(){
+        try {
+            indexingService.initiateIndexing();
+        }catch (InterruptedException e){
+            log.warn(e);
+        }
+    }
 
     @Autowired
     private TruckSearchService truckSearchService;
