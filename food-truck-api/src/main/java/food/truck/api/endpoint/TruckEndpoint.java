@@ -20,6 +20,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
@@ -358,11 +359,12 @@ public class TruckEndpoint {
         var t = truck.get();
 
         var menu = t.getMenu();
-        if (menu == null || menu.length == 0)
+        if (menu == null || menu.length == 0 || t.getMenuContentType() == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         var headers = new HttpHeaders();
-        headers.setContentType(t.getMenuContentType());
+        var mediaType = MediaType.parseMediaType(t.getMenuContentType());
+        headers.setContentType(mediaType);
         return new ResponseEntity<>(menu, headers, HttpStatus.OK);
     }
 

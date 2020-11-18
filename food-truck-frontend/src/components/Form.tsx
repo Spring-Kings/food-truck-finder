@@ -1,5 +1,5 @@
 import React, {Component, ReactElement} from 'react'
-import {AxiosResponse} from 'axios'
+import {AxiosError, AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
 
@@ -7,7 +7,7 @@ export type Props = {
     submitUrl: string,
     submitMethod?: "POST" | "PUT" | "DELETE",
     onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
-    onFailedSubmit?: (formData: any, response: any) => void, // TODO: Figure out type of response
+    onFailedSubmit?: (formData: any, response: AxiosError<any>) => void, // TODO: Figure out type of response
     children?: React.ReactNode,
     customSubmitHandler?: Function,
     formProps?: any
@@ -39,7 +39,7 @@ class Form extends Component<Props, State> {
             // Ensure a null didn't slip through (can happen in dynamic forms)
             if (c === null)
                 return;
-            
+
             // Parse child
             const child = c as ReactElement;
             if (child.props.name != null) {
@@ -135,7 +135,7 @@ class Form extends Component<Props, State> {
                 // Ensure a null didn't slip through (can happen in dynamic forms)
                 if (c === null)
                     return;
-            
+
                 // Parse child
                 let name: string = (c as ReactElement).props.name as string;
                 newFormData[name] = state.formData[name];

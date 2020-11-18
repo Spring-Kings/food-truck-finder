@@ -1,25 +1,18 @@
-import React, { Component } from "react";
-import {
-  Button,
-  Container,
-  Grid,
-  List,
-  ListItem,
-  Typography,
-} from "@material-ui/core";
+import React, {Component} from "react";
+import {Button, Container, Grid, List, ListItem, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
 import getUserInfo from "../util/token";
 import TruckRouteMapComponent from "./map";
-import { RouteLocation } from "./map/route-map/RouteLocation";
+import {RouteLocation} from "./map/route-map/RouteLocation";
 
-import { DEFAULT_ERR_RESP } from "../api/DefaultResponses";
-import { loadTodaysRoute } from "../api/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
+import {loadTodaysRoute} from "../api/RouteLocation";
 import SendNotificationComponent from "./notifications/SendNotificationComponent";
-import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from "../api/Subscription";
-import {Subscription} from "../api/Subscription";
+import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
+import LinkButton from "./layout/LinkButton";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -35,7 +28,8 @@ export interface TruckState {
   name: string;
   description: string | null;
   priceRating: number | null;
-  tags: string[]
+  tags: string[];
+  menuContentType: string | null;
 }
 
 interface TruckViewState {
@@ -64,7 +58,8 @@ class TruckView extends Component<TruckProps, State> {
       priceRating: -1,
       routePts: [],
       subscription: null,
-      tags: []
+      tags: [],
+      menuContentType: null
     };
   }
 
@@ -103,67 +98,73 @@ class TruckView extends Component<TruckProps, State> {
 
   render() {
     if (!this.state) {
-      return <NotFound />;
+      return <NotFound/>;
     } else if (this.state.id < 1) {
       return (
-        <Container>
-          <CircularProgress />
-        </Container>
+          <Container>
+            <CircularProgress/>
+          </Container>
       );
     }
 
+    let menuImage = null;
+    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
+    if (this.state.menuContentType === 'application/pdf')
+      menuImage = <ListItem><LinkButton url={menuUrl} text="View Menu"/></ListItem>;
+    else if (this.state.menuContentType?.startsWith('image/'))
+      menuImage = <ListItem><img alt="Menu" src={menuUrl}/></ListItem>;
+
+    const nonOwnerStuff = [
+      <ListItem>
+        <Button color="primary"
+                onClick={this.handleSubscription}>
+          {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
+        </Button>
+      </ListItem>,
+      <ListItem>
+        <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
+      </ListItem>
+    ];
+    const ownerStuff = [
+      <ListItem>
+        <Button color="primary" onClick={this.editTruck}>
+          Edit
+        </Button>
+      </ListItem>,
+      <ListItem>Send Notification To Subscribers:</ListItem>,
+      <ListItem>
+        <SendNotificationComponent truckId={this.state.id}/>
+      </ListItem>
+    ];
+
+
     return (
-      <Grid container direction="row">
-        <Grid item xs>
-          <Typography variant="h4">{this.state.name}</Typography>
-          <List>
-            <ListItem>
-              <img src={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`} alt="Menu"/>
-            </ListItem>
-            <ListItem>
-              Description: {this.state.description}
-            </ListItem>
-            <ListItem>
-              Price Rating: {this.state.priceRating}
-            </ListItem>
-            <ListItem>
-              Tags:
-              <List>
-                {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
-              </List>
-            </ListItem>
-          </List>
-          <Grid>
-            {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
-              <Button color="primary"
-                      onClick={this.handleSubscription}>
-                {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
-              </Button>
-            }
-            {userCanEditTruck(this.state.userId)?
-              <>
-                <Button color="primary"
-                        onClick={this.editTruck}>
-                  Edit
-                </Button>
-                <Grid>
-                  {"Send Notification To Subscribers:"}
-                  <SendNotificationComponent truckId={this.state.id}/>
-                </Grid>
-              </> :
-              <Grid item>
-                <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
-              </Grid>
-            }
-            <Grid>
-              <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
-            </Grid>
+        <Grid container direction="column" spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h4">{this.state.name}</Typography>
+            <List>
+              {menuImage}
+              <ListItem>
+                Description: {this.state.description}
+              </ListItem>
+              <ListItem>
+                Price Rating: {this.state.priceRating}
+              </ListItem>
+              <ListItem>
+                Tags: {this.state.tags.join(', ')}
+              </ListItem>
+
+              {userCanEditTruck(this.state.userId) ? ownerStuff : nonOwnerStuff}
+              <ListItem>
+                <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
+              </ListItem>
+
+            </List>
+          </Grid>
+          <Grid item xs={12}>
+            <TruckRouteMapComponent locations={this.state.routePts}/>
           </Grid>
         </Grid>
-        <Grid item xs>
-          <TruckRouteMapComponent locations={this.state.routePts} />
-        </Grid>
-      </Grid>
     );
   }
 

@@ -29,14 +29,14 @@ function coolLayout(args: Args) {
         <link rel="icon" href="/favicon.ico"/>
         <meta name="description" content="Oi mate description goes here"/>
       </Head>
-      <Grid direction="row">
-        <Grid item>
+      <Grid container direction="column" alignItems="stretch">
+        <Grid id="navbar" item>
           <Box mb={4}>
             <AppMenuBarComponent/>
           </Box>
         </Grid>
-        <Grid item>
-          <Container maxWidth="xl">
+        <Grid id="mainSection" item container alignItems="center">
+          <Grid item container direction="row" xs={12} lg={10} xl={8}>
             <Paper className={classes.paper}>
               <Box p={4}>
                 <Container>
@@ -44,7 +44,7 @@ function coolLayout(args: Args) {
                 </Container>
               </Box>
             </Paper>
-          </Container>
+          </Grid>
         </Grid>
         <Grid item>
           <Box p={2}>
