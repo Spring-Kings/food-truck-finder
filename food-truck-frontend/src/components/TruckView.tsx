@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import {
+  Box,
   Button,
-  Container,
+  Container, Dialog,
   Grid,
   List,
   ListItem,
@@ -113,56 +114,83 @@ class TruckView extends Component<TruckProps, State> {
     }
 
     return (
-      <Grid container direction="row">
-        <Grid item xs>
-          <Typography variant="h4">{this.state.name}</Typography>
-          <List>
-            <ListItem>
-              <img src={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`} alt="Menu"/>
-            </ListItem>
-            <ListItem>
-              Description: {this.state.description}
-            </ListItem>
-            <ListItem>
-              Price Rating: {this.state.priceRating}
-            </ListItem>
-            <ListItem>
-              Tags:
-              <List>
-                {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
-              </List>
-            </ListItem>
-          </List>
-          <Grid>
-            {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
-              <Button color="primary"
-                      onClick={this.handleSubscription}>
-                {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
-              </Button>
-            }
-            {userCanEditTruck(this.state.userId)?
-              <>
-                <Button color="primary"
-                        onClick={this.editTruck}>
-                  Edit
-                </Button>
-                <Grid>
-                  {"Send Notification To Subscribers:"}
-                  <SendNotificationComponent truckId={this.state.id}/>
+      <Grid container justify="flex-start" alignItems="flex-start">
+        <Grid container direction="row" justify="flex-start" align-items="flex-start">
+          <Grid item>
+            <Typography variant="h4">{this.state.name}</Typography>
+            <List>
+              <ListItem>
+                <Grid container justify="flex-start" alignItems="flex-start" spacing={1}>
+                  <Grid item>
+                    <Typography variant="subtitle1">Description:</Typography>
+                  </Grid>
+                  <Grid item>
+                    {this.state.description}
+                  </Grid>
                 </Grid>
-              </> :
-              <Grid item>
-                <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
-              </Grid>
-            }
-            <Grid>
-              <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
-            </Grid>
+              </ListItem>
+              <ListItem>
+                <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={1}>
+                  <Grid item>
+                    <Typography variant="subtitle1">Price Rating:</Typography>
+                  </Grid>
+                  <Grid item>
+                    {this.state.priceRating}
+                  </Grid>
+                </Grid>
+              </ListItem>
+              <ListItem>
+                <Typography variant="subtitle1">Tags:</Typography>
+                <List>
+                  {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
+                </List>
+              </ListItem>
+              <ListItem>
+                {/* TODO: Move this into a "View Menu" dialog */}
+                <img src={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`} alt="Menu"/>
+              </ListItem>
+            </List>
+          </Grid>
+          <Grid item xs>
+            <TruckRouteMapComponent locations={this.state.routePts} />
           </Grid>
         </Grid>
-        <Grid item xs>
-          <TruckRouteMapComponent locations={this.state.routePts} />
+        <Grid item>
+          {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
+          <Button color="primary"
+                  onClick={this.handleSubscription}>
+            {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
+          </Button>
+          }
         </Grid>
+        <Grid item>
+          <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
+        </Grid>
+        {userCanEditTruck(this.state.userId) ?
+          <>
+            <Grid item>
+              <Button color="primary"
+                      onClick={this.editTruck}>
+                Edit
+              </Button>
+            </Grid>
+            <Grid item>
+              <Grid container spacing={0}>
+                <Grid item>
+                  <Typography variant="subtitle1">Send Notification To Subscribers:</Typography>
+                </Grid>
+                <Grid item>
+                  <SendNotificationComponent truckId={this.state.id}/>
+                </Grid>
+              </Grid>
+            </Grid>
+          </>
+          : (
+            <Grid item>
+              <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
+            </Grid>
+          )
+        }
       </Grid>
     );
   }

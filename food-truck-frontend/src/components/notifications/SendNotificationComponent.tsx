@@ -25,10 +25,19 @@ class SendNotificationComponent extends Component<SendNotificationProps, SendNot
 
   render() {
     return (
-      <Form submitMethod="POST" submitUrl={'/truck/notification'} onFailedSubmit={this.onFail}>
+      <Form submitMethod="POST"
+            submitUrl={'/truck/notification'}
+            onSuccessfulSubmit={this.onSuccess}
+            onFailedSubmit={this.onFail}>
         <TextField className="hidden" disabled label="Truck ID" name="truckId"
                    defaultValue={this.state.truckId}/>
-        <TextField label="Message" name="message" defaultValue={this.state.message}/>
+        <TextField label="Message"
+                   name="message"
+                   defaultValue={this.state.message}
+                   fullWidth
+                   multiline
+                   rows={3}
+                   rowsMax={8}/>
       </Form>
     );
   }
@@ -37,6 +46,13 @@ class SendNotificationComponent extends Component<SendNotificationProps, SendNot
     this.setState({
       ...this.state,
       error: `Failed to send notification: ${JSON.stringify(response)}`
+    });
+  }
+
+  onSuccess = (formData: any, response: AxiosResponse) => {
+    this.setState({
+      ...this.state,
+      message: ""
     });
   }
 }

@@ -49,11 +49,11 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
   render() {
     var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
-      <Container>
+      <Container fixed>
         <LoadScript googleMapsApiKey={key as string}>
           <GoogleMap
             mapContainerStyle={{
-              height: "100vh",
+              height: "50vh",
               width: "100%",
             }}
             zoom={10}

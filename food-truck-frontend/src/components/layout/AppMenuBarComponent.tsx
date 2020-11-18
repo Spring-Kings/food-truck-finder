@@ -15,6 +15,7 @@ import {UserData} from "../../redux/user/UserReducer";
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 import ThemeSwitchComponent from "./theme/ThemeSwitch";
 import MenuDropdownComponent from "./MenuDropdownComponent";
+import QuickSearchComponent from "../search/QuickSearchComponent";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -58,6 +59,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
 
   const menuDropdown = (
     <Box>
+      <QuickSearchComponent/>
       <NotificationWatcherComponent/>
       <ThemeSwitchComponent/>
       {props.data.username !== "" && <MenuDropdownComponent logoutUser={props.logoutUser}/>}
