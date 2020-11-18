@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import food.truck.api.MediaTypeConverter;
 import food.truck.api.security.SecurityConstants;
 import lombok.Data;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.*;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.http.MediaType;
 
@@ -55,6 +54,9 @@ public class Truck {
     @Nullable
     String description;
 
+
+    @IndexedEmbedded
+    @Field(name = "tags")
     @ElementCollection
     Set<String> tags;
 
