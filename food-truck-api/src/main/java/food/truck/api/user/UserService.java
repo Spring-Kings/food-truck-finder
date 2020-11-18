@@ -66,4 +66,17 @@ public class UserService implements UserDetailsService {
     public boolean usernameIsTaken(String username) {
         return userRepository.existsByUsername(username);
     }
+
+    public boolean usernameIsValid(String username) {
+        return username.matches("[a-zA-Z0-9_]{3,30}");
+    }
+
+    public boolean passwordIsValid(String password) {
+        return password.length() >= 6 && password.length() <= 50;
+    }
+
+    public boolean emailIsValid(String email) {
+        return email.contains("@") && email.length() <= 100 || email.length() >= 3;
+    }
+
 }

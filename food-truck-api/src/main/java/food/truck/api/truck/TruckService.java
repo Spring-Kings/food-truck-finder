@@ -87,7 +87,15 @@ public class TruckService {
         if (truck.getPriceRating() == null)
             truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
-        truck.setTags(tags.orElse(null));
+
+        // Ensure all tags are unique and lowercase and have no whitespace at start/end
+        if (tags.isPresent()) {
+            var tags2 = tags.get().stream()
+                    .map(tag -> tag.toLowerCase().trim())
+                    .filter(tag -> !tag.isEmpty())
+                    .collect(Collectors.toSet());
+            truck.setTags(tags2);
+        }
         return saveTruck(truck);
     }
 
