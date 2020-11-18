@@ -45,7 +45,7 @@ class SearchTruckPage extends React.Component<SearchTruckProps, SearchTruckState
 
     handleSubmit(){
         api.get(`/truck/search?search=${this.state.search}`).then(event => {
-                this.setState({trucks: event.data});
+            this.setState({trucks: event.data});
         }).catch();
     }
 
