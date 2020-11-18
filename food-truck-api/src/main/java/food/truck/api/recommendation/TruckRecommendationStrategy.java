@@ -15,6 +15,9 @@ public interface TruckRecommendationStrategy {
             return trucksScores;
 
         var stats = trucksScores.stream().mapToDouble(Pair::getSecond).summaryStatistics();
+        if (stats.getMin() + stats.getMax() == 0)
+            return trucksScores;
+
         return trucksScores.stream()
                 .map(pair -> {
                     var truck = pair.getFirst();
