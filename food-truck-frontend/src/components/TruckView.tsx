@@ -139,8 +139,10 @@ class TruckView extends Component<TruckProps, State> {
       </Grid>
     );
 
-    const priceRating = rating("Price Rating:", <MoneyRating precision={0.1} disabled value={this.state.priceRating} />);
-    const starRating = rating("Star Rating:", <StarRating precision={0.1} disabled value={this.state.priceRating} />);
+    const priceRating = this.state.priceRating ?
+      rating("Price Rating:", <MoneyRating precision={0.1} disabled value={this.state.priceRating} />) : <></>;
+    const starRating = this.state.starRating ?
+      rating("Star Rating:", <StarRating precision={0.1} disabled value={this.state.priceRating} />) : <></>;
 
     const tags = (
       <>
