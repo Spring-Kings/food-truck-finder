@@ -1,5 +1,6 @@
 package food.truck.api.recommendation;
 
+import food.truck.api.recommendation.semantic_similarity.FoodTruckDictionary;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
@@ -28,6 +29,9 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
     private final SubscriptionService subscriptionService;
     private final User user;
     private final UserPreferences prefs;
+
+    // Since we're instantiating this with 'new', I can't @Autowire it
+    private final FoodTruckDictionary ftd = new FoodTruckDictionary();
 
     public ScoringRecommendationStrategy(TruckService truckSvc, SubscriptionService subscriptionService, User user, UserPreferences prefs) {
         this.truckSvc = truckSvc;

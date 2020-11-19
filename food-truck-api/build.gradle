@@ -115,6 +115,11 @@ dependencies {
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok'
 
     compile 'com.maxmind.geoip2:geoip2:2.15.0'
+
+    // https://mvnrepository.com/artifact/net.sf.extjwnl/extjwnl
+    compile group: 'net.sf.extjwnl', name: 'extjwnl', version: '2.0.3'
+    // https://mvnrepository.com/artifact/net.sf.extjwnl/extjwnl-data-wn31-map
+    compile group: 'net.sf.extjwnl', name: 'extjwnl-data-wn31-map', version: '1.0'
 }
 
 configurations.all {
