@@ -1,7 +1,7 @@
 import React from 'react';
 import {Button, FormGroup, Grid, List, TextField} from "@material-ui/core";
-import api from "../../util/api";
 import SearchTruckRow, {SearchTruckData} from "../../components/search/SearchRow";
+import {searchTruckByName} from "../../api/Truck";
 
 const truck = [{
   id: -1,
@@ -31,11 +31,10 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-
-  handleSubmit(){
-    api.get(`/truck/search?search=${this.state.search}`).then(event => {
-      this.setState({trucks: event.data});
-    }).catch();
+  handleSubmit() {
+    searchTruckByName(this.state.search, (_err) => {
+      this.setState({trucks: []});
+    }).then(trucks => this.setState({trucks: trucks}));
   }
 
   render() {
