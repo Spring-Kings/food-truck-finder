@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
-import {Button, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@material-ui/core";
-import {Close} from "@material-ui/icons";
+import {Button, Dialog, DialogContent} from "@material-ui/core";
+import {StyledDialogTitle} from "./StyledDialogTitle";
 
 interface ImageDialogProps {
   url: string;
@@ -19,17 +19,9 @@ function ImageDialog(props: ImageDialogProps) {
       <Dialog open={open}
               fullWidth
               maxWidth="md">
-        <Grid container direction="row" justify="flex-start">
-          <Grid item xs={10}>
-            <DialogTitle>{props.text}</DialogTitle>
-          </Grid>
-          <Grid item xs>
-            <IconButton color="inherit"
-                        onClick={() => setOpen(false)}>
-              <Close/>
-            </IconButton>
-          </Grid>
-        </Grid>
+        <StyledDialogTitle onClose={() => setOpen(false)}>
+          {props.text}
+        </StyledDialogTitle>
         <DialogContent>
           <img src={props.url} alt={props.text}/>
         </DialogContent>

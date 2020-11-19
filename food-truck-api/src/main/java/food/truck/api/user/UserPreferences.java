@@ -9,6 +9,5 @@ public class UserPreferences {
     double acceptableRadius;
     double priceRating;
     int numRequested;
-    Set<String> menuItems;
     Set<String> tags;
 }

@@ -1,6 +1,6 @@
 import {LatLng} from "@google/maps";
-import {Button, Grid, List, ListItem, Slider, TextField, Typography} from "@material-ui/core";
-import React, {ChangeEvent, Component} from "react";
+import {Button, Grid, Slider, Typography} from "@material-ui/core";
+import React, {Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
 import { RouteLocation } from "../map/route-map/RouteLocation";
@@ -13,11 +13,9 @@ import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMa
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
   location: LatLng;
-  acceptibleRadius: number;
+  acceptableRadius: number;
   priceRating: number;
-  menuItems: string[];
   tags: string[];
-
   selectedTrucks?: RouteLocation[];
 };
 
@@ -48,9 +46,8 @@ class RecommendedTrucksForm extends Component<
     super(props);
     this.state = {
       location: { lat: 0, lng: 0 },
-      acceptibleRadius: 1,
+      acceptableRadius: 1,
       priceRating: 3,
-      menuItems: [],
       tags: []
     };
     this.setState = this.setState.bind(this);
@@ -81,7 +78,7 @@ class RecommendedTrucksForm extends Component<
         </Grid>
         <Grid item>
           <Slider
-            value={this.state.acceptibleRadius}
+            value={this.state.acceptableRadius}
             aria-labelledby="discrete-slider"
             valueLabelDisplay="auto"
             step={1}
@@ -89,7 +86,7 @@ class RecommendedTrucksForm extends Component<
             marks={MARKS}
             max={30}
             onChange={(_, val) =>
-              this.setState({ acceptibleRadius: this.coerce(val) })
+              this.setState({ acceptableRadius: this.coerce(val) })
             }
             style={{
               width: 200,
@@ -108,9 +105,6 @@ class RecommendedTrucksForm extends Component<
         </Grid>
         <Grid item>
           <Typography variant="h4">Food Categories</Typography>
-        </Grid>
-        <Grid item>
-          <MultiField title="Desired Menu Items" name="menuItems" onChange={this.changeItems}/>
         </Grid>
         <Grid item>
           <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
@@ -136,7 +130,6 @@ class RecommendedTrucksForm extends Component<
     if (newVal !== null) this.setState({ priceRating: newVal });
   };
 
-  changeItems = (data: ReactEventAdapter) => this.setState({ menuItems: data.target.value });
   changeTags = (data: ReactEventAdapter) => this.setState({ tags: data.target.value });
 
   submit = async () => {
@@ -144,9 +137,8 @@ class RecommendedTrucksForm extends Component<
       let resp: any = await api.request({
         url: "/truck/recommended",
         data: {
-            acceptableRadius: this.state.acceptibleRadius,
+            acceptableRadius: this.state.acceptableRadius,
             priceRating: this.state.priceRating,
-            menuItems: this.state.menuItems,
             tags: this.state.tags,
             location: this.state.location,
             numRequested: 10
