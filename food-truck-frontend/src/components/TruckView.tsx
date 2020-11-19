@@ -166,29 +166,33 @@ class TruckView extends Component<TruckProps, State> {
       </ListItem>
     );
 
-    const truckInfo = (
+    const menuButton = (
+      <ImageDialog url={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`}
+                   text={`${this.state.name} Menu`}/>
+    );
+
+    const viewReviewsButton = (
+      <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
+    );
+
+    const truckInfo = [
+      description,
+      priceRating,
+      starRating,
+      tags,
+      menuButton,
+      viewReviewsButton
+    ];
+
+    const truckInfoView = (
       <Grid item>
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
-          <ListItem>
-            {description}
-          </ListItem>
-          <ListItem>
-            {priceRating}
-          </ListItem>
-          <ListItem>
-            {starRating}
-          </ListItem>
-          <ListItem>
-            {tags}
-          </ListItem>
-          <ListItem>
-            <ImageDialog url={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`}
-                         text={`${this.state.name} Menu`}/>
-          </ListItem>
-          <ListItem>
-            <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
-          </ListItem>
+          {truckInfo.map(el => (
+            <ListItem>
+              {el}
+            </ListItem>
+          ))}
           {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
           <>
             {reviewButton}
@@ -226,7 +230,7 @@ class TruckView extends Component<TruckProps, State> {
     return (
       <Grid container justify="flex-start" alignItems="flex-start">
         <Grid container direction="row" justify="flex-start" align-items="flex-start">
-          {truckInfo}
+          {truckInfoView}
           <Grid item xs>
             <TruckRouteMapComponent locations={this.state.routePts} />
           </Grid>
