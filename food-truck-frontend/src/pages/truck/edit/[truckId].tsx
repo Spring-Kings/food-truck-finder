@@ -23,7 +23,8 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
             userId: -1,
             name: "",
             description: "",
-            priceRating: -1,
+            priceRating: null,
+            starRating: null,
             message: "",
             tags: []
         };
