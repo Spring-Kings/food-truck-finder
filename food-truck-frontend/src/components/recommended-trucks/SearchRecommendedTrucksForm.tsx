@@ -1,5 +1,5 @@
 import {LatLng} from "@google/maps";
-import {Button, Slider, TextField, Typography} from "@material-ui/core";
+import {Button, Grid, List, ListItem, Slider, TextField, Typography} from "@material-ui/core";
 import React, {ChangeEvent, Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
@@ -72,38 +72,55 @@ class RecommendedTrucksForm extends Component<
       return <TruckLocationMapComponent locations={this.state.selectedTrucks} />;
 
     return (
-      <>
-        <Typography variant="h6">Acceptable Radius</Typography>
-        <Slider
-          value={this.state.acceptibleRadius}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={1}
-          min={0}
-          marks={MARKS}
-          max={30}
-          onChange={(_, val) =>
-            this.setState({ acceptibleRadius: this.coerce(val) })
-          }
-          style={{
-            width: 200,
-          }}
-        />
-
-        <Typography variant="h6">Price Rating</Typography>
-        <MoneyRating
-          name="priceRating"
-          defaultValue={this.state.priceRating}
-          onChange={this.changePrice}
-        />
-
-        <Typography variant="h6">Food Categories</Typography>
-        <MultiField title="Desired Menu Items" name="menuItems" onChange={this.changeItems}/>
-        <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
-        <Button variant="contained" color="primary" onClick={this.submit}>
-          Search Trucks
-        </Button>
-      </>
+      <Grid container alignItems="flex-start" spacing={1}>
+        <Grid item>
+          <Typography variant="h4">Search Recommended Trucks</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">Acceptable Radius</Typography>
+        </Grid>
+        <Grid item>
+          <Slider
+            value={this.state.acceptibleRadius}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            step={1}
+            min={0}
+            marks={MARKS}
+            max={30}
+            onChange={(_, val) =>
+              this.setState({ acceptibleRadius: this.coerce(val) })
+            }
+            style={{
+              width: 200,
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">Price Rating</Typography>
+        </Grid>
+        <Grid item>
+          <MoneyRating
+            name="priceRating"
+            defaultValue={this.state.priceRating}
+            onChange={this.changePrice}
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant="h4">Food Categories</Typography>
+        </Grid>
+        <Grid item>
+          <MultiField title="Desired Menu Items" name="menuItems" onChange={this.changeItems}/>
+        </Grid>
+        <Grid item>
+          <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
+        </Grid>
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={this.submit}>
+            Search Trucks
+          </Button>
+        </Grid>
+      </Grid>
     );
   }
 
