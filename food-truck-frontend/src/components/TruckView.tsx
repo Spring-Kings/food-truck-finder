@@ -232,7 +232,7 @@ class TruckView extends Component<TruckProps, State> {
         <Grid container direction="row" justify="flex-start" align-items="flex-start">
           {truckInfoView}
           <Grid item xs>
-            <TruckRouteMapComponent locations={this.state.routePts} />
+            <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
           </Grid>
         </Grid>
         {userCanEditTruck(this.state.userId) && ownerButtons}

@@ -16,9 +16,11 @@ interface MapProps {
   onDrag?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
   onMarkerClick?: (pt: RouteLocation, latLng: LatLngLiteral) => void;
   onMapClick?: (latLng: LatLngLiteral) => void;
+  height?: string;
 }
 interface MapState {
   coordinates: LatLngLiteral;
+  height?: string;
 }
 
 export class TruckRouteMapComponent extends React.Component<MapProps, MapState> {
@@ -30,6 +32,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
         lat: 0,
         lng: 0,
       },
+      height: props.height ? props.height : '100vh'
     };
     this.trigger = this.trigger.bind(this);
   }
@@ -53,7 +56,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
         <LoadScript googleMapsApiKey={key as string}>
           <GoogleMap
             mapContainerStyle={{
-              height: "50vh",
+              height: this.state.height,
               width: "100%",
             }}
             zoom={10}
