@@ -48,3 +48,12 @@ export const getTruckById = async (truckId: number, onFail: (err: any) => void) 
     }
     return undefined;
 }
+
+export const searchTruckByName = async (search: string, onFail: (err: any) => void) => {
+  let result = await api.get(`/truck/search?search=${search}`)
+    .catch(onFail);
+  if (result) {
+    return result.data;
+  }
+  return [];
+}

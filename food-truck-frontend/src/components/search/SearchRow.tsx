@@ -2,34 +2,40 @@ import React from 'react';
 import {Divider, ListItem, ListItemText} from "@material-ui/core";
 import {useRouter} from "next/router";
 
-type TruckProp = {
-    truck : {
-        id: number,
-        name: string,
-        description: string
-    }
+export type SearchTruckData = {
+  id: number;
+  name: string;
+  description: string;
 }
 
-function SearchTruckRow(truck: TruckProp){
-    const router = useRouter();
+type TruckProp = {
+  truck: SearchTruckData,
+  onRedirect?: () => void;
+}
 
-    if(truck.truck.id == -1){
-        return(
-            <div>
+function SearchTruckRow(props: TruckProp) {
+  const router = useRouter();
 
-            </div>
-        )
-    }
-
+  if (props.truck.id == -1){
     return(
-        <div>
-            <Divider/>
-            <ListItem button onClick={() => {router.push(`/truck/${truck.truck.id}`)}}>
-                <ListItemText primary={truck.truck.name}/>
-                <ListItemText secondary={truck.truck.description ? truck.truck.description : "No Description"}/>
-            </ListItem>
-        </div>
-    )
+      <></>
+    );
+  }
+
+  return (
+    <>
+      <Divider/>
+      <ListItem button onClick={() => {
+        if (props.onRedirect) {
+          props.onRedirect();
+        }
+        router.push(`/truck/${props.truck.id}`);
+      }}>
+        <ListItemText primary={props.truck.name}/>
+        <ListItemText secondary={props.truck.description ? props.truck.description : "No Description"}/>
+      </ListItem>
+    </>
+  )
 }
 
 export default SearchTruckRow;

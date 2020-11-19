@@ -28,7 +28,7 @@ class MultiField extends Component<MultiProps, MultiState> {
 
   render() {
     return (
-      <Grid container direction="column">
+      <Grid container spacing={0}>
         <Grid item key="head">
           <Typography variant={this.props.variant? this.props.variant : "h6"}>{this.props.title}</Typography>
         </Grid>
