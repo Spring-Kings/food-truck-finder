@@ -1,80 +1,82 @@
 package food.truck.api.recommendation.semantic_similarity;
 
 import lombok.extern.log4j.Log4j2;
-import net.sf.extjwnl.JWNLException;
-import net.sf.extjwnl.data.IndexWord;
-import net.sf.extjwnl.data.POS;
-import net.sf.extjwnl.dictionary.Dictionary;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-/**
- * Facade to access extJWNL. Learned to use through: https://github.com/extjwnl/extjwnl
- */
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
+import java.util.function.ToDoubleFunction;
+
 @Log4j2
 public class FoodTruckDictionary {
 
-    /** Order of POSes to try, from most likely to least likely */
-    private static final POS[] ATTEMPT = { POS.NOUN, POS.ADJECTIVE, POS.ADVERB, POS.VERB };
-
-    /** extJWNL dictionary, for semantic analysis */
-    private static final Dictionary dictionary;
-
-    public static void main(String[] args) {
-        FoodTruckDictionary ftd = new FoodTruckDictionary();
-        System.out.println(ftd.wordsSemanticallyRelated("taco", "enchilada"));
-    }
-
-    /**
-     * Load the dictionary
-     */
+    private static final String SIMILARITY_URL = System.getenv("SIMILARITY_URL");
+    private static final Double MIN_FOR_MATCH;
+    private static final Double MIN_FOR_SAMETYPE;
     static {
-        Dictionary tDict = null;
-        try {
-            tDict = Dictionary.getDefaultResourceInstance();
-        } catch (JWNLException e) {
-            log.error("Could not load dictionary for semantic similarity! No semantic fallback enabled", e);
-        } finally {
-            dictionary = tDict;
-        }
-    }
+        var similarityThreshhold = System.getenv("EXACT_THRESHHOLD");
+        var typeThreshhold = System.getenv("TYPE_THRESHHOLD");
+        double threshhold = 0.98d;
+        double type = 0.65d;
 
-    public boolean wordsSemanticallyRelated(String word1, String word2) {
-        if (dictionary != null) {
-            IndexWord iword1 = null, iword2 = null;
-
-            // Retrieve words
+        // Extract threshhold
+        if (similarityThreshhold != null) {
             try {
-                iword1 = getWordFor(word1);
-                iword2 = getWordFor(word2);
-            } catch (JWNLException e) {
-                log.error(String.format("Error thrown while getting index words for %s and %s", iword1, iword2), e);
+                threshhold = Double.parseDouble(similarityThreshhold);
+                type = Double.parseDouble(typeThreshhold);
+            } catch (Exception ex) {
+                log.error("Similarity threshhold or type could not be extracted from environment variables!", ex);
             }
-
-            // If one word not found, assume they can't be the same
-            if (iword1 == null || iword2 == null)
-                return false;
-
-            // Run similarity analysis
-            
         }
 
-        // In the event of utter calamity, assume words not related and hope for the best
-        return false;
+        // Set up minimum threshhold for a 'match'
+        MIN_FOR_MATCH = threshhold;
+        MIN_FOR_SAMETYPE = type;
     }
 
-    /**
-     * Translate the provided word into an IndexWord
-     * @param word The word to translate
-     * @return The IndexWord for the provided String, or null if no word found
-     * @throws JWNLException If something dorks with JWNL. Seriously, I got nothing.
-     */
-    private IndexWord getWordFor(String word) throws JWNLException {
-        IndexWord iWord;
-        for (var pos : ATTEMPT) {
-            iWord = dictionary.getIndexWord(pos, word);
-            if (iWord != null)
-                return iWord;
+    public Double getSimilarityScore(Double baseScore, List<String> truckTags, List<String> searchTags) {
+        // Get the list; if nothing's returned, return 0
+        var simList = getSimilarities(truckTags, searchTags);
+        if (simList == null || simList.size() == 0)
+            return 0d;
+
+        // Calculate the score for the category
+        int score = 0;
+        for (Double d : simList) {
+            if (d > MIN_FOR_MATCH)
+                score += 2;
+            else if (d > MIN_FOR_SAMETYPE)
+                score += 1;
         }
-        return null;
+        return baseScore * ((double) score) / (2 * simList.size());
+    }
+
+    public List<Double> getSimilarities(List<String> truckTags, List<String> searchTags) {
+        // Create input data
+        LinkedMultiValueMap body = new LinkedMultiValueMap();
+        body.put("truck_tags", truckTags);
+        body.put("search_tags", searchTags);
+
+        // Make request
+        try {
+            var result = (Map<String, List<Double>>) WebClient.create()
+                    .post()
+                    .uri(URI.create(SIMILARITY_URL + "/compare"))
+                    .body(BodyInserters.fromMultipartData(body))
+                    .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
+                    .acceptCharset(Charset.forName("UTF-8"))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+            return result.get("sim_list");
+        } catch (Exception ex) {
+            log.error("Failure occurred contacting similarity service", ex);
+            return null;
+        }
     }
 }
