@@ -16,7 +16,7 @@ type TruckProp = {
 function SearchTruckRow(props: TruckProp) {
   const router = useRouter();
 
-  if (props.truck.id == -1){
+  if (props.truck.id == -1) {
     return(
       <></>
     );
@@ -29,7 +29,12 @@ function SearchTruckRow(props: TruckProp) {
         if (props.onRedirect) {
           props.onRedirect();
         }
-        router.push(`/truck/${props.truck.id}`);
+        // It seems like when changing to the same route
+        // with a different URL slug, you need to either
+        // reload the page, or redirect to / and then to
+        // where you want in .then().
+        router.replace(`/truck/${props.truck.id}`)
+          .then(() => router.reload());
       }}>
         <ListItemText primary={props.truck.name}/>
         <ListItemText secondary={props.truck.description ? props.truck.description : "No Description"}/>
