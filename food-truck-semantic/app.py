@@ -54,3 +54,6 @@ def get_similarity():
     # Return the resulting best similarity ratings
     print(result)
     return {"sim_list": result}
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=os.environ.get("PORT"))

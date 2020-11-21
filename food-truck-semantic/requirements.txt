@@ -4,7 +4,6 @@ certifi==2020.11.8
 chardet==3.0.4
 click==7.1.2
 cymem==2.0.4
-en-vectors-web-lg==2.3.0
 Flask==1.1.2
 Flask-Cors==3.0.9
 idna==2.10

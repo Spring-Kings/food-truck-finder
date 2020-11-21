@@ -1,5 +1,14 @@
 version: '3'
 services:
+  similarity:
+    container_name: similarity-docker
+    build:
+      context: ../food-truck-semantic
+      dockerfile: food-truck-similarity.Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
   db:
     image: mysql
     command: --default-authentication-plugin=mysql_native_password
