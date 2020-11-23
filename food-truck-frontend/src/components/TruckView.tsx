@@ -12,6 +12,8 @@ import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
 import {loadTodaysRoute} from "../api/RouteLocation";
 import SendNotificationComponent from "./notifications/SendNotificationComponent";
 import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
+import ImageDialog from "./util/ImageDialog";
+import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 import LinkButton from "./layout/LinkButton";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
@@ -29,6 +31,7 @@ export interface TruckState {
   description: string | null;
   priceRating: number | null;
   tags: string[];
+  starRating: number | null;
   menuContentType: string | null;
 }
 
@@ -55,10 +58,11 @@ class TruckView extends Component<TruckProps, State> {
       userId: 0,
       name: "",
       description: "",
-      priceRating: -1,
+      priceRating: null,
       routePts: [],
       subscription: null,
       tags: [],
+      starRating: null,
       menuContentType: null
     };
   }
@@ -101,70 +105,136 @@ class TruckView extends Component<TruckProps, State> {
       return <NotFound/>;
     } else if (this.state.id < 1) {
       return (
-          <Container>
-            <CircularProgress/>
-          </Container>
+        <Container>
+          <CircularProgress/>
+        </Container>
       );
     }
 
-    let menuImage = null;
-    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
-    if (this.state.menuContentType === 'application/pdf')
-      menuImage = <ListItem><LinkButton url={menuUrl} text="View Menu"/></ListItem>;
-    else if (this.state.menuContentType?.startsWith('image/'))
-      menuImage = <ListItem><img alt="Menu" src={menuUrl}/></ListItem>;
+    const description = (
+      <Grid container justify="flex-start" alignItems="flex-start" spacing={1}>
+        <Grid item>
+          <Typography variant="subtitle1">Description:</Typography>
+        </Grid>
+        <Grid item>
+          {this.state.description}
+        </Grid>
+      </Grid>
+    );
 
-    const nonOwnerStuff = [
+    const rating = (name: string, child: JSX.Element) => (
+      <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={1}>
+        <Grid item>
+          <Typography variant="subtitle1">{name}</Typography>
+        </Grid>
+        <Grid item>
+          {child}
+        </Grid>
+      </Grid>
+    );
+
+    const priceRating = this.state.priceRating ?
+      rating("Price Rating:", <MoneyRating precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
+    const starRating = this.state.starRating ?
+      rating("Star Rating:", <StarRating precision={0.1} disabled value={this.state.starRating}/>) : <></>;
+
+    const tags = (
+      <>
+        <Typography variant="subtitle1">Tags:</Typography>
+        <List>
+          {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
+        </List>
+      </>
+    );
+
+    const reviewButton = (
+      <ListItem>
+        <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
+      </ListItem>
+    );
+
+    const subscribeButton = (
       <ListItem>
         <Button color="primary"
                 onClick={this.handleSubscription}>
           {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
         </Button>
-      </ListItem>,
-      <ListItem>
-        <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
       </ListItem>
+    );
+
+    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
+    let menuButton;
+    if (this.state.menuContentType === 'application/pdf')
+      menuButton = <LinkButton url={menuUrl} text="View Menu PDF"/>
+    else
+      menuButton = <ImageDialog url={menuUrl} text={`${this.state.name} Menu`}/>
+
+    const viewReviewsButton = (
+      <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
+    );
+
+    const truckInfo = [
+      description,
+      priceRating,
+      starRating,
+      tags,
+      menuButton,
+      viewReviewsButton
     ];
-    const ownerStuff = [
-      <ListItem>
-        <Button color="primary" onClick={this.editTruck}>
-          Edit
-        </Button>
-      </ListItem>,
-      <ListItem>Send Notification To Subscribers:</ListItem>,
-      <ListItem>
-        <SendNotificationComponent truckId={this.state.id}/>
-      </ListItem>
-    ];
 
+    const truckInfoView = (
+      <Grid item>
+        <Typography variant="h4">{this.state.name}</Typography>
+        <List>
+          {truckInfo.map(el => (
+            <ListItem>
+              {el}
+            </ListItem>
+          ))}
+          {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
+          <>
+            {reviewButton}
+            {subscribeButton}
+          </>
+          }
+        </List>
+      </Grid>
+    );
 
-    return (
-        <Grid container direction="column" spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h4">{this.state.name}</Typography>
-            <List>
-              {menuImage}
-              <ListItem>
-                Description: {this.state.description}
-              </ListItem>
-              <ListItem>
-                Price Rating: {this.state.priceRating}
-              </ListItem>
-              <ListItem>
-                Tags: {this.state.tags.join(', ')}
-              </ListItem>
-
-              {userCanEditTruck(this.state.userId) ? ownerStuff : nonOwnerStuff}
-              <ListItem>
-                <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
-              </ListItem>
-
-            </List>
-          </Grid>
-          <Grid item xs={12}>
-            <TruckRouteMapComponent locations={this.state.routePts}/>
+    const ownerButtons = (
+      <>
+        <Grid item>
+          <Typography variant="h4">Owner Zone</Typography>
+        </Grid>
+        <Grid item>
+          <Button color="primary"
+                  onClick={this.editTruck}>
+            Edit
+          </Button>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={0}>
+            <Grid item>
+              <Typography variant="subtitle1">Send Notification To Subscribers:</Typography>
+            </Grid>
+            <Grid item>
+              <SendNotificationComponent truckId={this.state.id}/>
+            </Grid>
           </Grid>
         </Grid>
+      </>
+    );
+
+    return (
+      <Grid container justify="flex-start" alignItems="flex-start">
+        <Grid container direction="row" justify="flex-start" align-items="flex-start">
+          {truckInfoView}
+          <Grid item xs>
+            <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+          </Grid>
+        </Grid>
+        {userCanEditTruck(this.state.userId) && ownerButtons}
+      </Grid>
     );
   }
 

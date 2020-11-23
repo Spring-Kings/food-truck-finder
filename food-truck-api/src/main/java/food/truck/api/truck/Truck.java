@@ -5,6 +5,7 @@ import food.truck.api.security.SecurityConstants;
 import lombok.Data;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.*;
@@ -51,6 +52,9 @@ public class Truck {
     @Nullable
     String description;
 
+
+    @IndexedEmbedded
+    @Field(name = "tags")
     @ElementCollection
     Set<String> tags;
 

@@ -1,10 +1,9 @@
 import api from "../../../util/api";
 import Form from "../../../components/Form";
 import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
-import NotFound from "../../../components/NotFound";
 import React, {Component} from 'react'
 import {AxiosResponse} from "axios";
-import Router, {useRouter} from "next/router";
+import Router from "next/router";
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
@@ -19,13 +18,14 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
     constructor(props: TruckProps) {
         super(props);
         this.state = {
-            id: this.props.truckId,
-            userId: -1,
-            name: "",
-            description: "",
-            priceRating: -1,
-            message: "",
-            tags: []
+          id: this.props.truckId,
+          userId: -1,
+          name: "",
+          description: "",
+          priceRating: null,
+          starRating: null,
+          message: "",
+          tags: []
         };
 
     }

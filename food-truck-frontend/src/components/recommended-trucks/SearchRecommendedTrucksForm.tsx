@@ -1,23 +1,21 @@
 import {LatLng} from "@google/maps";
-import {Button, Slider, TextField, Typography} from "@material-ui/core";
-import React, {ChangeEvent, Component} from "react";
+import {Button, Grid, Slider, Typography} from "@material-ui/core";
+import React, {Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
-import { RouteLocation } from "../map/route-map/RouteLocation";
+import {RouteLocation} from "../map/route-map/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
-import { ReactEventAdapter } from "../Form";
-import { getNearbyTruckLocationsById } from "../../api/Truck";
+import {ReactEventAdapter} from "../Form";
+import {getNearbyTruckLocationsById} from "../../api/Truck";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
   location: LatLng;
-  acceptibleRadius: number;
+  acceptableRadius: number;
   priceRating: number;
-  menuItems: string[];
   tags: string[];
-
   selectedTrucks?: RouteLocation[];
 };
 
@@ -47,10 +45,9 @@ class RecommendedTrucksForm extends Component<
   constructor(props: RecommendedTruckProps) {
     super(props);
     this.state = {
-      location: { lat: 0, lng: 0 },
-      acceptibleRadius: 1,
+      location: {lat: 0, lng: 0},
+      acceptableRadius: 1,
       priceRating: 3,
-      menuItems: [],
       tags: []
     };
     this.setState = this.setState.bind(this);
@@ -72,38 +69,52 @@ class RecommendedTrucksForm extends Component<
       return <TruckLocationMapComponent locations={this.state.selectedTrucks} />;
 
     return (
-      <>
-        <Typography variant="h6">Acceptable Radius</Typography>
-        <Slider
-          value={this.state.acceptibleRadius}
-          aria-labelledby="discrete-slider"
-          valueLabelDisplay="auto"
-          step={1}
-          min={0}
-          marks={MARKS}
-          max={30}
-          onChange={(_, val) =>
-            this.setState({ acceptibleRadius: this.coerce(val) })
-          }
-          style={{
-            width: 200,
-          }}
-        />
-
-        <Typography variant="h6">Price Rating</Typography>
-        <MoneyRating
-          name="priceRating"
-          defaultValue={this.state.priceRating}
-          onChange={this.changePrice}
-        />
-
-        <Typography variant="h6">Food Categories</Typography>
-        <MultiField title="Desired Menu Items" name="menuItems" onChange={this.changeItems}/>
-        <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
-        <Button variant="contained" color="primary" onClick={this.submit}>
-          Search Trucks
-        </Button>
-      </>
+      <Grid container alignItems="flex-start" spacing={1}>
+        <Grid item>
+          <Typography variant="h4">Search Recommended Trucks</Typography>
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">Acceptable Radius</Typography>
+        </Grid>
+        <Grid item>
+          <Slider
+            value={this.state.acceptableRadius}
+            aria-labelledby="discrete-slider"
+            valueLabelDisplay="auto"
+            step={1}
+            min={0}
+            marks={MARKS}
+            max={30}
+            onChange={(_, val) =>
+              this.setState({acceptableRadius: this.coerce(val)})
+            }
+            style={{
+              width: 200,
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant="h6">Price Rating</Typography>
+        </Grid>
+        <Grid item>
+          <MoneyRating
+            name="priceRating"
+            defaultValue={this.state.priceRating}
+            onChange={this.changePrice}
+          />
+        </Grid>
+        <Grid item>
+          <Typography variant="h4">Food Categories</Typography>
+        </Grid>
+        <Grid item>
+          <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags}/>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" color="primary" onClick={this.submit}>
+            Search Trucks
+          </Button>
+        </Grid>
+      </Grid>
     );
   }
 
@@ -119,7 +130,6 @@ class RecommendedTrucksForm extends Component<
     if (newVal !== null) this.setState({ priceRating: newVal });
   };
 
-  changeItems = (data: ReactEventAdapter) => this.setState({ menuItems: data.target.value });
   changeTags = (data: ReactEventAdapter) => this.setState({ tags: data.target.value });
 
   submit = async () => {
@@ -127,13 +137,12 @@ class RecommendedTrucksForm extends Component<
       let resp: any = await api.request({
         url: "/truck/recommended",
         data: {
-            acceptableRadius: this.state.acceptibleRadius,
-            priceRating: this.state.priceRating,
-            menuItems: this.state.menuItems,
-            tags: this.state.tags,
-            location: this.state.location,
-            numRequested: 10
-          },
+          acceptableRadius: this.state.acceptableRadius,
+          priceRating: this.state.priceRating,
+          tags: this.state.tags,
+          location: this.state.location,
+          numRequested: 10
+        },
         method: "POST",
       });
       if (resp.data !== undefined) {
