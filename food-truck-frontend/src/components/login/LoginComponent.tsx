@@ -1,6 +1,6 @@
 import React from 'react'
 import Form from "../Form";
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
 import {UserData} from "../../redux/user/UserReducer";
 import LinkButton from "../layout/LinkButton";
@@ -58,7 +58,7 @@ class LoginComponent extends React.Component<LoginProps, State> {
     Router.replace('/');
   }
 
-  onFail = (formData: any, err: any) => {
+  onFail = (formData: any, err: AxiosError) => {
     if (err.response?.status === 401)
       this.setState({resultText: "Incorrect username or password."});
     else if (err.response)

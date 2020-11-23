@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Grid, TextField, Typography} from "@material-ui/core";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import Form from "./Form";
 import Router from "next/router";
 
@@ -36,7 +36,7 @@ class CreateTruckForm extends Component<{}, State> {
     Router.replace(`/truck/${response.data.id}`);
   }
 
-  onFail = (formData: any, response: any) => {
+  onFail = (formData: any, response: AxiosError) => {
     this.setState({result: `Failed to create truck: ${JSON.stringify(response)}`});
   }
 }
