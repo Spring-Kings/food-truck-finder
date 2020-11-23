@@ -83,8 +83,6 @@ public class TruckService {
         if (truck.getPriceRating() == null)
             truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
-        truck.setTags(tags.orElse(null));
-        return truckRepository.save(truck);
 
         // Ensure all tags are unique and lowercase and have no whitespace at start/end
         if (tags.isPresent()) {
@@ -93,7 +91,10 @@ public class TruckService {
                     .filter(tag -> !tag.isEmpty())
                     .collect(Collectors.toSet());
             truck.setTags(tags2);
+        } else {
+            truck.setTags(null);
         }
+
         return truckRepository.save(truck);
     }
 

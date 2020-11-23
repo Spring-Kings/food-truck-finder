@@ -2,8 +2,9 @@ import React from "react";
 
 import {LatLngLiteral} from "@google/maps";
 import {Button, Container} from "@material-ui/core";
+import Alert from '@material-ui/lab/Alert'
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import {RouteLocation, RouteLocationState} from "./RouteLocation";
+import {locationsConflict, RouteLocation, RouteLocationState} from "./RouteLocation";
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
@@ -14,6 +15,7 @@ import {
 import {DEFAULT_ERR_KICK, DEFAULT_ERR_RESP, DEFAULT_OK_RESP as DEFAULT_NOOP,} from "../../../api/DefaultResponses";
 import RouteDaysBar from "./RouteDaysBar";
 import DayOfWeek from "./DayOfWeek";
+import {toTimeString} from "../../../util/date-conversions";
 
 
 interface RouteMapProps {
@@ -28,7 +30,7 @@ interface RouteMapState {
   trashedDays: DayOfWeek[];
   currentEdit: RouteLocation | undefined;
   canSave: boolean;
-
+  errorMessage: string | null;
 }
 
 class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
@@ -46,8 +48,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       currentEdit: undefined,
       days: [],
       trashedDays: [],
-      canSave: true
-
+      canSave: true,
+      errorMessage: null,
     };
 
     // Bind
@@ -69,17 +71,24 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   render() {
+    let errorAlert;
+    if (this.state.errorMessage)
+      errorAlert = <Alert severity="error">{this.state.errorMessage}</Alert>
+    else
+      errorAlert = null;
+
     return (
       <Container>
+        {errorAlert}
+
         <Button disabled={!this.state.canSave} onClick={this.save}>SAVE</Button>
         <RouteDaysBar routeId={this.props.routeId} func={this.saveDays}/>
-
 
         <EditRouteStopDialogComponent
           key={this.state.currentEdit && this.state.currentEdit.stopId}
           routePt={this.state.currentEdit}
           confirm={this.editPointTimes}
-          cancel={() => this.setState({ currentEdit: undefined })}
+          cancel={() => this.setState({currentEdit: undefined})}
           delete={this.delete}
         />
         <TruckRouteMapComponent
@@ -91,6 +100,26 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
         />
       </Container>
     );
+  }
+
+  private checkForConflicts = (locs: RouteLocation[]) => {
+    for (let i = 0; i < locs.length; ++i) {
+      for (let j = i + 1; j < locs.length; ++j) {
+        const loc1 = locs[i];
+        const loc2 = locs[j];
+        if (locationsConflict(loc1, loc2)) {
+          this.setState({
+            canSave: false,
+            errorMessage: `Stop #${loc1.stopId} (${toTimeString(loc1.arrivalTime)} - ${toTimeString(loc1.exitTime)})` +
+              ` conflicts with stop #${loc2.stopId} (${toTimeString(loc2.arrivalTime)} - ${toTimeString(loc2.exitTime)})`
+          });
+          return;
+        }
+
+      }
+    }
+
+    this.setState({errorMessage: null, canSave: true});
   }
 
   private async loadRoute() {
@@ -111,25 +140,31 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       this.props.routeId,
       DEFAULT_ERR_KICK
     );
-    this.setState({ mapCenter, routePts, nextStopId: routePts.length + 1 });
+    this.setState({mapCenter, routePts, nextStopId: routePts.length + 1});
+    this.checkForConflicts(routePts);
   }
 
   private addPoint(e: any) {
     const id: number = this.state.nextStopId;
+    const time = new Date();
+    time.setUTCSeconds(0, 0);
+    const pts = this.state.routePts.concat({
+      stopId: id,
+      routeLocationId: -1,
+      coords: {
+        lat: e.latLng.lat(),
+        lng: e.latLng.lng(),
+      },
+      arrivalTime: time,
+      exitTime: time,
+      state: RouteLocationState.CREATED,
+    });
+
     this.setState({
-      routePts: this.state.routePts.concat({
-        stopId: id,
-        routeLocationId: -1,
-        coords: {
-          lat: e.latLng.lat(),
-          lng: e.latLng.lng(),
-        },
-        arrivalTime: new Date(),
-        exitTime: new Date(),
-        state: RouteLocationState.CREATED,
-      }),
+      routePts: pts,
       nextStopId: id + 1,
     });
+    this.checkForConflicts(pts);
   }
 
   private editPointLoc(edit_pt: RouteLocation, newPos: LatLngLiteral) {
@@ -147,18 +182,21 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private editPointTimes(arrival: Date, departure: Date) {
+    const pts = this.state.routePts.map((pt) => {
+      if (pt.stopId === this.state.currentEdit?.stopId) {
+        return {
+          ...pt,
+          arrivalTime: arrival,
+          exitTime: departure,
+        };
+      } else return pt;
+    });
+
     this.setState({
-      routePts: this.state.routePts.map((pt) => {
-        if (pt.stopId === this.state.currentEdit?.stopId) {
-          return {
-            ...pt,
-            arrivalTime: arrival,
-            exitTime: departure,
-          };
-        } else return pt;
-      }),
+      routePts: pts,
       currentEdit: undefined,
     });
+    this.checkForConflicts(pts);
   }
 
   private initiateEditPointTimes(pt: RouteLocation, _: LatLngLiteral) {
@@ -195,6 +233,8 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       trashedPts: trash,
       nextStopId: id,
     });
+
+    this.checkForConflicts(result);
   }
 
   private async save() {
