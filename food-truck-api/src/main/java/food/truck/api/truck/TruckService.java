@@ -6,7 +6,6 @@ import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
 import food.truck.api.security.SecurityConstants;
-import food.truck.api.search.IndexingService;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,17 +49,13 @@ public class TruckService {
         return truckRepository.findById(truckId);
     }
 
-    public Truck saveTruck(Truck truck) {
-        return truckRepository.save(truck);
-    }
-
     public Truck createTruck(Long userId, String name) {
         var t = new Truck();
         t.setName(name);
         t.setUserId(userId);
         t.setDescription("");
         t.setTags(new HashSet<>());
-        return saveTruck(t);
+        return truckRepository.save(t);
     }
 
     public void deleteTruck(long truckId) {
@@ -90,7 +84,7 @@ public class TruckService {
             truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
         truck.setTags(tags.orElse(null));
-        return saveTruck(truck);
+        return truckRepository.save(truck);
     }
 
     public Route getActiveRoute(long truckId, DayOfWeek w) {
@@ -161,7 +155,7 @@ public class TruckService {
 
         t.setMenuContentType(mediaType);
 
-        saveTruck(t);
+        truckRepository.save(t);
         return HttpStatus.OK;
     }
 }

@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.time.LocalTime;
 
 
@@ -37,4 +36,17 @@ public class RouteLocation {
     @Convert(converter = PositionConverter.class)
     @Column(nullable = false)
     Position position;
+
+    // I have no idea how I came up with this but the tests seem to work
+    // 4 cases, depending on which locations wrap around midnight (UTC)
+    public boolean timeConflictsWith(RouteLocation other) {
+        if (exitTime.isAfter(arrivalTime) && other.exitTime.isAfter(other.arrivalTime))
+            return !arrivalTime.isAfter(other.exitTime) && !exitTime.isBefore(other.arrivalTime);
+        else if (exitTime.isBefore(arrivalTime) && other.exitTime.isAfter(other.arrivalTime))
+            return !exitTime.isBefore(other.arrivalTime) || !arrivalTime.isAfter(other.exitTime);
+        else if (exitTime.isAfter(arrivalTime) && other.exitTime.isBefore(other.arrivalTime))
+            return !arrivalTime.isAfter(other.exitTime) || !exitTime.isBefore(other.arrivalTime);
+        else
+            return true; // If both wrap around, that means they conflict at midnight
+    }
 }

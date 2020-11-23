@@ -4,8 +4,10 @@ import food.truck.api.Position;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -19,7 +21,9 @@ import java.util.Set;
 @Transactional
 public class RouteService {
 
-    /** Number of seconds in a day */
+    /**
+     * Number of seconds in a day
+     */
     private static final long SECONDS_IN_DAY = 60L * 60L * 24L;
 
     @Autowired
@@ -27,6 +31,16 @@ public class RouteService {
 
     @Autowired
     private RouteLocationRepository routeLocationRepository;
+
+    private boolean routeConflicts(Route r, Truck t) {
+        if (!r.isActive())
+            return false;
+        for (var existingRoute : routeRepository.findByTruck(t)) {
+            if (!r.routeId.equals(existingRoute.routeId) && existingRoute.conflictsWith(r))
+                return true;
+        }
+        return false;
+    }
 
     public List<Route> findRouteByTruck(Truck truck) {
         return routeRepository.findByTruck(truck);
@@ -41,6 +55,10 @@ public class RouteService {
         route.setRouteName(routeName);
         route.setTruck(truck);
         route.setActive(active);
+
+        if (routeConflicts(route, truck))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
         return routeRepository.save(route);
     }
 
@@ -53,10 +71,14 @@ public class RouteService {
     public boolean updateRoute(long routeId, Optional<String> newName, Optional<Boolean> newActive) {
         var r = routeRepository.findById(routeId);
         if (r.isEmpty())
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         var route = r.get();
+
         newName.ifPresent(route::setRouteName);
         newActive.ifPresent(route::setActive);
+        if (routeConflicts(route, route.getTruck()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
         routeRepository.save(route);
         return true;
     }
@@ -64,11 +86,15 @@ public class RouteService {
     public boolean addDayToRoute(long routeId, DayOfWeek w) {
         var r = findRouteById(routeId);
         if (r.isEmpty())
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         Route route = r.get();
         if (route.getDays().contains(w))
             return false;
         route.getDays().add(w);
+
+        if (routeConflicts(route, route.getTruck()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
         routeRepository.save(route);
         return true;
     }
@@ -86,11 +112,21 @@ public class RouteService {
     }
 
     public RouteLocation createLocation(long routeId, double lat, double lng, LocalTime arrivalTime, LocalTime exitTime) {
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var r = route.get();
+
         RouteLocation routeLoc = new RouteLocation();
-        routeLoc.setRoute(routeRepository.getOne(routeId)); // .getOne() uses lazy loading, so it doesn't really load the whole route here
         routeLoc.setPosition(new Position(lat, lng));
         routeLoc.setArrivalTime(arrivalTime);
         routeLoc.setExitTime(exitTime);
+        routeLoc.setRoute(r);
+        r.getLocations().add(routeLoc);
+
+        if (routeConflicts(r, r.getTruck()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
         return routeLocationRepository.save(routeLoc);
     }
 
@@ -104,11 +140,25 @@ public class RouteService {
         // Otherwise, update the old one
         var l = routeLocationRepository.findById(locId);
         if (l.isEmpty())
-            return false;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
         var loc = l.get();
-        loc.setPosition(new Position(lat, lng));
-        loc.setArrivalTime(arrivalTime);
-        loc.setExitTime(exitTime);
+        var newLoc = new RouteLocation();
+        newLoc.setPosition(new Position(lat, lng));
+        newLoc.setArrivalTime(arrivalTime);
+        newLoc.setExitTime(exitTime);
+        newLoc.setRouteLocationId(locId);
+
+        var route = findRouteById(routeId);
+        if (route.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
+        var r = route.get();
+        r.getLocations().remove(loc);
+        r.getLocations().add(newLoc);
+        if (routeConflicts(r, r.getTruck()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
         routeLocationRepository.save(loc);
         return true;
     }
