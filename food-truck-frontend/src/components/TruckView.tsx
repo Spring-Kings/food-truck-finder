@@ -1,26 +1,17 @@
-import React, { Component } from "react";
-import {
-  Box,
-  Button,
-  Container, Dialog,
-  Grid,
-  List,
-  ListItem,
-  Typography,
-} from "@material-ui/core";
+import React, {Component} from "react";
+import {Button, Container, Grid, Link, List, ListItem, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
 import getUserInfo from "../util/token";
 import TruckRouteMapComponent from "./map";
-import { RouteLocation } from "./map/route-map/RouteLocation";
+import {RouteLocation} from "./map/route-map/RouteLocation";
 
-import { DEFAULT_ERR_RESP } from "../api/DefaultResponses";
-import { loadTodaysRoute } from "../api/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
+import {loadTodaysRoute} from "../api/RouteLocation";
 import SendNotificationComponent from "./notifications/SendNotificationComponent";
-import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from "../api/Subscription";
-import {Subscription} from "../api/Subscription";
+import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 
@@ -40,6 +31,7 @@ export interface TruckState {
   priceRating: number | null;
   tags: string[];
   starRating: number | null;
+  menuContentType: string | null;
 }
 
 interface TruckViewState {
@@ -70,6 +62,7 @@ class TruckView extends Component<TruckProps, State> {
       subscription: null,
       tags: [],
       starRating: null,
+      menuContentType: null
     };
   }
 
@@ -108,11 +101,11 @@ class TruckView extends Component<TruckProps, State> {
 
   render() {
     if (!this.state) {
-      return <NotFound />;
+      return <NotFound/>;
     } else if (this.state.id < 1) {
       return (
         <Container>
-          <CircularProgress />
+          <CircularProgress/>
         </Container>
       );
     }
@@ -140,9 +133,9 @@ class TruckView extends Component<TruckProps, State> {
     );
 
     const priceRating = this.state.priceRating ?
-      rating("Price Rating:", <MoneyRating precision={0.1} disabled value={this.state.priceRating} />) : <></>;
+      rating("Price Rating:", <MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
     const starRating = this.state.starRating ?
-      rating("Star Rating:", <StarRating precision={0.1} disabled value={this.state.starRating} />) : <></>;
+      rating("Star Rating:", <StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>) : <></>;
 
     const tags = (
       <>
@@ -168,10 +161,12 @@ class TruckView extends Component<TruckProps, State> {
       </ListItem>
     );
 
-    const menuButton = (
-      <ImageDialog url={`${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`}
-                   text={`${this.state.name} Menu`}/>
-    );
+    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
+    let menuButton;
+    if (this.state.menuContentType === 'application/pdf')
+      menuButton = <Button><Link href={menuUrl} color="initial">View Menu PDF</Link></Button>
+    else
+      menuButton = <ImageDialog url={menuUrl} text={`${this.state.name} Menu`}/>
 
     const viewReviewsButton = (
       <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
@@ -190,8 +185,8 @@ class TruckView extends Component<TruckProps, State> {
       <Grid item>
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
-          {truckInfo.map(el => (
-            <ListItem>
+          {truckInfo.map((el, index) => (
+            <ListItem key={index}>
               {el}
             </ListItem>
           ))}

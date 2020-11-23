@@ -2,28 +2,21 @@ import React from "react";
 import Router from "next/router";
 
 import {
-  GridList,
-  GridListTile,
-  Card,
-  Button,
   Accordion,
-  AccordionSummary,
   AccordionDetails,
-  List,
-  ListItem,
-  Grid,
-  CardContent,
+  AccordionSummary,
+  Button,
+  Card,
   CircularProgress,
   Container,
+  GridList,
+  GridListTile,
   Typography,
-  CardActionArea,
-  IconButton,
 } from "@material-ui/core";
-import { Edit } from "@material-ui/icons";
 import TruckRouteMapComponent from "../../map";
 
 import TruckListComponent from "../TruckListComponent";
-import { SimpleTruck, UserData } from "../../../redux/user/UserReducer";
+import {UserData} from "../../../redux/user/UserReducer";
 
 interface OwnerDashboardProps {
   data: UserData | undefined;

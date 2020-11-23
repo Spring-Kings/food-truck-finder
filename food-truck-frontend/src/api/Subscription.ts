@@ -1,6 +1,5 @@
 import api from "../util/api";
 import {TruckState} from "../components/TruckView";
-import {AxiosResponse} from "axios";
 
 export interface Subscription {
   id: number;

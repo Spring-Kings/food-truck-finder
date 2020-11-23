@@ -2,9 +2,7 @@ package food.truck.api.notification;
 
 import food.truck.api.Position;
 import food.truck.api.PositionConverter;
-import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.truck.Truck;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;

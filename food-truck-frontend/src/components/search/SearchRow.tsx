@@ -16,8 +16,8 @@ type TruckProp = {
 function SearchTruckRow(props: TruckProp) {
   const router = useRouter();
 
-  if (props.truck.id == -1){
-    return(
+  if (props.truck.id == -1) {
+    return (
       <></>
     );
   }

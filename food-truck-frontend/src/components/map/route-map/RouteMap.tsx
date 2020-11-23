@@ -1,9 +1,9 @@
 import React from "react";
 
-import { LatLngLiteral } from "@google/maps";
-import { Button, Container } from "@material-ui/core";
+import {LatLngLiteral} from "@google/maps";
+import {Button, Container} from "@material-ui/core";
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import { RouteLocation, RouteLocationState } from "./RouteLocation";
+import {RouteLocation, RouteLocationState} from "./RouteLocation";
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
@@ -11,14 +11,8 @@ import {
   updateRouteDays,
   updateRouteLocations,
 } from "../../../api/RouteLocation";
-import {
-
-  DEFAULT_ERR_KICK,
-  DEFAULT_ERR_RESP,
-  DEFAULT_OK_RESP as DEFAULT_NOOP,
-} from "../../../api/DefaultResponses";
+import {DEFAULT_ERR_KICK, DEFAULT_ERR_RESP, DEFAULT_OK_RESP as DEFAULT_NOOP,} from "../../../api/DefaultResponses";
 import RouteDaysBar from "./RouteDaysBar";
-import api from "../../../util/api";
 import DayOfWeek from "./DayOfWeek";
 
 
@@ -66,11 +60,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.saveDays = this.saveDays.bind(this);
   }
 
-  componentDidMount() {
-    this.loadRoute();
+  async componentDidMount() {
+    await this.loadRoute();
   }
 
-  saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]){
+  saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]) {
     this.setState({days, trashedDays});
   }
 
@@ -101,7 +95,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
   private async loadRoute() {
     // get location
-    var mapCenter: LatLngLiteral = {
+    let mapCenter: LatLngLiteral = {
       lat: 0,
       lng: 0
     };
@@ -113,7 +107,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
 
     // Load route
-    var routePts: RouteLocation[] = await loadRouteLocations(
+    const routePts: RouteLocation[] = await loadRouteLocations(
       this.props.routeId,
       DEFAULT_ERR_KICK
     );
@@ -121,7 +115,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private addPoint(e: any) {
-    var id: number = this.state.nextStopId;
+    const id: number = this.state.nextStopId;
     this.setState({
       routePts: this.state.routePts.concat({
         stopId: id,
@@ -179,9 +173,9 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     if (curr == undefined) return;
 
     // Remove the route stop and re-index
-    var id: number = 1;
-    var result: RouteLocation[];
-    var trash: RouteLocation[] = this.state.trashedPts;
+    let id: number = 1;
+    let result: RouteLocation[];
+    let trash: RouteLocation[] = this.state.trashedPts;
 
     // If the point is in the DB, save it for deletion
     if (curr.state != RouteLocationState.CREATED) trash = trash.concat(curr);
@@ -207,7 +201,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({canSave: false});
 
     // Update in backend
-    updateRouteDays(this.props.routeId, this.state.days, this.state.trashedDays);
+    await updateRouteDays(this.props.routeId, this.state.days, this.state.trashedDays);
 
     if (this.state.routePts.length !== 0)
       await updateRouteLocations(

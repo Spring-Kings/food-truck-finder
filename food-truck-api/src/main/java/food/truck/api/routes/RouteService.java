@@ -170,7 +170,7 @@ public class RouteService {
     public Set<DayOfWeek> findRouteDaysByRouteId(long routeId) {
         return findRouteById(routeId)
                 .map(Route::getDays)
-                .orElse(null); // TODO: what to do if not found?
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     public List<RouteLocation> findRouteLocationByRouteId(long routeId) {

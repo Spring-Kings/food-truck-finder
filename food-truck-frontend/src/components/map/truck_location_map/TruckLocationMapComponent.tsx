@@ -1,14 +1,14 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from "@material-ui/core";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@material-ui/core";
 import Router from "next/router";
-import React, { useEffect, useState } from "react";
+import React, {useState} from "react";
 import TruckRouteMapComponent from "..";
-import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
-import { getTruckById } from "../../../api/Truck";
-import { MoneyRating } from "../../truck/rate_and_review/ratings";
-import { blankRouteLocation, RouteLocation } from "../route-map/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
+import {getTruckById} from "../../../api/Truck";
+import {MoneyRating} from "../../truck/rate_and_review/ratings";
+import {blankRouteLocation, RouteLocation} from "../route-map/RouteLocation";
 
 export type TruckLocationMapProps = {
-    locations: RouteLocation[]
+  locations: RouteLocation[]
 }
 
 const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
@@ -33,7 +33,8 @@ const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
           </Typography>
           <Grid container>
             <Grid>
-                {viewTruck && viewTruck.priceRating? <MoneyRating disabled value={viewTruck.priceRating} /> : <Typography variant="body1">Unrated</Typography>}
+              {viewTruck && viewTruck.priceRating ? <MoneyRating readOnly disabled value={viewTruck.priceRating}/> :
+                <Typography variant="body1">Unrated</Typography>}
             </Grid>
           </Grid>
         </DialogContent>

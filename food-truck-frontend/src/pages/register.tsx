@@ -61,7 +61,7 @@ class RegisterPageComponent extends React.Component<{}, State> {
   }
 
   private toggleOwner() {
-    var isOwner: boolean = this.state.owner;
+    const isOwner: boolean = this.state.owner;
     this.setState({owner: isOwner});
   }
 }

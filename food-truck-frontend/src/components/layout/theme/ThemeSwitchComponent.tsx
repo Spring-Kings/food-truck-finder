@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {IconButton} from "@material-ui/core";
 import {ThemeProps} from "../../theme/FoodTruckThemeProvider";
 import {Brightness4, BrightnessHigh} from "@material-ui/icons";

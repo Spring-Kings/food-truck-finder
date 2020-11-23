@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {createMuiTheme, jssPreset, StylesProvider, ThemeOptions, ThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, jssPreset, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
 import CoolLayout, {Args} from "../layout/CoolLayout"

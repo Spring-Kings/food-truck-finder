@@ -57,12 +57,14 @@ class LoginComponent extends React.Component<LoginProps, State> {
     this.state.loadUserFromBackend().catch(err => console.log(err));
     Router.replace('/');
   }
-  // TODO: change this once we find the type for the error response
-  onFail = (formData: any, response: any) => {
-    if (response.response.status === 401)
+
+  onFail = (formData: any, err: any) => {
+    if (err.response?.status === 401)
       this.setState({resultText: "Incorrect username or password."});
+    else if (err.response)
+      this.setState({resultText: 'Failed to login'});
     else
-      this.setState({resultText: `Failed to login: ${JSON.stringify(response)}`});
+      this.setState({resultText: 'Failed to login: No response.'});
   }
 }
 
