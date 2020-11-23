@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Container, Grid, List, ListItem, Typography,} from "@material-ui/core";
+import {Button, Container, Grid, Link, List, ListItem, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
@@ -14,7 +14,6 @@ import SendNotificationComponent from "./notifications/SendNotificationComponent
 import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
-import LinkButton from "./layout/LinkButton";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -134,9 +133,9 @@ class TruckView extends Component<TruckProps, State> {
     );
 
     const priceRating = this.state.priceRating ?
-      rating("Price Rating:", <MoneyRating precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
+      rating("Price Rating:", <MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
     const starRating = this.state.starRating ?
-      rating("Star Rating:", <StarRating precision={0.1} disabled value={this.state.starRating}/>) : <></>;
+      rating("Star Rating:", <StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>) : <></>;
 
     const tags = (
       <>
@@ -165,7 +164,7 @@ class TruckView extends Component<TruckProps, State> {
     const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
     let menuButton;
     if (this.state.menuContentType === 'application/pdf')
-      menuButton = <LinkButton url={menuUrl} text="View Menu PDF"/>
+      menuButton = <Button><Link href={menuUrl} color="initial">View Menu PDF</Link></Button>
     else
       menuButton = <ImageDialog url={menuUrl} text={`${this.state.name} Menu`}/>
 
@@ -186,8 +185,8 @@ class TruckView extends Component<TruckProps, State> {
       <Grid item>
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
-          {truckInfo.map(el => (
-            <ListItem>
+          {truckInfo.map((el, index) => (
+            <ListItem key={index}>
               {el}
             </ListItem>
           ))}

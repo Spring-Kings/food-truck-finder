@@ -58,7 +58,7 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
         </FormGroup>
         <List>
           {this.state.trucks.map(value => (
-            <SearchTruckRow truck={value} onRedirect={this.state.onRedirect}/>
+            <SearchTruckRow key={value.id} truck={value} onRedirect={this.state.onRedirect}/>
           ))}
         </List>
       </>

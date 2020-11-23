@@ -26,7 +26,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
   const classes = useAppBarStyles();
 
   const loadUser = () => {
-    if (localStorage.getItem("authToken") !== undefined && props.data.username === "") {
+    if (localStorage.getItem("authToken") != null && props.data.username === "") {
       props.loadUserFromBackend().then(
         (_response: any) => console.log('Loaded user'),
         (err: any) => console.log(err)

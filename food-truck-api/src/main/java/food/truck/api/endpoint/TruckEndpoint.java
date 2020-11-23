@@ -6,7 +6,6 @@ import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
-import food.truck.api.routes.RouteService;
 import food.truck.api.search.IndexingService;
 import food.truck.api.search.TruckSearchService;
 import food.truck.api.truck.Truck;
@@ -40,14 +39,12 @@ import java.util.Set;
 @RestController
 public class TruckEndpoint {
     private final TruckService truckService;
-    private final RouteService routeService;
     private final SubscriptionService subscriptionService;
     private final StrategySelector ss;
 
     @Autowired
-    public TruckEndpoint(TruckService truckService, RouteService routeService, SubscriptionService subscriptionService) {
+    public TruckEndpoint(TruckService truckService, SubscriptionService subscriptionService) {
         this.truckService = truckService;
-        this.routeService = routeService;
         this.subscriptionService = subscriptionService;
         this.ss = new StrategySelector(truckService, subscriptionService);
     }
@@ -105,7 +102,7 @@ public class TruckEndpoint {
     @GetMapping(path = "/truck/search")
     public List<Truck> searchTrucks(@RequestParam String search){
        if( search.isEmpty()){
-           return new ArrayList<Truck>();
+           return new ArrayList<>();
        }
        
         return truckSearchService.getTruckBaseOnText(search);

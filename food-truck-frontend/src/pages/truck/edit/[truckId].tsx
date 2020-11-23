@@ -2,7 +2,7 @@ import api from "../../../util/api";
 import Form from "../../../components/Form";
 import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
 import React, {Component} from 'react'
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import Router from "next/router";
 import {Button, CircularProgress, TextField, Typography} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
@@ -25,7 +25,8 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
           priceRating: null,
           starRating: null,
           message: "",
-          tags: []
+          tags: [],
+          menuContentType: null
         };
 
     }
@@ -72,18 +73,18 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
   }
 
     onMenuChange = (event: React.FormEvent) => {
-        var formData = new FormData();
-        var imagefile = document.querySelector('#fileInput') as HTMLInputElement;
+      const formData = new FormData();
+      const imagefile = document.querySelector('#fileInput') as HTMLInputElement;
 
-        if (imagefile === null || imagefile.files === null || imagefile.files[0] == null) {
-            console.log("Don't see a file there mate");
-            return;
-        }
+      if (imagefile === null || imagefile.files === null || imagefile.files[0] == null) {
+        console.log("Don't see a file there mate");
+        return;
+      }
 
-        formData.append("file", imagefile.files[0]);
-        api.post(`/truck/${this.state.id}/upload-menu`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+      formData.append("file", imagefile.files[0]);
+      api.post(`/truck/${this.state.id}/upload-menu`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
             }
         })
             .then(_ => this.setState({message: "Successfully uploaded menu"}))
@@ -117,7 +118,7 @@ class EditTruck extends Component<TruckProps, TruckComponentState> {
     Router.replace(`/truck/${this.state.id}`);
   }
 
-  onFail = (formData: any, response: AxiosResponse) => {
+  onFail = (formData: any, response: AxiosError) => {
     this.setState({
       ...this.state,
       message: `Failed to update truck details: ${JSON.stringify(response)}`

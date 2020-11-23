@@ -1,15 +1,10 @@
-import React, { Component } from "react";
-import {
-  Button,
-  Container,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import React, {Component} from "react";
+import {Button, Container, Grid, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review, { TruckReviews } from "../../../domain/truck/Review";
-import { loadReviewsByTruck } from "../../../api/RateReview";
-import { DEFAULT_ERR_KICK } from "../../../api/DefaultResponses";
-import { MoneyRating, StarRating } from "./ratings";
+import Review, {TruckReviews} from "../../../domain/truck/Review";
+import {loadReviewsByTruck} from "../../../api/RateReview";
+import {DEFAULT_ERR_KICK} from "../../../api/DefaultResponses";
+import {MoneyRating, StarRating} from "./ratings";
 import Router from "next/router";
 
 interface RateProps {
@@ -91,14 +86,14 @@ class ReviewListComponent extends Component<RateProps, RateState> {
   );
 
   ratingsReport = (id: number, starRating: number, costRating: number, item: boolean = false) => (
-    <Grid container item={item} xs key={`${id}/ratings`}>
+    <Grid container item={item} key={`${id}/ratings`}>
       <Grid item xs key={"star"}>
         <Typography variant="h6">Quality:</Typography>
-        <StarRating precision={0.1} disabled value={starRating} />
+        <StarRating readOnly precision={0.1} disabled value={starRating}/>
       </Grid>
       <Grid item xs key={"`cost"}>
         <Typography variant="h6">Value:</Typography>
-        <MoneyRating precision={0.1} disabled value={costRating} />
+        <MoneyRating readOnly precision={0.1} disabled value={costRating}/>
       </Grid>
     </Grid>)
 

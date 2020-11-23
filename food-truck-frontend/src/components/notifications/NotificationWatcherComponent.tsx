@@ -10,8 +10,8 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   const [notify, setNotify]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
-  const reloadNotifications = () => {
-    props.loadNotificationsFromBackend();
+  const reloadNotifications = async () => {
+    await props.loadNotificationsFromBackend();
     notifyUnread();
   };
   const notifyUnread = () => {
@@ -24,21 +24,26 @@ function NotificationWatcherComponent(props: NotificationListProps) {
     setNotified(true);
     router.replace('/notifications');
   }
+
   useEffect(() => {
-    if (!initialized) {
-      reloadNotifications();
-      setInitialized(true);
-    } else {
-      const timer = setInterval(reloadNotifications, 5000);
+      if (!initialized) {
+        reloadNotifications().then(setInitialized(true));
+      }
+    },
+    [] // No state dependencies --> only run once
+  );
+  useEffect(() => {
+    if (initialized) {
+      const timer = setInterval(reloadNotifications, 15000);
       return () => clearInterval(timer);
     }
-    return () => {};
-  });
+  })
+
   return (
     <>
       <IconButton color="inherit"
                   onClick={() => Router.replace('/notifications')}>
-        { initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/> }
+        {initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/>}
       </IconButton>
       <Dialog open={notify && !notified}>
         <DialogTitle>You have unread notifications!</DialogTitle>

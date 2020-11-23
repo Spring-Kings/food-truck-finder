@@ -46,7 +46,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
   }
 
   render() {
-    var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
+    const key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container fixed>
         <LoadScript googleMapsApiKey={key as string}>
