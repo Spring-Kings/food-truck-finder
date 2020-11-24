@@ -1,24 +1,12 @@
-import React, { Component } from "react";
-import {
-  Button,
-  Container,
-  FormControlLabel,
-  Grid,
-  Switch,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import React, {Component} from "react";
+import {Button, Container, FormControlLabel, Grid, Switch, TextField, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review, { emptyReview } from "../../../domain/truck/Review";
-import {
-  deleteReview,
-  getSaveReviewUrl,
-  loadReviewFromTruckForUser,
-} from "../../../api/RateReview";
+import Review, {emptyReview} from "../../../domain/truck/Review";
+import {deleteReview, getSaveReviewUrl, loadReviewFromTruckForUser,} from "../../../api/RateReview";
 import NotFound from "../../NotFound";
-import getUserInfo, { UserInfo } from "../../../util/token";
-import { MoneyRating, StarRating } from "./ratings";
-import { DEFAULT_ERR_RESP } from "../../../api/DefaultResponses";
+import loggedInUser, {UserInfo} from "../../../util/token";
+import {MoneyRating, StarRating} from "./ratings";
+import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
 import Router from "next/router";
 import Form from "../../Form";
 
@@ -49,7 +37,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
   }
 
   async componentDidMount() {
-    let user: UserInfo | null = getUserInfo();
+    let user: UserInfo | null = loggedInUser();
     if (user !== null) {
       let review: Review | null = await loadReviewFromTruckForUser(
         this.props.truckId,
@@ -69,7 +57,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
       else this.setState({ review: review, user: user, old_review_text: review.review });
     } else
       this.setState({
-        user: getUserInfo(),
+        user: loggedInUser(),
       });
   }
 

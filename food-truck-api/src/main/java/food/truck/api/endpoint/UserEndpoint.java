@@ -5,10 +5,7 @@ import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
-import food.truck.api.user.AbstractUser;
-import food.truck.api.user.User;
-import food.truck.api.user.UserService;
-import food.truck.api.user.UserView;
+import food.truck.api.user.*;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -38,9 +35,21 @@ public class UserEndpoint {
 
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
-        return userService.findUserById(id)
-                .map(UserView::of)
-                .orElse(null);
+        var target = userService.findUserById(id);
+        if (target.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var t = target.get();
+
+        if (t.getPrivacySetting() == PrivacySetting.PUBLIC
+                || (t.getPrivacySetting() == PrivacySetting.USERS_ONLY && viewer instanceof User)
+                || (t.getPrivacySetting() == PrivacySetting.PRIVATE && viewer instanceof User && ((User) viewer).getId() == id)
+        ) {
+            return userService.findUserById(id)
+                    .map(UserView::of)
+                    .orElse(null);
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     @Value
@@ -50,6 +59,8 @@ public class UserEndpoint {
         String newPassword;
         @Nullable
         String newEmail;
+        PrivacySetting newPrivacySetting;
+        boolean newOwnerStatus;
     }
 
     @PutMapping("/user")
@@ -69,8 +80,11 @@ public class UserEndpoint {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             u.setEmail(data.newEmail);
         }
+        u.setPrivacySetting(data.newPrivacySetting);
+        u.setOwner(data.newOwnerStatus);
 
         userService.saveUser(u);
+
         return true;
     }
 

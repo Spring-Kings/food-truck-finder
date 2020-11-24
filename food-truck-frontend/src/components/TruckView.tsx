@@ -4,7 +4,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import NotFound from "./NotFound";
 import api from "../util/api";
 import Router from "next/router";
-import getUserInfo from "../util/token";
+import loggedInUser from "../util/token";
 import TruckRouteMapComponent from "./map";
 import {RouteLocation} from "./map/route-map/RouteLocation";
 
@@ -16,7 +16,7 @@ import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
-  const user = getUserInfo();
+  const user = loggedInUser();
   if (user) {
     return truckOwnerId === user.userID;
   }
@@ -190,7 +190,7 @@ class TruckView extends Component<TruckProps, State> {
               {el}
             </ListItem>
           ))}
-          {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
+          {!userCanEditTruck(this.state.userId) && loggedInUser() !== null &&
           <>
             {reviewButton}
             {subscribeButton}

@@ -1,6 +1,6 @@
 import {Dispatch} from "redux";
 import api from "../../util/api";
-import getUserInfo from "../../util/token";
+import loggedInUser from "../../util/token";
 import {AxiosResponse} from "axios";
 import {UserAction, UserActionTypes} from "../../redux/user/UserActions";
 import {SimpleTruck} from "../../redux/user/UserReducer";
@@ -76,7 +76,7 @@ function logout(dispatch: Dispatch<UserAction>) {
 const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
   return {
     loadUserFromBackend: () => {
-      const id: number | undefined = getUserInfo()?.userID;
+      const id: number | undefined = loggedInUser()?.userID;
       if (id === undefined)
         throw "No user logged in!";
 
