@@ -18,7 +18,7 @@ type SearchTruckProps = {
   onRedirect?: () => void;
 }
 
-class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruckState>{
+class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruckState> {
   constructor(props: SearchTruckProps) {
     super(props);
 
@@ -46,7 +46,7 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
               <TextField fullWidth label="Search" onChange={(event) => {
                 this.setState({search: event.target.value.toLowerCase()})
               }} onKeyDown={event => {
-                if(event.key === 'Enter'){
+                if (event.key === 'Enter') {
                   this.handleSubmit();
                 }
               }}/>
@@ -58,7 +58,7 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
         </FormGroup>
         <List>
           {this.state.trucks.map(value => (
-            <SearchTruckRow truck={value} onRedirect={this.state.onRedirect}/>
+            <SearchTruckRow key={value.id} truck={value} onRedirect={this.state.onRedirect}/>
           ))}
         </List>
       </>

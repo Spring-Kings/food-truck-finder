@@ -1,38 +1,30 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 
 import Router from "next/router";
 
 import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Card,
-  CardContent,
   CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   GridList,
   GridListTile,
-  List,
-  ListItem,
   Typography,
 } from "@material-ui/core";
 
-import TruckRouteMapComponent from "../../../map";
-import { SimpleTruck, UserData } from "../../../../redux/user/UserReducer";
+import {UserData} from "../../../../redux/user/UserReducer";
 import TruckListComponent from "../../TruckListComponent";
-import { RouteLocation } from "../../../map/route-map/RouteLocation";
-import { DEFAULT_ERR_RESP } from "../../../../api/DefaultResponses";
-import { getNearbyTruckLocations, getTruckById } from "../../../../api/Truck";
+import {RouteLocation} from "../../../map/route-map/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
+import {getNearbyTruckLocations} from "../../../../api/Truck";
 import TruckLocationMapComponent from "../../../map/truck_location_map/TruckLocationMapComponent";
 
 // Dashboard props
 interface UserDashboardProps {
   data: UserData | undefined;
+
   readonly [x: string]: any;
 }
 
@@ -67,9 +59,9 @@ class UserDashboardComponent extends Component<
   async componentDidMount() {
     // Load
     try {
-      if (this.props.data !== undefined) {
+      if (this.props.data != null) {
         let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
-        this.setState({ inError: null, nearbyTrucks: trucks });
+        this.setState({inError: null, nearbyTrucks: trucks});
       } else
         await this.props.loadUserFromBackend();
     } catch (err) {

@@ -1,16 +1,16 @@
 import React, {Component, ReactElement} from 'react'
-import {AxiosResponse} from 'axios'
+import {AxiosError, AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
 
 export type Props = {
-  submitUrl: string,
-  submitMethod?: "POST" | "PUT" | "DELETE",
-  onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
-  onFailedSubmit?: (formData: any, response: any) => void, // TODO: Figure out type of response
-  children?: React.ReactNode,
-  customSubmitHandler?: Function,
-  formProps?: any
+    submitUrl: string,
+    submitMethod?: "POST" | "PUT" | "DELETE",
+    onSuccessfulSubmit?: (formData: any, response: AxiosResponse<any>) => void,
+    onFailedSubmit?: (formData: any, response: AxiosError<any>) => void, // TODO: Figure out type of response
+    children?: React.ReactNode,
+    customSubmitHandler?: Function,
+    formProps?: any
 }
 
 type State = {

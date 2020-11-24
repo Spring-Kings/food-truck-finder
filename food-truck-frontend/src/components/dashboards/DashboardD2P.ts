@@ -18,7 +18,7 @@ function requestSubscribed(id: number): Promise<AxiosResponse<any>> {
 async function requestOwnedTrucks(
   id: number
 ): Promise<SimpleTruck[] | undefined> {
-  var result: AxiosResponse = await api.request({
+  const result: AxiosResponse = await api.request({
     url: `/truck/owner/${id}`,
     method: "GET",
   });
@@ -40,8 +40,8 @@ async function updateUser(
       async (response) => {
         console.log(response.data);
         // Get trucks
-        var trucks: SimpleTruck[] | undefined = undefined;
-        if (response.data.owner === true) trucks = await requestOwnedTrucks(id);
+        let trucks: SimpleTruck[] | undefined = undefined;
+        if (response.data.owner) trucks = await requestOwnedTrucks(id);
 
         // Dispatch update
         dispatch({
@@ -79,26 +79,20 @@ function logout(dispatch: Dispatch<UserAction>) {
 const mapDispatchToProps = (dispatch: Dispatch<UserAction>) => {
   return {
     loadUserFromBackend: () => {
-      return new Promise<void>(() => {
-        var id: number | undefined = getUserInfo()?.userID;
-        if (id !== undefined) {
-          requestSubscribed(id).then(
-            (response) => updateUser(dispatch, id as number, response.data),
-            (err) => {
-              console.log(err);
-              updateUser(dispatch, id as number, []);
-            }
-          );
-        } else {
-          throw "No user logged in!";
+      const id: number | undefined = getUserInfo()?.userID;
+      if (id === undefined)
+        throw "No user logged in!";
+
+      return requestSubscribed(id).then(
+        (response) => updateUser(dispatch, id as number, response.data),
+        async (err) => {
+          console.log(err);
+          await updateUser(dispatch, id as number, []);
         }
-      });
+      );
     },
-    logoutUser: () => {
-      return new Promise<void>(() => {
-        logout(dispatch);
-      });
-    },
+
+    logoutUser: async () => logout(dispatch),
     dispatch,
   };
 };

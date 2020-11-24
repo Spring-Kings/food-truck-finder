@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import Form from "../Form";
-import {AxiosResponse} from 'axios';
+import {AxiosError, AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
 import {UserData} from "../../redux/user/UserReducer";
 import LinkButton from "../layout/LinkButton";
@@ -29,11 +29,14 @@ function LoginComponent(props: LoginProps) {
   }
 
   // TODO: change this once we find the type for the error response
-  const onFail = (formData: any, response: any) => {
-    if (response.response.status === 401)
+  const onFail = (formData: any, err: AxiosError) => {
+    if (err.response?.status === 401) {
       setResultText("Incorrect username or password.");
-    else
-      setResultText(`Failed to login: ${JSON.stringify(response)}`);
+    } else if (err.response) {
+      setResultText("Failed to login");
+    } else {
+      setResultText("Failed to login: No response.");
+    }
   }
 
   return (

@@ -13,7 +13,7 @@ function ImageDialog(props: ImageDialogProps) {
   return (
     <>
       <Button color="primary"
-                  onClick={() => setOpen(true)}>
+              onClick={() => setOpen(true)}>
         View {props.text}
       </Button>
       <Dialog open={open}

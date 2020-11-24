@@ -1,14 +1,5 @@
 import React, {useEffect} from 'react'
-import {
-  AppBar,
-  Avatar,
-  Box,
-  createStyles,
-  Grid,
-  Theme,
-  Toolbar,
-  Typography
-} from '@material-ui/core'
+import {AppBar, Avatar, Box, createStyles, Grid, Theme, Toolbar, Typography} from '@material-ui/core'
 import {makeStyles} from "@material-ui/core/styles";
 import LinkButton from "./LinkButton";
 import {UserData} from "../../redux/user/UserReducer";
@@ -35,7 +26,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
   const classes = useAppBarStyles();
 
   const loadUser = () => {
-    if (localStorage.getItem("authToken") !== undefined && props.data.username === "") {
+    if (localStorage.getItem("authToken") != null && props.data.username === "") {
       props.loadUserFromBackend().then(
         (_response: any) => console.log('Loaded user'),
         (err: any) => console.log(err)
@@ -70,14 +61,14 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     <AppBar className={classes.root}>
       <Toolbar>
         <Grid container direction="row" alignContent="space-between">
-          {menuBarItems.map(item => (
-            <Grid item>
-              {item}
-            </Grid>
+          {menuBarItems.map((item, index) => (
+              <Grid item key={index}>
+                {item}
+              </Grid>
           ))}
           <Grid item>
             {props.data.username === "" ? (
-              <LinkButton url="/login" text="Login"/>
+                <LinkButton url="/login" text="Login"/>
             ) : (
               <LinkButton url={`/dashboard/${dashboardUrl}`} text={`${props.data.username}'s Dashboard`}/>
             )}

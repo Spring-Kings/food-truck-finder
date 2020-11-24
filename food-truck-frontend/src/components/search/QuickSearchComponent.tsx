@@ -1,9 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Dialog,
-  DialogContent,
-  IconButton
-} from "@material-ui/core";
+import {Dialog, DialogContent, IconButton} from "@material-ui/core";
 import {Search} from "@material-ui/icons";
 import SearchTruckComponent from "./SearchTruckComponent";
 import {StyledDialogTitle} from "../util/StyledDialogTitle";
