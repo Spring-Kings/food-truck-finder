@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react'
-import {AppBar, Avatar, Box, createStyles, Grid, Theme, Toolbar, Typography} from '@material-ui/core'
-import {makeStyles} from "@material-ui/core/styles";
+import {AppBar, Avatar, Box, Grid, Toolbar, Typography} from '@material-ui/core'
 import LinkButton from "./LinkButton";
 import {UserData} from "../../redux/user/UserReducer";
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 import ThemeSwitchComponent from "./theme/ThemeSwitch";
 import MenuDropdownComponent from "./MenuDropdownComponent";
 import QuickSearchComponent from "../search/QuickSearchComponent";
+import {useFlexGrowStyles} from "../theme/FoodTruckThemeProvider";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -14,16 +14,8 @@ export type AppMenuBarProps = {
   loadUserFromBackend: () => Promise<void>;
 };
 
-const useAppBarStyles = makeStyles((_theme: Theme) =>
-  createStyles({
-    root: {
-      flexGrow: 1,
-    },
-  }),
-);
-
 export function AppMenuBarComponent(props: AppMenuBarProps) {
-  const classes = useAppBarStyles();
+  const classes = useFlexGrowStyles();
 
   const loadUser = () => {
     if (localStorage.getItem("authToken") != null && props.data.username === "") {
