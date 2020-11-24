@@ -13,10 +13,13 @@ import {
   GridListTile,
   Typography,
 } from "@material-ui/core";
-import TruckRouteMapComponent from "../../map";
 
 import TruckListComponent from "../TruckListComponent";
 import {UserData} from "../../../redux/user/UserReducer";
+import {loadTodaysRoute} from "../../../api/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
+import {RouteLocation} from "../../map/route-map/RouteLocation";
+import TruckLocationMapComponent from "../../map/truck_location_map/TruckLocationMapComponent";
 
 interface OwnerDashboardProps {
   data: UserData | undefined;
@@ -25,6 +28,7 @@ interface OwnerDashboardProps {
 
 function OwnerDashboardComponent(props: OwnerDashboardProps) {
   const [inError, setInError]: [string | null, any] = useState(null);
+  const [routePts, setRoutePts]: [RouteLocation[], any] = useState([]);
 
   const viewTruck = (id: number): void => {
     Router.replace(`/truck/${id}`);
@@ -40,6 +44,17 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
       (err: any) => setInError(err)
     );
   }, []);
+
+  useEffect(() => {
+    props.data?.ownedTrucks?.forEach(async truck => {
+      try {
+        const pts = await loadTodaysRoute(truck.id, DEFAULT_ERR_RESP);
+        setRoutePts(routePts.concat(pts));
+      } catch (err) {
+        setInError(err);
+      }
+    });
+  }, [props.data?.ownedTrucks]);
 
   // Be safe: don't show to people who don't deserve it. Of course you can hack and bypass it,
   // but it looks better to our "customers"
@@ -130,7 +145,7 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
 
         {/** Where the map would be */}
         <GridListTile cols={4} style={{ height: "100vh" }}>
-          <TruckRouteMapComponent locations={[]} />
+          <TruckLocationMapComponent locations={routePts} />
         </GridListTile>
       </GridList>
     </>
