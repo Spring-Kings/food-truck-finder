@@ -1,6 +1,7 @@
 package food.truck.api.recommendation;
 
 import food.truck.api.recommendation.semantic_similarity.FoodTruckDictionary;
+import food.truck.api.recommendation.semantic_similarity.FoodTruckThread;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
@@ -46,6 +47,12 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
 
         var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
         var scores = new HashMap<Truck, Double>();
+
+        // Run a secondary thread to acquire all truck tags
+        var getTagThread = new FoodTruckThread(ftd, trucks, prefs.getTags(), ScoreWeights.TagWeight.val);
+        getTagThread.start();
+
+        // Compute the rest of the scores
         for (var truck : trucks) {
             // I think this .get() is okay because .getTrucksCloseToLocation already filtered it to trucks with a valid current location
             var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId()).get().getPosition();
@@ -58,18 +65,6 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             else
                 priceScore = 0;
 
-            double tagScore;
-            if (prefs.getTags().size() != 0) {
-                int numMatchingTags = 0;
-                for (String tag : prefs.getTags()) {
-                    if (truck.hasTag(tag))
-                        ++numMatchingTags;
-                }
-                tagScore = ScoreWeights.TagWeight.val * ((double) (numMatchingTags) / prefs.getTags().size());
-            } else {
-                tagScore = 0;
-            }
-
             double ratingScore;
             if (truck.getStarRating() != null) {
                 ratingScore = ScoreWeights.RatingWeight.val * (truck.getStarRating() - 3);
@@ -81,9 +76,18 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             if (userSubs.stream().anyMatch(sub -> sub.getTruck().getId().equals(truck.getId())))
                 subScore = ScoreWeights.SubscriptionWeight.val;
 
-            scores.put(truck, distScore + priceScore + tagScore + ratingScore + subScore);
+            scores.put(truck, distScore + priceScore + ratingScore + subScore);
         }
 
+        // Rejoin the two score computations
+        try {
+            getTagThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        getTagThread.populateScores(scores);
+
+        // Finalize scoring and return
         trucks.sort((a, b) -> Double.compare(scores.get(b), scores.get(a)));
         return trucks;
     }
