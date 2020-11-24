@@ -77,7 +77,7 @@ public class RouteService {
         newName.ifPresent(route::setRouteName);
         newActive.ifPresent(route::setActive);
         if (routeConflicts(route, route.getTruck()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
 
         routeRepository.save(route);
         return true;

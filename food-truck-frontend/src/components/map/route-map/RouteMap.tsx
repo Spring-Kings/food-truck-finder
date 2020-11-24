@@ -16,7 +16,11 @@ import {DEFAULT_ERR_KICK, DEFAULT_ERR_RESP, DEFAULT_OK_RESP as DEFAULT_NOOP,} fr
 import RouteDaysBar from "./RouteDaysBar";
 import DayOfWeek from "./DayOfWeek";
 import {toTimeString} from "../../../util/date-conversions";
+import api from "../../../util/api";
 
+enum Status {
+  OK, PLEASE_WAIT, CONFLICT, BAD_ROUTE
+}
 
 interface RouteMapProps {
   routeId: number;
@@ -29,7 +33,7 @@ interface RouteMapState {
   days: DayOfWeek[];
   trashedDays: DayOfWeek[];
   currentEdit: RouteLocation | undefined;
-  canSave: boolean;
+  status: Status;
   errorMessage: string | null;
 }
 
@@ -48,7 +52,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       currentEdit: undefined,
       days: [],
       trashedDays: [],
-      canSave: true,
+      status: Status.PLEASE_WAIT,
       errorMessage: null,
     };
 
@@ -64,6 +68,20 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
   async componentDidMount() {
     await this.loadRoute();
+    api.get(`/route/${this.props.routeId}`)
+      .then((resp) => {
+        if (resp.data.active === false)
+          this.setState({status: Status.OK});
+        else
+          this.setState({
+            status: Status.BAD_ROUTE,
+            errorMessage: "Only non-active routes can be edited."
+          });
+      })
+      .catch(_ => this.setState({
+        status: Status.BAD_ROUTE,
+        errorMessage: "The route appears to be invalid."
+      }));
   }
 
   saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]) {
@@ -77,11 +95,16 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     else
       errorAlert = null;
 
+    const pleaseWait = (this.state.status == Status.PLEASE_WAIT)
+      ? <p>Please wait...</p>
+      : null;
+
     return (
       <Container>
         {errorAlert}
+        {pleaseWait}
 
-        <Button disabled={!this.state.canSave} onClick={this.save}>SAVE</Button>
+        <Button disabled={this.state.status != Status.OK} onClick={this.save}>SAVE</Button>
         <RouteDaysBar routeId={this.props.routeId} func={this.saveDays}/>
 
         <EditRouteStopDialogComponent
@@ -102,27 +125,38 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     );
   }
 
-  private checkForConflicts = (locs: RouteLocation[]) => {
+  private verify = (): Promise<void> => {
+    if (this.state.status == Status.OK || this.state.status == Status.CONFLICT) {
+      const errMsg = this.checkForConflicts();
+      if (errMsg)
+        return new Promise<void>((resolve) =>
+          this.setState({errorMessage: errMsg, status: Status.CONFLICT}, resolve)
+        );
+      else
+        return new Promise<void>(resolve =>
+          this.setState({errorMessage: null, status: Status.OK}, resolve)
+        );
+    } else
+      return Promise.resolve();
+  }
+
+  private checkForConflicts = (): string | null => {
+    const locs = this.state.routePts;
     for (let i = 0; i < locs.length; ++i) {
       for (let j = i + 1; j < locs.length; ++j) {
         const loc1 = locs[i];
         const loc2 = locs[j];
         if (locationsConflict(loc1, loc2)) {
-          this.setState({
-            canSave: false,
-            errorMessage: `Stop #${loc1.stopId} (${toTimeString(loc1.arrivalTime)} - ${toTimeString(loc1.exitTime)})` +
-              ` conflicts with stop #${loc2.stopId} (${toTimeString(loc2.arrivalTime)} - ${toTimeString(loc2.exitTime)})`
-          });
-          return;
+          return `Stop #${loc1.stopId} (${toTimeString(loc1.arrivalTime)} - ${toTimeString(loc1.exitTime)})` +
+            ` conflicts with stop #${loc2.stopId} (${toTimeString(loc2.arrivalTime)} - ${toTimeString(loc2.exitTime)})`
         }
-
       }
     }
 
-    this.setState({errorMessage: null, canSave: true});
+    return null;
   }
 
-  private async loadRoute() {
+  private loadRoute(): Promise<void> {
     // get location
     let mapCenter: LatLngLiteral = {
       lat: 0,
@@ -136,12 +170,13 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     });
 
     // Load route
-    const routePts: RouteLocation[] = await loadRouteLocations(
+    return loadRouteLocations(
       this.props.routeId,
       DEFAULT_ERR_KICK
-    );
-    this.setState({mapCenter, routePts, nextStopId: routePts.length + 1});
-    this.checkForConflicts(routePts);
+    ).then(pts => {
+      return this.setState({mapCenter, routePts: pts, nextStopId: pts.length + 1}, this.verify);
+    });
+
   }
 
   private addPoint(e: any) {
@@ -163,8 +198,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({
       routePts: pts,
       nextStopId: id + 1,
-    });
-    this.checkForConflicts(pts);
+    }, this.verify);
   }
 
   private editPointLoc(edit_pt: RouteLocation, newPos: LatLngLiteral) {
@@ -195,8 +229,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     this.setState({
       routePts: pts,
       currentEdit: undefined,
-    });
-    this.checkForConflicts(pts);
+    }, this.verify);
   }
 
   private initiateEditPointTimes(pt: RouteLocation, _: LatLngLiteral) {
@@ -232,13 +265,11 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       routePts: result,
       trashedPts: trash,
       nextStopId: id,
-    });
-
-    this.checkForConflicts(result);
+    }, this.verify);
   }
 
   private async save() {
-    this.setState({canSave: false});
+    this.setState({status: Status.PLEASE_WAIT});
 
     // Update in backend
     await updateRouteDays(this.props.routeId, this.state.days, this.state.trashedDays);
@@ -262,7 +293,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
     // Reload from backend
     await this.loadRoute();
-    this.setState({canSave: true});
+    this.setState({status: Status.OK}, this.verify);
   }
 }
 
