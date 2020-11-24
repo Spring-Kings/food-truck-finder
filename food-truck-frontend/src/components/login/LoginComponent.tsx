@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import Form from "../Form";
 import {AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
@@ -6,64 +6,55 @@ import {UserData} from "../../redux/user/UserReducer";
 import LinkButton from "../layout/LinkButton";
 import Router from "next/router";
 
-type State = LoginProps & {
-  resultText: string;
-}
-
 interface LoginProps {
   data: UserData;
   loadUserFromBackend: () => Promise<void>;
 }
 
-class LoginComponent extends React.Component<LoginProps, State> {
-  constructor(props: LoginProps) {
-    super(props);
-    this.state = {
-      resultText: "",
-      data: props.data,
-      loadUserFromBackend: props.loadUserFromBackend
+function LoginComponent(props: LoginProps) {
+  const [resultText, setResultText]: [string, any] = useState("");
+
+  useEffect(() => {
+    if (props.data.username != "") {
+      const dashboardType = props.data.owner ? 'owner' : 'user';
+      Router.replace(`/dashboard/${dashboardType}`);
     }
-  }
+  });
 
-  render() {
-    return (
-      <Grid container>
-        <Grid item>
-          <Typography variant="h2">Login</Typography>
-        </Grid>
-        <Grid item>
-          <Form submitUrl={'/login'} onSuccessfulSubmit={this.onSubmit} onFailedSubmit={this.onFail}>
-            <TextField label="Username" name="username"/>
-            <TextField label="Password" name="password" type="password"/>
-          </Form>
-        </Grid>
-        <Grid item>
-          <LinkButton url="/register" text="Create an account here."/>
-        </Grid>
-        <Grid item>
-          <Typography variant="h6">{this.state.resultText}</Typography>
-        </Grid>
-      </Grid>
-    )
-  }
-
-  onSubmit = (formData: any, response: AxiosResponse<any>) => {
+  const onSubmit = (formData: any, response: AxiosResponse<any>) => {
     const token = response.headers['token'];
     localStorage.setItem('authToken', token);
-    this.setState({
-      ...this.state,
-      resultText: `Set token to ${token}`
-    });
-    this.state.loadUserFromBackend().catch(err => console.log(err));
-    Router.replace('/');
+    setResultText(`Set token to ${token}`);
+    props.loadUserFromBackend().catch(err => console.log(err));
   }
+
   // TODO: change this once we find the type for the error response
-  onFail = (formData: any, response: any) => {
+  const onFail = (formData: any, response: any) => {
     if (response.response.status === 401)
-      this.setState({resultText: "Incorrect username or password."});
+      setResultText("Incorrect username or password.");
     else
-      this.setState({resultText: `Failed to login: ${JSON.stringify(response)}`});
+      setResultText(`Failed to login: ${JSON.stringify(response)}`);
   }
+
+  return (
+    <Grid container>
+      <Grid item>
+        <Typography variant="h2">Login</Typography>
+      </Grid>
+      <Grid item>
+        <Form submitUrl={'/login'} onSuccessfulSubmit={onSubmit} onFailedSubmit={onFail}>
+          <TextField label="Username" name="username"/>
+          <TextField label="Password" name="password" type="password"/>
+        </Form>
+      </Grid>
+      <Grid item>
+        <LinkButton url="/register" text="Create an account here."/>
+      </Grid>
+      <Grid item>
+        <Typography variant="h6">{resultText}</Typography>
+      </Grid>
+    </Grid>
+  )
 }
 
 export default LoginComponent;

@@ -46,7 +46,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     loadUser();
   });
 
-  const dashboardUrl = props.data.ownedTrucks !== undefined ? 'owner' : 'user';
+  const dashboardUrl = props.data.owner ? 'owner' : 'user';
 
   const menuBarItems = [
     <Avatar src="/logo.png" alt="logo" variant="rounded"/>,
@@ -79,7 +79,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
             {props.data.username === "" ? (
               <LinkButton url="/login" text="Login"/>
             ) : (
-              <LinkButton url={`/dashboard/${dashboardUrl}`} text="Dashboard"/>
+              <LinkButton url={`/dashboard/${dashboardUrl}`} text={`${props.data.username}'s Dashboard`}/>
             )}
           </Grid>
           {menuDropdown}
