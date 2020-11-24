@@ -72,9 +72,21 @@ const cardOptions = {
   raised: false,
 };
 
+const lightCardHeaderOptions = {
+  root: {
+    backgroundColor: blueGrey[100],
+  }
+};
+
 const lightCardContentOptions = {
   root: {
     backgroundColor: grey[100]
+  }
+};
+
+const darkCardHeaderOptions = {
+  root: {
+    backgroundColor: blueGrey[900]
   }
 };
 
@@ -129,6 +141,7 @@ let themeOptions = {
       },
     },
     MuiCardContent: darkCardContentOptions,
+    MuiCardHeader: darkCardHeaderOptions
   }
 };
 
@@ -159,7 +172,8 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
     },
     overrides: {
       ...themeOptions.overrides,
-      MuiCardContent: props.data.isDark ? darkCardContentOptions : lightCardContentOptions
+      MuiCardContent: props.data.isDark ? darkCardContentOptions : lightCardContentOptions,
+      MuiCardHeader: props.data.isDark ? darkCardHeaderOptions : lightCardHeaderOptions,
     }
   }));
 
