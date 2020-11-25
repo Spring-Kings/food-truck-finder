@@ -23,7 +23,6 @@ import TruckLocationMapComponent from "../../map/truck_location_map/TruckLocatio
 import {useFlexGrowStyles} from "../../theme/FoodTruckThemeProvider";
 import TruckCardComponent from "../../truck/TruckCardComponent";
 import {StyledDialogTitle} from "../../util/StyledDialogTitle";
-import SendNotificationComponent from "../../notifications/SendNotificationComponent";
 import CreateTruckForm from "../../CreateTruckForm";
 
 interface OwnerDashboardProps {
@@ -92,71 +91,6 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
         </Button>
       </Container>
     );
-
-  // Return true UI
-  // const oldUI = (
-  //   <>
-  //     {/** Props IDd using: https://material-ui.com/components/grid/ */}
-  //     <GridList
-  //       cols={5}
-  //       style={{
-  //         height: "100vh",
-  //         width: "100%",
-  //       }}
-  //     >
-  //       {/** Side list */}
-  //       <GridListTile cols={1} style={{ height: "100vh" }}>
-  //         {/* Return to user dashboard */}
-  //         <Card>
-  //           <Button
-  //             variant="contained"
-  //             color="primary"
-  //             onClick={toUserDashboard}
-  //           >
-  //             User Dashboard
-  //           </Button>
-  //         </Card>
-  //
-  //         {/* Subscribe list */}
-  //         <Accordion>
-  //           <AccordionSummary>My Trucks</AccordionSummary>
-  //           <AccordionDetails>
-  //             <TruckListComponent
-  //               trucks={props.data.ownedTrucks}
-  //               tail={
-  //                 <Card>
-  //                   <Button
-  //                     variant="contained"
-  //                     onClick={() => Router.replace("/create-truck")}
-  //                   >
-  //                     New...
-  //                   </Button>
-  //                 </Card>
-  //               }
-  //               handleTruckIcon={<Typography>View</Typography>}
-  //               handleTruck={viewTruck}
-  //             />
-  //           </AccordionDetails>
-  //         </Accordion>
-  //
-  //         {/* Open manager page */}
-  //         <Card>
-  //           <Button
-  //             variant="contained"
-  //             onClick={() => Router.replace("/manage-trucks")}
-  //           >
-  //             Manage trucks
-  //           </Button>
-  //         </Card>
-  //       </GridListTile>
-  //
-  //       {/** Where the map would be */}
-  //       <GridListTile cols={4} style={{ height: "100vh" }}>
-  //         <TruckLocationMapComponent locations={routePts} />
-  //       </GridListTile>
-  //     </GridList>
-  //   </>
-  // );
 
   return (
     <Grid container>
