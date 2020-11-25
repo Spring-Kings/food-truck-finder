@@ -28,10 +28,6 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
   const [routePts, setRoutePts]: [RouteLocation[], any] = useState([]);
   const [creatingTruck, setCreatingTruck]: [boolean, any] = useState(false);
 
-  const viewTruck = (id: number): void => {
-    Router.replace(`/truck/${id}`);
-  };
-
   const toUserDashboard = (): void => {
     Router.replace("/dashboard/user");
   }
