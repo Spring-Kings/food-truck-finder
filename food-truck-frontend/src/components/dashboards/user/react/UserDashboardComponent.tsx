@@ -8,7 +8,7 @@ import {
   AccordionDetails,
   AccordionSummary, Box,
   Card,
-  CircularProgress, Container, Grid,
+  CircularProgress, Container, Dialog, DialogContent, Grid,
   GridList,
   GridListTile, List, ListItem, ListSubheader,
   Typography,
@@ -21,6 +21,9 @@ import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
 import {getNearbyTruckLocations} from "../../../../api/Truck";
 import TruckLocationMapComponent from "../../../map/truck_location_map/TruckLocationMapComponent";
 import TruckCardComponent from "../../../truck/TruckCardComponent";
+import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
+import {StyledDialogTitle} from "../../../util/StyledDialogTitle";
+import CreateTruckForm from "../../../CreateTruckForm";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -53,7 +56,6 @@ class UserDashboardComponent extends Component<
     };
 
     // Bind methods
-    this.viewTruck = this.viewTruck.bind(this);
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
   }
 
@@ -81,56 +83,26 @@ class UserDashboardComponent extends Component<
     return (
       <>
         {this.props.data.ownedTrucks ? (
-          <Box py={1} px={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.toOwnerDashboard}
-            >
-              Owner Dashboard
-            </Button>
-          </Box>
+          <Grid container direction="row" justify="flex-start" alignItems="flex-start">
+            <Grid item>
+              <Box px={3}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={this.toOwnerDashboard}
+                >
+                  Owner Dashboard
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
         ) : null}
-        {/** Props IDd using: https://material-ui.com/components/grid/ */}
-        <GridList
-          cols={5}
-          style={{
-            height: "100vh",
-            width: "100%",
-          }}
-        >
-          {/** Side list */}
-          <GridListTile cols={2} style={{ height: '50vh' }}>
-            <Box px={3}>
-              <Typography variant="h6">Subscribed Trucks</Typography>
-            </Box>
-            <Container style={{ maxHeight: '50vh', overflow: 'auto' }}>
-              <List disablePadding>
-                {
-                  this.props.data.subscribedTrucks.map(truck => (
-                    <ListItem key={truck.id} style={{ minWidth: '100%' }} disableGutters>
-                      <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
-                    </ListItem>
-                  ))
-                }
-              </List>
-            </Container>
-          </GridListTile>
-
-          {/* Show nearby trucks on the map */}
-          <GridListTile cols={3} style={{ height: '50vh' }}>
-            <Box pb={0.5} px={3}>
-              <Typography variant="h6">Nearby Trucks</Typography>
-            </Box>
-            <TruckLocationMapComponent locations={this.state.nearbyTrucks} height="50vh"/>
-          </GridListTile>
-        </GridList>
+        <TruckListAndMapComponent routePts={this.state.nearbyTrucks}
+                                  trucks={this.props.data.subscribedTrucks}
+                                  listLabel={'Subscribed Trucks'}
+                                  mapLabel={'Nearby Trucks'}/>
       </>
     );
-  }
-
-  private viewTruck(id: number): void {
-    Router.replace(`/truck/${id}`);
   }
 
   private toOwnerDashboard() {

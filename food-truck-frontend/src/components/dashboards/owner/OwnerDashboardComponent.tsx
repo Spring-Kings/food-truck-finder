@@ -24,6 +24,7 @@ import {useFlexGrowStyles} from "../../theme/FoodTruckThemeProvider";
 import TruckCardComponent from "../../truck/TruckCardComponent";
 import {StyledDialogTitle} from "../../util/StyledDialogTitle";
 import CreateTruckForm from "../../CreateTruckForm";
+import TruckListAndMapComponent from "../../truck/TruckListAndMapComponent";
 
 interface OwnerDashboardProps {
   data: UserData | undefined;
@@ -119,34 +120,10 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
           </Dialog>
         </Grid>
       </Grid>
-      <GridList cols={5}
-                style={{
-                  height: "100vh",
-                  width: "100%",
-                }}>
-        <GridListTile cols={2} style={{ height: '50vh' }}>
-          <Box pt={1} px={3}>
-            <Typography variant="h6">Owned Trucks</Typography>
-          </Box>
-          <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
-            <List disablePadding>
-              {
-                props.data?.ownedTrucks?.map(truck => (
-                  <ListItem key={truck.id} style={{ minWidth: '100%' }} disableGutters>
-                    <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
-                  </ListItem>
-                ))
-              }
-            </List>
-          </Container>
-        </GridListTile>
-        <GridListTile cols={3} style={{ height: '50vh' }}>
-          <Box py={0.5} px={3}>
-            <Typography variant="h6">Active Locations</Typography>
-          </Box>
-          <TruckLocationMapComponent locations={routePts} height="50vh"/>
-        </GridListTile>
-      </GridList>
+      <TruckListAndMapComponent routePts={routePts}
+                                trucks={props.data?.ownedTrucks}
+                                listLabel={'Owned Trucks'}
+                                mapLabel={'Active Locations'}/>
     </>
   );
 }
