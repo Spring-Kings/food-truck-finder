@@ -125,7 +125,7 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
             <List disablePadding>
               {
                 props.data?.ownedTrucks?.map(truck => (
-                  <ListItem style={{minWidth: '100%'}} disableGutters>
+                  <ListItem key={truck.id} style={{minWidth: '100%'}} disableGutters>
                     <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
                   </ListItem>
                 ))

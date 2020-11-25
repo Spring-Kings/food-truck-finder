@@ -8,9 +8,9 @@ import {
   AccordionDetails,
   AccordionSummary,
   Card,
-  CircularProgress,
+  CircularProgress, Container, Grid,
   GridList,
-  GridListTile,
+  GridListTile, List, ListItem,
   Typography,
 } from "@material-ui/core";
 
@@ -20,6 +20,7 @@ import {RouteLocation} from "../../../map/route-map/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
 import {getNearbyTruckLocations} from "../../../../api/Truck";
 import TruckLocationMapComponent from "../../../map/truck_location_map/TruckLocationMapComponent";
+import TruckCardComponent from "../../../truck/TruckCardComponent";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -88,65 +89,45 @@ class UserDashboardComponent extends Component<
           }}
         >
           {/** Side list */}
-          <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Go to owner dashboard */}
-            {this.props.data.ownedTrucks ? (
-              <Card>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.toOwnerDashboard}
-                >
-                  Owner Dashboard
-                </Button>
-              </Card>
-            ) : null}
-
-            {/* Go to notifications page */}
-            <Card>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.toNotifications}
-              >
-                Notifications
-              </Button>
-            </Card>
-
-            {/* Go to notifications page */}
-            <Card>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.toSearchTrucks}
-              >
-                Search Trucks
-              </Button>
-            </Card>
-
-            {/* Subscribe list */}
-            <Accordion>
-              <AccordionSummary>Subscribed Trucks</AccordionSummary>
-              <AccordionDetails>
-                <TruckListComponent
-                  trucks={this.props.data.subscribedTrucks}
-                  empty={
-                    <Card>
-                      <Button disabled={true}>No subscriptions</Button>
-                    </Card>
-                  }
-                  handleTruckIcon={<Typography>VIEW</Typography>}
-                  handleTruck={this.viewTruck}
-                />
-              </AccordionDetails>
-            </Accordion>
+          <GridListTile cols={2} style={{ height: '50vh' }}>
+            <Grid container alignItems="flex-start">
+              <Grid item>
+                {this.props.data.ownedTrucks ? (
+                  <Card>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={this.toOwnerDashboard}
+                    >
+                      Owner Dashboard
+                    </Button>
+                  </Card>
+                ) : null}
+              </Grid>
+              <Grid item>
+                <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
+                  <List disablePadding>
+                    {
+                      this.props.data.subscribedTrucks.map(truck => (
+                        <ListItem key={truck.id} style={{minWidth: '100%'}} disableGutters>
+                          <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
+                        </ListItem>
+                      ))
+                    }
+                  </List>
+                </Container>
+              </Grid>
+            </Grid>
           </GridListTile>
 
-          {/** Where the map would be */}
-          <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckLocationMapComponent
-              locations={this.state.nearbyTrucks}
-            />
+          {/* Show nearby trucks on the map */}
+          <GridListTile cols={3} style={{ height: '50vh' }}>
+            <Grid container>
+              <Grid item>
+                <Typography variant="h4">Nearby Trucks</Typography>
+              </Grid>
+              <TruckLocationMapComponent locations={this.state.nearbyTrucks} height="50vh"/>
+            </Grid>
           </GridListTile>
         </GridList>
       </React.Fragment>
@@ -159,14 +140,6 @@ class UserDashboardComponent extends Component<
 
   private toOwnerDashboard() {
     Router.replace("/dashboard/owner");
-  }
-
-  private toNotifications() {
-    Router.replace("/notifications");
-  }
-
-  private toSearchTrucks() {
-    Router.replace("/search/truck");
   }
 }
 
