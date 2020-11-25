@@ -4,7 +4,6 @@ import TruckCardComponent from "./TruckCardComponent";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 import {RouteLocation} from "../map/route-map/RouteLocation";
 import {SimpleTruck} from "../../redux/user/UserReducer";
-import {userCanEditTruck} from "../TruckView";
 
 interface Props {
   routePts: RouteLocation[];

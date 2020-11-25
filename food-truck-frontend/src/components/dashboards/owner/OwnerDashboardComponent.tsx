@@ -2,26 +2,17 @@ import React, {useEffect, useState} from "react";
 import Router from "next/router";
 
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary, Box,
   Button,
-  Card, CardActionArea, CardActions, CardContent, CardHeader,
   CircularProgress,
   Container, Dialog, DialogContent, Grid,
-  GridList,
-  GridListTile, List, ListItem,
   Typography,
 } from "@material-ui/core";
 
-import TruckListComponent from "../TruckListComponent";
 import {UserData} from "../../../redux/user/UserReducer";
 import {loadTodaysRoute} from "../../../api/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
 import {RouteLocation} from "../../map/route-map/RouteLocation";
-import TruckLocationMapComponent from "../../map/truck_location_map/TruckLocationMapComponent";
 import {useFlexGrowStyles} from "../../theme/FoodTruckThemeProvider";
-import TruckCardComponent from "../../truck/TruckCardComponent";
 import {StyledDialogTitle} from "../../util/StyledDialogTitle";
 import CreateTruckForm from "../../CreateTruckForm";
 import TruckListAndMapComponent from "../../truck/TruckListAndMapComponent";
