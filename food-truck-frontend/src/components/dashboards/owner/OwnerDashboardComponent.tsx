@@ -4,7 +4,7 @@ import Router from "next/router";
 import {
   Accordion,
   AccordionDetails,
-  AccordionSummary,
+  AccordionSummary, Box,
   Button,
   Card, CardActionArea, CardActions, CardContent, CardHeader,
   CircularProgress,
@@ -93,8 +93,8 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
     );
 
   return (
-    <Grid container>
-      <Grid item container direction="row" justify="flex-start" alignItems="flex-start" className={classes.root}>
+    <>
+      <Grid container direction="row" justify="flex-start" alignItems="flex-start" className={classes.root}>
         <Grid item>
           <Button
             variant="contained"
@@ -119,25 +119,35 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
           </Dialog>
         </Grid>
       </Grid>
-      <Grid item container direction="row" alignItems="flex-start" spacing={0} className={classes.root}>
-        <Grid item direction="column" xs={5}>
+      <GridList cols={5}
+                style={{
+                  height: "100vh",
+                  width: "100%",
+                }}>
+        <GridListTile cols={2} style={{ height: '50vh' }}>
+          <Box pt={1} px={3}>
+            <Typography variant="h6">Owned Trucks</Typography>
+          </Box>
           <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
             <List disablePadding>
               {
                 props.data?.ownedTrucks?.map(truck => (
-                  <ListItem key={truck.id} style={{minWidth: '100%'}} disableGutters>
+                  <ListItem key={truck.id} style={{ minWidth: '100%' }} disableGutters>
                     <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
                   </ListItem>
                 ))
               }
             </List>
           </Container>
-        </Grid>
-        <Grid item xs={7}>
+        </GridListTile>
+        <GridListTile cols={3} style={{ height: '50vh' }}>
+          <Box py={0.5} px={3}>
+            <Typography variant="h6">Active Locations</Typography>
+          </Box>
           <TruckLocationMapComponent locations={routePts} height="50vh"/>
-        </Grid>
-      </Grid>
-    </Grid>
+        </GridListTile>
+      </GridList>
+    </>
   );
 }
 

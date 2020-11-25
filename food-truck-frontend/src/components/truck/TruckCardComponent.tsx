@@ -29,6 +29,7 @@ export const useTruckDescriptionStyles = makeStyles((_theme: Theme) =>
 interface TruckCardProps {
   id: number;
   userOwnsTruck: boolean;
+  onRedirect?: () => void;
 }
 
 function TruckCardComponent(props: TruckCardProps) {
@@ -45,17 +46,13 @@ function TruckCardComponent(props: TruckCardProps) {
   });
   const [sendingNotification, setSendingNotification]: [boolean, any] = useState(false);
 
-  const viewTruck = (id: number): void => {
-    Router.replace(`/truck/${id}`);
-  };
-
-  const editTruck = (id: number): void => {
-    Router.replace(`/truck/edit/${id}`);
+  const redirect = (url: string): void => {
+    if (props.onRedirect) props.onRedirect();
+    Router.replace(url).then(() => Router.reload());
   }
-
-  const manageRoutes = (id: number): void => {
-    Router.replace(`/manage-routes/${id}`);
-  }
+  const viewTruck = (id: number): void => redirect(`/truck/${id}`);
+  const editTruck = (id: number): void => redirect(`/truck/edit/${id}`);
+  const manageRoutes = (id: number): void => redirect(`/manage-routes/${id}`);
 
   useEffect(() => {
     getTruckById(props.id, (err) => console.log(`Could not load truck card: ${err}`))

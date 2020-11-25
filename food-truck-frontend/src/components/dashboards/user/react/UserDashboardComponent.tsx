@@ -6,11 +6,11 @@ import Button from "@material-ui/core/Button";
 import {
   Accordion,
   AccordionDetails,
-  AccordionSummary,
+  AccordionSummary, Box,
   Card,
   CircularProgress, Container, Grid,
   GridList,
-  GridListTile, List, ListItem,
+  GridListTile, List, ListItem, ListSubheader,
   Typography,
 } from "@material-ui/core";
 
@@ -79,7 +79,18 @@ class UserDashboardComponent extends Component<
 
     // If OK, return actual component
     return (
-      <React.Fragment>
+      <>
+        {this.props.data.ownedTrucks ? (
+          <Box py={1} px={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={this.toOwnerDashboard}
+            >
+              Owner Dashboard
+            </Button>
+          </Box>
+        ) : null}
         {/** Props IDd using: https://material-ui.com/components/grid/ */}
         <GridList
           cols={5}
@@ -90,47 +101,31 @@ class UserDashboardComponent extends Component<
         >
           {/** Side list */}
           <GridListTile cols={2} style={{ height: '50vh' }}>
-            <Grid container alignItems="flex-start">
-              <Grid item>
-                {this.props.data.ownedTrucks ? (
-                  <Card>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={this.toOwnerDashboard}
-                    >
-                      Owner Dashboard
-                    </Button>
-                  </Card>
-                ) : null}
-              </Grid>
-              <Grid item>
-                <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
-                  <List disablePadding>
-                    {
-                      this.props.data.subscribedTrucks.map(truck => (
-                        <ListItem key={truck.id} style={{minWidth: '100%'}} disableGutters>
-                          <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
-                        </ListItem>
-                      ))
-                    }
-                  </List>
-                </Container>
-              </Grid>
-            </Grid>
+            <Box px={3}>
+              <Typography variant="h6">Subscribed Trucks</Typography>
+            </Box>
+            <Container style={{ maxHeight: '50vh', overflow: 'auto' }}>
+              <List disablePadding>
+                {
+                  this.props.data.subscribedTrucks.map(truck => (
+                    <ListItem key={truck.id} style={{ minWidth: '100%' }} disableGutters>
+                      <TruckCardComponent id={truck.id} userOwnsTruck={true}/>
+                    </ListItem>
+                  ))
+                }
+              </List>
+            </Container>
           </GridListTile>
 
           {/* Show nearby trucks on the map */}
           <GridListTile cols={3} style={{ height: '50vh' }}>
-            <Grid container>
-              <Grid item>
-                <Typography variant="h4">Nearby Trucks</Typography>
-              </Grid>
-              <TruckLocationMapComponent locations={this.state.nearbyTrucks} height="50vh"/>
-            </Grid>
+            <Box pb={0.5} px={3}>
+              <Typography variant="h6">Nearby Trucks</Typography>
+            </Box>
+            <TruckLocationMapComponent locations={this.state.nearbyTrucks} height="50vh"/>
           </GridListTile>
         </GridList>
-      </React.Fragment>
+      </>
     );
   }
 
