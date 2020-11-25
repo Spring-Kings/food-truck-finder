@@ -85,15 +85,13 @@ class UserDashboardComponent extends Component<
         {this.props.data.ownedTrucks ? (
           <Grid container direction="row" justify="flex-start" alignItems="flex-start">
             <Grid item>
-              <Box px={3}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.toOwnerDashboard}
-                >
-                  Owner Dashboard
-                </Button>
-              </Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.toOwnerDashboard}
+              >
+                Owner Dashboard
+              </Button>
             </Grid>
           </Grid>
         ) : null}
