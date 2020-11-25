@@ -1,7 +1,6 @@
 package food.truck.api.recommendation.semantic_similarity;
 
 import food.truck.api.truck.Truck;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Set;
 /**
  * Provides a secondary thread to compute tag scores for all trucks
  */
-@RequiredArgsConstructor
 public class FoodTruckThread extends Thread {
 
     /** All similarity scores, in (TruckId,Score) pairs */
@@ -20,13 +18,20 @@ public class FoodTruckThread extends Thread {
     private final FoodTruckDictionary dict;
 
     /** All nearby trucks, as provided by caller */
-    private final List<Truck> nearbyTrucks;
+    private final List<SimilarityTruck> nearbyTrucks;
 
     /** Searched tags */
     private final Set<String> tags;
 
     /** The score weighting for this category */
     private final Double score;
+
+    public FoodTruckThread(FoodTruckDictionary ftd, List<Truck> trucks, Set<String> tags, double score) {
+        this.dict = ftd;
+        this.nearbyTrucks = SimilarityTruck.toSimilarityTrucks(trucks);
+        this.tags = tags;
+        this.score = score;
+    }
 
     @Override
     public void run() {

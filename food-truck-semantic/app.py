@@ -15,8 +15,8 @@ import spacy
 
 app = Flask(__name__)
 # Learned via: https://stackoverflow.com/questions/54171101/restrict-access-to-a-flask-rest-api
-cors = CORS(app, resources={"/*": {"origins": "http://localhost:3306/*"}})#os.environ.get("FOOD_TRUCK_API")})
-nlp = spacy.load("en_vectors_web_lg")#os.environ.get("WORD_VEC_DICT"))
+cors = CORS(app, resources={"/*": {"origins": os.environ.get("FOOD_TRUCK_API")}})
+nlp = spacy.load("en_vectors_web_lg")
 
 # Load constants for the comparisons
 MIN_FOR_EXACT = os.environ.get("MIN_FOR_EXACT") or 0.98
@@ -36,16 +36,18 @@ def get_similarity():
              [(# perfect matches) + 0.5 * (# partial matches)] / (# search tags)
     """
     # Learned to extract from: https://stackoverflow.com/questions/10434599/get-the-data-received-in-a-flask-request
-    all_truck_tags = request.form.getlist("trucks")
-    search_tags = request.form.getlist("search_tags")
+    data = request.json
+    all_truck_tags = data["trucks"]
+    search_tags = data["tags"]
     result = {}
 
     # Go through all provided Truck tags
     for truck in all_truck_tags:
-        result[truck.id] = get_similarity_for(truck.tags, search_tags)
+        result[truck["truckID"]] = get_similarity_for(truck["tags"],
+                                                      search_tags)
 
     # Return the resulting similarity ratings
-    return result
+    return {"similarity_scores": result}
 
 
 def get_similarity_for(truck_tags, search_tags):
@@ -84,3 +86,6 @@ def get_similarity_for(truck_tags, search_tags):
 
     # Return the percent of the search tags that were exact or fuzzy matched
     return result / len(search_tags)
+
+
+app.run()
