@@ -32,12 +32,12 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
   const dashboardUrl = props.data.owner ? 'owner' : 'user';
 
   const menuBarItems = [
-    <Avatar src="/logo.png" alt="logo" variant="rounded"/>,
-    <Typography variant="h6">Stacked Trucks</Typography>,
-    <LinkButton url="/" text="Home"/>,
-    <LinkButton url="/search/truck" text="Search Trucks"/>,
-    <LinkButton url="/interactive-map" text="Nearby Trucks"/>,
-    <LinkButton url="/recommended-trucks" text="Recommended Trucks"/>,
+    { key: "avatar", val: <Avatar src="/logo.png" alt="logo" variant="rounded"/> },
+    { key: "title", val: <Typography variant="h6">Stacked Trucks</Typography> },
+    { key: "home", val: <LinkButton url="/" text="Home"/> },
+    { key: "search", val: <LinkButton url="/search/truck" text="Search Trucks"/> },
+    { key: "nearby", val: <LinkButton url="/interactive-map" text="Nearby Trucks"/> },
+    { key: "recommended", val: <LinkButton url="/recommended-trucks" text="Recommended Trucks"/> },
   ];
 
   const menuDropdown = (
@@ -53,12 +53,12 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     <AppBar className={classes.root}>
       <Toolbar>
         <Grid container direction="row" alignContent="space-between">
-          {menuBarItems.map((item, index) => (
-              <Grid item key={index}>
-                {item}
+          {menuBarItems.map((item) => (
+              <Grid key={item.key} item>
+                {item.val}
               </Grid>
           ))}
-          <Grid item>
+          <Grid key="login/dashboard" item>
             {props.data.username === "" ? (
                 <LinkButton url="/login" text="Login"/>
             ) : (

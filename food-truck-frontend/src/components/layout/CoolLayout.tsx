@@ -30,12 +30,12 @@ function coolLayout(args: Args) {
         <meta name="description" content="Oi mate description goes here"/>
       </Head>
       <Grid container alignItems="center" spacing={0}>
-        <Grid item xs={12}>
+        <Grid key="navbar" item xs={12}>
           <Box mb={4}>
             <AppMenuBarComponent/>
           </Box>
         </Grid>
-        <Grid item xs={12} container direction="row">
+        <Grid key="body" item xs={12} container direction="row">
           <Grid item xs={10} md={10} lg={10} xl={10}>
             <Paper className={classes.paper} elevation={0}>
               <Box p={4}>
@@ -46,7 +46,7 @@ function coolLayout(args: Args) {
             </Paper>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
+        <Grid key="footer" item xs={12}>
           <Box p={2}>
             <SiteFooter/>
           </Box>
