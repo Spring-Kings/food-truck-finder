@@ -110,7 +110,8 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
       <TruckListAndMapComponent routePts={routePts}
                                 trucks={props.data?.ownedTrucks}
                                 listLabel={'Owned Trucks'}
-                                mapLabel={'Active Locations'}/>
+                                mapLabel={'Active Locations'}
+                                owner={true}/>
     </>
   );
 }

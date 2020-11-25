@@ -29,7 +29,7 @@ function TruckListAndMapComponent(props: Props) {
             {
               props.trucks?.map(truck => (
                 <ListItem key={truck.id} style={{ minWidth: '100%' }} disableGutters>
-                  <TruckCardComponent id={truck.id} userOwnsTruck={props.owner ? props.owner : false}/>
+                  <TruckCardComponent id={truck.id} userOwnsTruck={props.owner !== undefined ? props.owner : false}/>
                 </ListItem>
               ))
             }
