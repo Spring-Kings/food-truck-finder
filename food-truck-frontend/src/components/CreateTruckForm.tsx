@@ -18,15 +18,20 @@ class CreateTruckForm extends Component<{}, State> {
 
   render() {
     return (
-      <Grid container direction="column" justify="center" xs={2}>
-        <Typography variant="h4">Create Truck</Typography>
-        <Form submitUrl={'/truck/create'}
-              onSuccessfulSubmit={this.onSubmit}
-              onFailedSubmit={this.onFail}>
-          <TextField label="Truck Name" name="truckName"/>
-        </Form>
-        <br/>
-        {this.state.result}
+      <Grid container direction="column" justify="center">
+        <Grid item>
+          <Typography variant="h4">Create Truck</Typography>
+        </Grid>
+        <Grid item>
+          <Form submitUrl={'/truck/create'}
+                onSuccessfulSubmit={this.onSubmit}
+                onFailedSubmit={this.onFail}>
+            <TextField label="Truck Name" name="truckName"/>
+          </Form>
+        </Grid>
+        <Grid item>
+          {this.state.result}
+        </Grid>
       </Grid>
     );
   }

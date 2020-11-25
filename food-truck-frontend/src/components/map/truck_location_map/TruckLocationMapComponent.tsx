@@ -8,7 +8,8 @@ import {MoneyRating} from "../../truck/rate_and_review/ratings";
 import {blankRouteLocation, RouteLocation} from "../route-map/RouteLocation";
 
 export type TruckLocationMapProps = {
-  locations: RouteLocation[]
+  locations: RouteLocation[];
+  height?: string;
 }
 
 const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
@@ -45,7 +46,7 @@ const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
       </Dialog>
 
       {/* Actual map */}
-      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} isRoute={false} />
+      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} isRoute={false} height={props.height}/>
     </>
   );
 };

@@ -141,7 +141,9 @@ let themeOptions = {
       },
     },
     MuiCardContent: darkCardContentOptions,
-    MuiCardHeader: darkCardHeaderOptions
+    MuiCardHeader: darkCardHeaderOptions,
+    MuiCardActionArea: darkCardContentOptions,
+    MuiCardActions: darkCardContentOptions
   }
 };
 
@@ -174,6 +176,8 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
       ...themeOptions.overrides,
       MuiCardContent: props.data.isDark ? darkCardContentOptions : lightCardContentOptions,
       MuiCardHeader: props.data.isDark ? darkCardHeaderOptions : lightCardHeaderOptions,
+      MuiCardActionArea: props.data.isDark ? darkCardContentOptions : lightCardContentOptions,
+      MuiCardActions: props.data.isDark ? darkCardContentOptions : lightCardContentOptions
     }
   }));
 

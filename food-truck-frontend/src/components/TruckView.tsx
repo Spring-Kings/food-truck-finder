@@ -14,6 +14,7 @@ import SendNotificationComponent from "./notifications/SendNotificationComponent
 import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
+import TruckRatingComponent from "./truck/TruckRatingComponent";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -115,27 +116,20 @@ class TruckView extends Component<TruckProps, State> {
         <Grid item>
           <Typography variant="subtitle1">Description:</Typography>
         </Grid>
-        <Grid item>
+        <Grid item style={{maxWidth: '250px'}}>
           {this.state.description}
         </Grid>
       </Grid>
     );
 
-    const rating = (name: string, child: JSX.Element) => (
-      <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={1}>
-        <Grid item>
-          <Typography variant="subtitle1">{name}</Typography>
-        </Grid>
-        <Grid item>
-          {child}
-        </Grid>
-      </Grid>
-    );
-
     const priceRating = this.state.priceRating ?
-      rating("Price Rating:", <MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
+      <TruckRatingComponent name="Price Rating:"
+                            child={<MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>}/>
+       : <></>;
     const starRating = this.state.starRating ?
-      rating("Star Rating:", <StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>) : <></>;
+      <TruckRatingComponent name="Star Rating:"
+                            child={<StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>}/>
+       : <></>;
 
     const tags = (
       <>
