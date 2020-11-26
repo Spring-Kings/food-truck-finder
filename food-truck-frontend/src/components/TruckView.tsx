@@ -35,6 +35,19 @@ export interface TruckState {
   menuContentType: string | null;
 }
 
+export const makeEmptyTruckState = (): TruckState => {
+  return {
+    id: 0,
+    userId: 0,
+    name: "",
+    description: "",
+    priceRating: null,
+    tags: [],
+    starRating: null,
+    menuContentType: null
+  };
+};
+
 interface TruckViewState {
   notFound: boolean | null;
 }
@@ -53,17 +66,10 @@ class TruckView extends Component<TruckProps, State> {
     super(props);
 
     this.state = {
+      ...makeEmptyTruckState(),
       notFound: null,
-      id: 0,
-      userId: 0,
-      name: "",
-      description: "",
-      priceRating: null,
       routePts: [],
       subscription: null,
-      tags: [],
-      starRating: null,
-      menuContentType: null
     };
   }
 
@@ -124,30 +130,30 @@ class TruckView extends Component<TruckProps, State> {
 
     const priceRating = this.state.priceRating ?
       <TruckRatingComponent name="Price Rating:"
-                            child={<MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>}/>
+                            child={<MoneyRating readOnly precision={0.1} value={this.state.priceRating}/>}/>
        : <></>;
     const starRating = this.state.starRating ?
       <TruckRatingComponent name="Star Rating:"
-                            child={<StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>}/>
+                            child={<StarRating readOnly precision={0.1} value={this.state.starRating}/>}/>
        : <></>;
 
     const tags = (
       <>
         <Typography variant="subtitle1">Tags:</Typography>
         <List>
-          {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
+          {this.state.tags.map((tag, _ndx) => <ListItem key={`${this.state.id}-${tag}`}>{tag}</ListItem>)}
         </List>
       </>
     );
 
     const reviewButton = (
-      <ListItem>
+      <ListItem key={`${this.state.id}-reviewBtn`}>
         <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
       </ListItem>
     );
 
     const subscribeButton = (
-      <ListItem>
+      <ListItem key={`${this.state.id}-subscribeBtn`}>
         <Button color="primary"
                 onClick={this.handleSubscription}>
           {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
@@ -180,7 +186,7 @@ class TruckView extends Component<TruckProps, State> {
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
           {truckInfo.map((el, index) => (
-            <ListItem key={index}>
+            <ListItem key={`${this.state.id}-${index}`}>
               {el}
             </ListItem>
           ))}

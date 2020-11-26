@@ -8,6 +8,15 @@ interface NotificationProps {
   deletedCallback: (id: number) => void;
 }
 
+const timeOptions = {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric'
+};
+
 function NotificationComponent(props: NotificationProps) {
   const [read, setRead]: [boolean, any] = useState(props.notification.read);
 
@@ -40,15 +49,6 @@ function NotificationComponent(props: NotificationProps) {
   // it claims the date value is not finite
   //@ts-ignore
   const parsedDate = Date.parse(props.notification.time);
-
-  const timeOptions = {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric'
-  };
   const dateTime = new Intl.DateTimeFormat('en-US', timeOptions).format(parsedDate);
 
   return (

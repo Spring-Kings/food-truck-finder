@@ -53,12 +53,12 @@ const dense = {
 
 const lightBackground = {
   paper: grey[200],
-  'default': grey[200],//blueGrey[200],
+  'default': grey[200],
 }
 
 const darkBackground = {
   paper: '#181d1f',
-  'default': '#181d1f',//'#1e272b',
+  'default': '#181d1f',
 }
 
 const gridOptions = {

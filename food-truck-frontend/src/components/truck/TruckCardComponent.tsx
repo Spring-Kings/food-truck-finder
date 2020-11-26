@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {TruckState, userCanEditTruck} from "../TruckView";
+import {makeEmptyTruckState, TruckState, userCanEditTruck} from "../TruckView";
 import {getTruckById} from "../../api/Truck";
 import {
   Button,
@@ -34,16 +34,7 @@ interface TruckCardProps {
 
 function TruckCardComponent(props: TruckCardProps) {
   const classes = useTruckDescriptionStyles();
-  const [truck, setTruck]: [TruckState, any] = useState({
-    id: 0,
-    userId: 0,
-    name: "",
-    description: "",
-    priceRating: null,
-    tags: [],
-    starRating: null,
-    menuContentType: null
-  });
+  const [truck, setTruck]: [TruckState, any] = useState(makeEmptyTruckState());
   const [sendingNotification, setSendingNotification]: [boolean, any] = useState(false);
 
   const redirect = (url: string): void => {
@@ -67,27 +58,32 @@ function TruckCardComponent(props: TruckCardProps) {
 
   return (
     <Card className={classes.root}>
-      <CardHeader title={truck.name}/>
       <CardActionArea onClick={() => viewTruck(truck.id)}>
-        <CardContent>
+        <CardHeader title={truck.name}/>
+      </CardActionArea>
+      <CardContent>
           <Grid container alignItems="flex-start">
             <Grid item>{truck.description}</Grid>
             <Grid item container direction="row" justify="flex-start" alignItems="flex-start">
+              {truck.priceRating && 
               <Grid item>
-                <MoneyRating readOnly precision={0.1} disabled value={truck.priceRating}/>
+                <MoneyRating name={`${truck.id}-priceRating`} readOnly precision={0.1} value={truck.priceRating}/>
               </Grid>
+              }
+              {truck.starRating && 
               <Grid item>
-                {truck.starRating && <StarRating readOnly precision={0.1} disabled value={truck.starRating}/>}
+                <StarRating name={`${truck.id}-starRating`} readOnly precision={0.1} value={truck.starRating}/>
               </Grid>
+              }
             </Grid>
           </Grid>
         </CardContent>
-      </CardActionArea>
       <CardActions>
         <Button onClick={() => viewTruck(truck.id)}>
           View Truck
         </Button>
-        {props.userOwnsTruck && <>
+        {props.userOwnsTruck && (
+        <>
           <Button onClick={() => editTruck(truck.id)}>
             Edit Truck
           </Button>
@@ -107,7 +103,8 @@ function TruckCardComponent(props: TruckCardProps) {
               <SendNotificationComponent truckId={truck.id}/>
             </DialogContent>
           </Dialog>
-        </>}
+        </>
+        )}
       </CardActions>
     </Card>
   );
