@@ -1,6 +1,6 @@
 import api from "../../../util/api";
 import Form from "../../../components/Form";
-import {TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
+import {makeEmptyTruckState, TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
 import Router from "next/router";
@@ -16,6 +16,7 @@ import {
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
+import {getTruckById, deleteTruck} from "../../../api/Truck";
 
 interface EditTruckState {
     message: string;
@@ -26,15 +27,9 @@ type TruckComponentState = TruckState & EditTruckState;
 function EditTruck(props: TruckProps) {
   const classes = useFlexGrowStyles();
   const [state, setState]: [TruckComponentState, any] = useState({
+    ...makeEmptyTruckState(),
     id: props.truckId,
-    userId: -1,
-    name: "",
-    description: "",
-    priceRating: null,
-    starRating: null,
     message: "",
-    tags: [],
-    menuContentType: null,
   });
 
   const onMenuChange = (event: React.FormEvent) => {
@@ -57,30 +52,20 @@ function EditTruck(props: TruckProps) {
   }
 
   useEffect(() => {
-    if (state.userId === -1) {
-      api.get(`/truck/${props.truckId}`, {})
-        .then(res => {
-          // If the response indicates they own the truck, show them. Otherwise, kick out.
-          if (res && userCanEditTruck(res.data.userId)) {
-            setState(res.data);
-          } else
-            Router.replace("/");
-        })
-        .catch(err => {
-          // If an error, log to console and kick out
-          if (err.response) {
-            console.log('Got error response code');
-          } else if (err.request) {
-            console.log('Did not receive Truck response');
-          } else {
-            console.log(err);
-          }
-
-          // Cancel
+    getTruckById(props.truckId, (err) => {
+      console.log(`Could not load truck card: ${err}`);
+      // Cancel
+      Router.replace("/");
+    })
+      .then(truck => {
+        console.table(truck);
+        // If the response indicates they own the truck, show them. Otherwise, kick out.
+        if (truck && userCanEditTruck(truck.userId))
+          setState(truck);
+        else
           Router.replace("/");
-        });
-    }
-  });
+      });
+  }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
     Router.replace(`/truck/${state.id}`);
@@ -93,15 +78,14 @@ function EditTruck(props: TruckProps) {
     });
   }
 
-  const deleteTruck = () => {
-    api.delete(`/truck/delete/${state.id}`, {})
-      .then(res => Router.replace('/'))
-      .catch(err => {
-        setState({
-          ...state,
-          message: `Failed to update truck details: ${JSON.stringify(err)}`
-        })
-      });
+  const deleteTruckCallback = () => {
+    deleteTruck(state.id, err => {
+      setState({
+        ...state,
+        message: `Failed to update truck details: ${JSON.stringify(err)}`
+      })
+    })
+      .then(res => Router.replace('/'));
   }
 
   if (state.userId == -1)
@@ -147,7 +131,7 @@ function EditTruck(props: TruckProps) {
                 </Grid>
                 <Grid item>
                   <Button color="secondary"
-                          onClick={deleteTruck}>
+                          onClick={deleteTruckCallback}>
                     Delete Truck
                   </Button>
                 </Grid>
