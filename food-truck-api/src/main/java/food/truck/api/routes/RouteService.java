@@ -4,8 +4,10 @@ import food.truck.api.Position;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -120,7 +122,7 @@ public class RouteService {
     public Set<DayOfWeek> findRouteDaysByRouteId(long routeId) {
         return findRouteById(routeId)
                 .map(Route::getDays)
-                .orElse(null); // TODO: what to do if not found?
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     public List<RouteLocation> findRouteLocationByRouteId(long routeId) {

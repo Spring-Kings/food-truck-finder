@@ -1,14 +1,9 @@
 import React from "react";
 
-import { LatLng, LatLngArray, LatLngLiteral } from "@google/maps";
-import { Container } from "@material-ui/core";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  Polyline,
-} from "@react-google-maps/api/dist";
-import { RouteLocation } from "../route-map/RouteLocation";
+import {LatLngLiteral} from "@google/maps";
+import {Container} from "@material-ui/core";
+import {GoogleMap, LoadScript, Marker, Polyline,} from "@react-google-maps/api/dist";
+import {RouteLocation} from "../route-map/RouteLocation";
 
 interface MapProps {
   locations: RouteLocation[];
@@ -18,6 +13,7 @@ interface MapProps {
   onMapClick?: (latLng: LatLngLiteral) => void;
   height?: string;
 }
+
 interface MapState {
   coordinates: LatLngLiteral;
   height?: string;
@@ -50,7 +46,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
   }
 
   render() {
-    var key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
+    const key: string | undefined = process.env.GOOGLE_MAPS_API_KEY;
     return (
       <Container fixed>
         <LoadScript googleMapsApiKey={key as string}>

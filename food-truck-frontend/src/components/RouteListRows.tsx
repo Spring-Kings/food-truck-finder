@@ -1,7 +1,7 @@
 import React from "react";
 import Router from "next/router";
 import api from "../util/api";
-import {FormControlLabel, IconButton, Slider, Switch} from "@material-ui/core";
+import {FormControlLabel, IconButton, Switch} from "@material-ui/core";
 
 import EditIcon from "@material-ui/icons/Edit"
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';

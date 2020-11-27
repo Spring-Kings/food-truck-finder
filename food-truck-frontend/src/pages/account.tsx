@@ -13,7 +13,6 @@ type PageState = {
     email: string,
     id: number,
     submitResultText: string | null;
-    debugText: string | null
 };
 
 type PageProps = {};
@@ -29,7 +28,6 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
             email: "",
             id: 0,
             submitResultText: null,
-            debugText: null
         };
     }
 
@@ -62,8 +60,6 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                     <p>Your ID is {this.state.id} and your email is {this.state.email}.</p>
                     <Button variant="contained" onClick={this.toggleEditMode}>Edit</Button>
                     {editForm}
-                    <p>Here is some nerdy debug information:</p>
-                    <pre>{this.state.debugText}</pre>
                 </div>
             )
         }
@@ -97,7 +93,6 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                         username: response.data.username,
                         email: response.data.email,
                         id: response.data.id,
-                        debugText: JSON.stringify(response.data, null, 4)
                     })
                 })
                 .catch(err => {

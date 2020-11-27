@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {Box, Grid, Typography} from "@material-ui/core";
 import NotificationComponent from "./NotificationComponent";
-import { Notification, getNotifications } from "../../api/Notification";
-import { NotificationData } from "../../redux/notifications/NotificationReducer";
-import getUserInfo from "../../util/token";
+import {Notification} from "../../api/Notification";
+import {NotificationData} from "../../redux/notifications/NotificationReducer";
 
 export type NotificationListProps = {
   data: NotificationData,
@@ -41,6 +40,7 @@ function NotificationListComponent(props: NotificationListProps) {
       <Typography variant="h4">Notifications</Typography>
       { notifications.length > 0 ?
         notifications?.map((notification: Notification) => <NotificationComponent
+          key={notification.id}
           notification={notification}
           deletedCallback={deleteNotification}
         />)

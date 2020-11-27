@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {TextField} from "@material-ui/core";
 import Form from "../Form";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 
 interface SendNotificationProps {
   truckId: number;
@@ -42,7 +42,7 @@ class SendNotificationComponent extends Component<SendNotificationProps, SendNot
     );
   }
 
-  onFail = (formData: any, response: AxiosResponse) => {
+  onFail = (formData: any, response: AxiosError) => {
     this.setState({
       ...this.state,
       error: `Failed to send notification: ${JSON.stringify(response)}`

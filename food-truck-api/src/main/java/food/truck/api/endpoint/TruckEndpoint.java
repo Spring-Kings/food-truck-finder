@@ -6,7 +6,6 @@ import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.reviews_and_subscriptions.SubscriptionView;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
-import food.truck.api.routes.RouteService;
 import food.truck.api.search.IndexingService;
 import food.truck.api.search.TruckSearchService;
 import food.truck.api.truck.Truck;
@@ -18,8 +17,10 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
@@ -29,9 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.PostConstruct;
-import java.time.Instant;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,14 +39,12 @@ import java.util.Set;
 @RestController
 public class TruckEndpoint {
     private final TruckService truckService;
-    private final RouteService routeService;
     private final SubscriptionService subscriptionService;
     private final StrategySelector ss;
 
     @Autowired
-    public TruckEndpoint(TruckService truckService, RouteService routeService, SubscriptionService subscriptionService) {
+    public TruckEndpoint(TruckService truckService, SubscriptionService subscriptionService) {
         this.truckService = truckService;
-        this.routeService = routeService;
         this.subscriptionService = subscriptionService;
         this.ss = new StrategySelector(truckService, subscriptionService);
     }
@@ -57,10 +53,10 @@ public class TruckEndpoint {
     private IndexingService indexingService;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         try {
             indexingService.initiateIndexing();
-        }catch (InterruptedException e){
+        } catch (InterruptedException e) {
             log.warn(e);
         }
     }
@@ -85,14 +81,14 @@ public class TruckEndpoint {
     }
 
     @PostMapping(path = "/truck/recommended")
-    public List<Truck> getRecommendedTrucks(
+    public List<Pair<Truck, Double>> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
             @RequestBody @NonNull UserPreferences prefs
     ) {
         var strategy = ss.selectStrategy(u, prefs);
 
         // Get the desired trucks
-        var truckList = strategy.selectTrucks();
+        var truckList = strategy.getTrucksWithNormalizedScores();
         if (truckList.size() > prefs.getNumRequested())
             truckList = truckList.subList(0, prefs.getNumRequested());
         return truckList;
@@ -106,28 +102,10 @@ public class TruckEndpoint {
     @GetMapping(path = "/truck/search")
     public List<Truck> searchTrucks(@RequestParam String search){
        if( search.isEmpty()){
-           return new ArrayList<Truck>();
+           return new ArrayList<>();
        }
        
         return truckSearchService.getTruckBaseOnText(search);
-    }
-
-    @GetMapping("/truck/{truckId}/reviews")
-    public String getTruckReviews(@PathVariable long truckId) {
-        return ""; // TODO
-    }
-
-    @Value
-    private static class PostReviewParams {
-        int score;
-        int costRating;
-        @Nullable
-        String reviewText;
-    }
-
-    @PostMapping("/truck/{truckId}/reviews")
-    public String postTruckReview(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostReviewParams data) {
-        return ""; // TODO
     }
 
     @Value
@@ -194,105 +172,6 @@ public class TruckEndpoint {
             log.warn(e);
         }
         return truck;
-    }
-
-    @GetMapping("/truck/{truckId}/routes")
-    public List<Route> getRoutes(@PathVariable long truckId) {
-        Optional<Truck> truck = truckService.findTruckById(truckId);
-        if (truck.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-        }
-
-        return routeService.findRouteByTruck(truck.get());
-    }
-
-    @Secured("ROLE_OWNER")
-    @DeleteMapping("/truck/routes-delete/{routeId}")
-    public void deleteRoute(@AuthenticationPrincipal User u, @PathVariable long routeId) {
-        if (!routeService.userOwnsRoute(u, routeId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-        routeService.deleteRoute(routeId);
-    }
-
-    @Value
-    public static class UpdateRouteParams {
-        long routeId;
-        @Nullable
-        String newName;
-        @Nullable
-        Boolean newActive;
-    }
-
-    @PutMapping("/truck/{truckId}/update-route")
-    @Secured("ROLE_OWNER")
-    public boolean updateRoute(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestBody UpdateRouteParams data) {
-        if (!routeService.userOwnsRoute(u, data.routeId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-        return routeService.updateRoute(data.routeId, Optional.ofNullable(data.newName), Optional.ofNullable(data.newActive));
-    }
-
-    @Value
-    private static class PostRouteParams {
-        @NonNull String routeName;
-        char active;
-    }
-
-    @PostMapping("/truck/{truckId}/create-route")
-    @Secured("ROLE_OWNER")
-    public Route createTruckRoute(@AuthenticationPrincipal User user, @PathVariable long truckId, @RequestBody PostRouteParams data) {
-        if (!truckService.userOwnsTruck(user, truckId))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-        return routeService.createRoute(truckService.findTruckById(truckId).get(), data.routeName, Character.toUpperCase(data.active) == 'Y');
-    }
-
-
-    // TODO: Should all users be able to see route locations?
-    @GetMapping("/truck/route/locations/{routeId}")
-    public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
-        return routeService.findRouteLocationByRouteId(routeId);
-    }
-
-    @Value
-    private static class UpdateRouteLocationParams {
-        Long routeLocationId;
-        long routeId;
-        @NonNull
-        Instant arrivalTime;
-        @NonNull
-        Instant exitTime;
-        double lng;
-        double lat;
-    }
-
-    @PostMapping("/truck/route/locations/{routeId}")
-    @Secured("ROLE_OWNER")
-    public boolean updateTruckRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId, @RequestBody List<UpdateRouteLocationParams> data) {
-        boolean good = true;
-
-        for (var d : data) {
-            if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-
-            LocalTime arrival = d.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
-            LocalTime exit = d.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();
-            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
-                good = false;
-        }
-        return good;
-    }
-
-    @DeleteMapping("/truck/route/locations")
-    @Secured("ROLE_OWNER")
-    public void deleteTruckRouteLocations(@AuthenticationPrincipal User user, @RequestBody @NonNull List<Long> locationIds) {
-        for (long l : locationIds) {
-            if (!routeService.userOwnsLocation(user, l))
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            routeService.deleteLocation(l);
-        }
     }
 
     // TODO: Should this be public?
@@ -368,11 +247,12 @@ public class TruckEndpoint {
         var t = truck.get();
 
         var menu = t.getMenu();
-        if (menu == null || menu.length == 0)
+        if (menu == null || menu.length == 0 || t.getMenuContentType() == null)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         var headers = new HttpHeaders();
-        headers.setContentType(t.getMenuContentType());
+        var mediaType = MediaType.parseMediaType(t.getMenuContentType());
+        headers.setContentType(mediaType);
         return new ResponseEntity<>(menu, headers, HttpStatus.OK);
     }
 

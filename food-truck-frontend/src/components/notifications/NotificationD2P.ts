@@ -1,11 +1,9 @@
-import { Dispatch } from "redux";
-import { NotificationAction, NotificationActionTypes } from "../../redux/notifications/NotificationActions";
+import {Dispatch} from "redux";
+import {NotificationAction, NotificationActionTypes} from "../../redux/notifications/NotificationActions";
 import {getNotifications} from "../../api/Notification";
-import getUserInfo from "../../util/token";
 
-async function updateNotifications(
-  dispatch: Dispatch<NotificationAction>,
-) {
+async function updateNotifications(dispatch: Dispatch<NotificationAction>)
+  : Promise<void> {
   // Fetch notifications
   getNotifications()
     .then(
@@ -13,7 +11,7 @@ async function updateNotifications(
         // Dispatch update
         dispatch({
           type: NotificationActionTypes.LOAD_NOTIFICATIONS,
-          payload: { notifications: notifications }
+          payload: {notifications: notifications}
         });
       },
       (err) => {
@@ -24,11 +22,7 @@ async function updateNotifications(
 
 const mapDispatchToProps = (dispatch: Dispatch<NotificationAction>) => {
   return {
-    loadNotificationsFromBackend: () => {
-      return new Promise<void>(() => {
-        updateNotifications(dispatch);
-      });
-    },
+    loadNotificationsFromBackend: () => updateNotifications(dispatch),
     dispatch,
   };
 };

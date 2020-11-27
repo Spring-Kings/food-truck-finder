@@ -41,7 +41,7 @@ public class ReviewEndpoint {
     public List<Review> getUserReviews(@RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         if(user == null){
-            return new LinkedList<Review>();
+            return new LinkedList<>();
         }
         return reviewService.findReviewsByUserId(user.getId());
     }
@@ -59,7 +59,7 @@ public class ReviewEndpoint {
     @GetMapping("/reviews/truck/{truckId}/user")
     public Review getTruckReviews(@PathVariable long truckId, @RequestParam Long userId) {
         var result = reviewService.findReviewForUser(userId, truckId);
-        if (!result.isEmpty())
+        if (result.isPresent())
             return result.get();
         else
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested review does not exist");
