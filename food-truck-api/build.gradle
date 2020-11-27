@@ -109,6 +109,8 @@ dependencies {
 
     implementation group: 'org.hibernate', name: 'hibernate-java8'
 
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.11.163'
+
     compileOnly group: 'org.projectlombok', name: 'lombok'
     testCompileOnly group: 'org.projectlombok', name: 'lombok'
     annotationProcessor group: 'org.projectlombok', name: 'lombok'
