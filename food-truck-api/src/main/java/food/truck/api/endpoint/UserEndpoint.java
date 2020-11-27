@@ -60,11 +60,16 @@ public class UserEndpoint {
         }
 
         if (data.newPassword != null) {
+            if (!userService.passwordIsValid(data.newPassword))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             userService.changePassword(u, data.newPassword);
         }
         if (data.newEmail != null) {
+            if (!userService.emailIsValid(data.newEmail))
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             u.setEmail(data.newEmail);
         }
+
         userService.saveUser(u);
         return true;
     }
@@ -113,12 +118,5 @@ public class UserEndpoint {
         }
         return reviewService.findReviewsByUserId(user.getId());
     }
-
-    @Secured({"ROLE_USER"})
-    @PostMapping("/delete-review")
-    public String deleteReview(@AuthenticationPrincipal User u, @RequestBody long reviewId) {
-        return ""; // TODO
-    }
-
 
 }

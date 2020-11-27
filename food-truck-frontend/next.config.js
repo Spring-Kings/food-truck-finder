@@ -6,6 +6,7 @@ module.exports = withPlugins([withTM], {
     distDir: 'build',
     env: {
         ...localEnv,
+        GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY
     },
     webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
         config.plugins.push(new webpack.EnvironmentPlugin(localEnv));

@@ -57,3 +57,8 @@ export const searchTruckByName = async (search: string, onFail: (err: any) => vo
   }
   return [];
 }
+
+export const deleteTruck = async (truckId: number, onFail: (err: any) => void) => {
+  await api.delete(`/truck/delete/${truckId}`, {})
+    .catch(onFail);
+}

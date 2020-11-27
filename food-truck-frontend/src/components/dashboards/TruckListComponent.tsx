@@ -1,9 +1,7 @@
-import React, { ReactElement } from "react";
-import Router from "next/router";
+import React, {ReactElement} from "react";
 
-import { Grid, Card, CardContent, IconButton, Button } from "@material-ui/core";
-import { Edit } from "@material-ui/icons";
-import { SimpleTruck } from "../../redux/user/UserReducer";
+import {Card, CardContent, Grid, IconButton} from "@material-ui/core";
+import {SimpleTruck} from "../../redux/user/UserReducer";
 
 export interface TruckListProps {
   trucks: SimpleTruck[];
@@ -36,7 +34,7 @@ class TruckListComponent extends React.Component<TruckListProps, any> {
 
   private createTruckEntry(sub: SimpleTruck) {
     return (
-      <Grid item xs>
+      <Grid item key={sub.id}>
         <Card>
           <CardContent>
             {sub.name}

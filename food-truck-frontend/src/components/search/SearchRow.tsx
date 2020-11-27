@@ -1,6 +1,6 @@
 import React from 'react';
-import {Divider, ListItem, ListItemText} from "@material-ui/core";
-import {useRouter} from "next/router";
+import {Divider, ListItem} from "@material-ui/core";
+import TruckCardComponent from "../truck/TruckCardComponent";
 
 export type SearchTruckData = {
   id: number;
@@ -14,10 +14,8 @@ type TruckProp = {
 }
 
 function SearchTruckRow(props: TruckProp) {
-  const router = useRouter();
-
-  if (props.truck.id == -1){
-    return(
+  if (props.truck.id == -1) {
+    return (
       <></>
     );
   }
@@ -25,14 +23,8 @@ function SearchTruckRow(props: TruckProp) {
   return (
     <>
       <Divider/>
-      <ListItem button onClick={() => {
-        if (props.onRedirect) {
-          props.onRedirect();
-        }
-        router.push(`/truck/${props.truck.id}`);
-      }}>
-        <ListItemText primary={props.truck.name}/>
-        <ListItemText secondary={props.truck.description ? props.truck.description : "No Description"}/>
+      <ListItem style={{minWidth: '100%'}} disableGutters>
+        <TruckCardComponent id={props.truck.id} userOwnsTruck={false} onRedirect={props.onRedirect}/>
       </ListItem>
     </>
   )

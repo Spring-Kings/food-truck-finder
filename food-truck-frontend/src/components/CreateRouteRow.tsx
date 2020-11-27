@@ -1,5 +1,5 @@
 import React from "react";
-import {FormControlLabel, Input, Switch, TextField} from "@material-ui/core";
+import {FormControlLabel, Switch, TextField} from "@material-ui/core";
 
 type CreateRowState = {
     days: string[],

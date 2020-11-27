@@ -6,7 +6,6 @@ import food.truck.api.routes.RouteLocation;
 import food.truck.api.routes.RouteRepository;
 import food.truck.api.routes.RouteService;
 import food.truck.api.security.SecurityConstants;
-import food.truck.api.search.IndexingService;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -89,7 +87,15 @@ public class TruckService {
         if (truck.getPriceRating() == null)
             truck.setPriceRating(priceRating.orElse(null));
         truck.setDescription(description.orElse(null));
-        truck.setTags(tags.orElse(null));
+
+        // Ensure all tags are unique and lowercase and have no whitespace at start/end
+        if (tags.isPresent()) {
+            var tags2 = tags.get().stream()
+                    .map(tag -> tag.toLowerCase().trim())
+                    .filter(tag -> !tag.isEmpty())
+                    .collect(Collectors.toSet());
+            truck.setTags(tags2);
+        }
         return saveTruck(truck);
     }
 
@@ -136,14 +142,17 @@ public class TruckService {
 
         var t = truck.get();
 
-        if (file.getContentType() == null || !file.getContentType().startsWith("image/"))
+        if (file.getContentType() == null)
             return HttpStatus.BAD_REQUEST;
 
-        MediaType mediaType;
+        String contentType = file.getContentType();
         try {
-            mediaType = MediaType.parseMediaType(file.getContentType());
+            MediaType.parseMediaType(contentType);
         } catch (InvalidMediaTypeException e) {
-            return HttpStatus.BAD_REQUEST;
+            return HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+        }
+        if (!contentType.startsWith("image/") && !contentType.equals("application/pdf")) {
+            return HttpStatus.UNSUPPORTED_MEDIA_TYPE;
         }
 
         if (file.getSize() == 0)
@@ -159,7 +168,7 @@ public class TruckService {
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
-        t.setMenuContentType(mediaType);
+        t.setMenuContentType(contentType);
 
         saveTruck(t);
         return HttpStatus.OK;

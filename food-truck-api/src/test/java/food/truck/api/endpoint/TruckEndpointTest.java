@@ -168,7 +168,7 @@ public class TruckEndpointTest extends EndpointTest {
     @Test
     public void updateRoute() throws Exception {
         var req = put("/truck/{tId}/update-route", data.testTruckA.getId())
-                .content(asJson(new TruckEndpoint.UpdateRouteParams(data.testRouteA.getRouteId(), "newName", null)))
+                .content(asJson(new RouteEndpoint.UpdateRouteParams(data.testRouteA.getRouteId(), "newName", null)))
                 .contentType("application/json")
                 .with(user(data.ownerA));
         mockMvc.perform(req)

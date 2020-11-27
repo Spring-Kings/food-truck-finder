@@ -1,5 +1,4 @@
-import React, {Component} from 'react';
-import {AxiosResponse} from "axios";
+import React from 'react';
 import api from "../util/api";
 
 type SubscriptionProps = {
