@@ -18,6 +18,7 @@ public class StrategySelector {
     public TruckRecommendationStrategy selectStrategy(AbstractUser u, UserPreferences prefs) {
         if (u instanceof User) {
             return new ScoringRecommendationStrategy(truckSvc, subSvc, (User) u, prefs);
+
         }
         return new GuestRecommendationStrategy(truckSvc, u.getPosition());
     }

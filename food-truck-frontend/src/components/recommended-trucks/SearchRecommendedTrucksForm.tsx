@@ -141,6 +141,7 @@ class RecommendedTrucksForm extends Component<
             priceRating: this.state.priceRating,
             tags: this.state.tags,
             location: this.state.location,
+            active: true,
             numRequested: 10
           },
         method: "POST",

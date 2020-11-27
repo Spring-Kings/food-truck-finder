@@ -18,7 +18,7 @@ import {
   GridList,
   GridListTile,
   List,
-  ListItem,
+  ListItem, MenuItem, Select,
   Typography,
 } from "@material-ui/core";
 
@@ -40,6 +40,8 @@ interface UserDashboardProps {
 interface UserDashboardState {
   inError: string | null;
   nearbyTrucks: RouteLocation[];
+  recommendedTrucks: RouteLocation[];
+  nearBy: boolean;
   // TODO tighten typing
   viewTruck: any | undefined;
 }
@@ -56,6 +58,8 @@ class UserDashboardComponent extends Component<
     this.state = {
       inError: null,
       nearbyTrucks: [],
+      recommendedTrucks: [],
+      nearBy: true,
       viewTruck: undefined
     };
 
@@ -76,6 +80,9 @@ class UserDashboardComponent extends Component<
       console.log(err);
       this.setState({ inError: err });
     }
+
+
+
   }
 
   render() {
@@ -152,9 +159,18 @@ class UserDashboardComponent extends Component<
 
           {/** Where the map would be */}
           <GridListTile cols={4} style={{ height: "100vh" }}>
+            <Select native style={{margin: "30px"}} onChange={(event) => {
+              this.setState({nearBy: event.target.value == 1 ? false : true})
+            }}>
+              <option value={0}>Nearby</option>
+              <option value={1}>Recommended</option>
+            </Select>
+            { this.state.nearBy ?
             <TruckLocationMapComponent
-              locations={this.state.nearbyTrucks}
-            />
+              locations={this.state.nearbyTrucks}/> :
+            <TruckLocationMapComponent
+                locations={this.state.recommendedTrucks}/>
+            }
           </GridListTile>
         </GridList>
       </React.Fragment>
