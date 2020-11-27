@@ -5,7 +5,7 @@ import {
     Button,
     FormControl,
     FormControlLabel,
-    FormHelperText,
+    FormHelperText, FormLabel,
     Grid,
     MenuItem,
     Select,
@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import {AxiosResponse} from 'axios';
 import {privacySettingDisplayString, queryUser, User} from "../api/User";
+import {Label} from "@material-ui/icons";
 
 type PageState = {
     editMode: boolean,
@@ -40,17 +41,18 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
     }
 
     render() {
-        if (this.state.user == null) {
-            return <p>Please wait...</p>
-        } else if (this.state.error) {
+        if (this.state.error) {
             return <h2>Error: {this.state.error}</h2>
+        }
+        else if (this.state.user == null) {
+            return <p>Please wait...</p>
         } else {
             let editForm = null;
             if (this.state.editMode) {
                 const resultP = (this.state.submitResultText !== null) ? <p>{this.state.submitResultText}</p> : null;
                 editForm = <div>
                     <Form submitUrl="/user" submitMethod="PUT" onSuccessfulSubmit={this.onSubmitSuccess}>
-                        <TextField required label="Current Password" type="password" name="password"/>
+                        <TextField  required label="Current Password" type="password" name="password"/>
                         <TextField label="New Password" type="password" name="newPassword"/>
                         <TextField label="New Email" name="newEmail"/>
                         <FormControl>
@@ -61,10 +63,10 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                             </Select>
                             <FormHelperText>New Privacy Setting</FormHelperText>
                         </FormControl>
-                        <FormControlLabel
-                          control={<Switch name="newOwnerStatus"/>}
-                          label="Secondary"
-                        />
+                        <Grid container direction="row">
+                            <p>Owner account?</p>
+                            <Switch name="newOwnerStatus" checked={this.state.user.owner}/>
+                        </Grid>
                     </Form>
                     {resultP}
                 </div>
