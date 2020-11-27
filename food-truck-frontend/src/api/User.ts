@@ -18,13 +18,26 @@ export function privacySettingDisplayString(u: User): string {
   throw 'Invalid privacy setting';
 }
 
-export async function queryUser(id: number): Promise<User | null> {
+export function parseUser(obj: any): User|null {
+  if (obj && obj.username != null && obj.email != null && obj.owner != null && obj.privacySetting != null)
+    return obj;
+  console.log("Invalid user object");
+  console.log(obj);
+  return null;
+}
+
+export async function queryUserById(id: number): Promise<User | null> {
   const result = await api.get(`/user/${id}`)
     .catch(err => {
       console.log("Error getting user: " + JSON.stringify(err))
     });
-  if (result && result.data && result.data.username && result.data.email && result.data.owner && result.data.privacySetting)
-    return result.data;
-  console.log("Invalid response getting user: " + JSON.stringify(result));
-  return null;
+  return result ? parseUser(result.data) : null;
+}
+
+export async function queryUserByName(username: string): Promise<User | null> {
+  const result = await api.get('/search-usernames?username=' + username)
+      .catch(err => {
+        console.log("Error getting user: " + JSON.stringify(err))
+      });
+  return result ? parseUser(result.data) : null;
 }

@@ -2,45 +2,51 @@ import React from 'react';
 import ReviewsList from "./ReviewsList";
 import SubscriptionList from "./SubscriptionList";
 import api from "../util/api";
+import {User, queryUserByName} from "../api/User";
+import Review from "../domain/truck/Review";
+import {loadReviewsByUser} from "../api/RateReview";
+import ReviewView from "./truck/rate_and_review/ReviewView";
 
 type UserDetailsProps = {
     username: string
 }
 
 type UserDetailsState = {
-    data: {username: string,
-            id: string,
-            email: string}[];
+    user: User|null,
+    reviews: Review[]|null
+    err: string|null
 }
 
 class UserDetails extends React.Component<UserDetailsProps, UserDetailsState>{
     constructor(props: UserDetailsProps) {
         super(props);
-        this.state = {data: [{username: "", id: "", email: ""}]}
+        this.state = {
+            user: null,
+            reviews: null,
+            err: null
+        }
     }
 
-    componentDidMount() {
-        api.get(`/search-usernames?username=${this.props.username}`)
-            .then(response => {
-                this.setState({data: response.data});
-            }).catch(error => {
-             console.log(error.toString())
+    async componentDidMount() {
+        const user = await queryUserByName(this.props.username);
+        if (user == null) {
+            this.setState({err: "User not found."});
+            return;
+        }
+        const reviews = await loadReviewsByUser(user.id, () => {
+            this.setState({err: "Failed to fetch reviews."})
         });
+        this.setState({reviews});
     }
 
     render() {
-        if(this.state.data.length == 0){
-            return(
-                <div>
-                    <h1>User Doesn't Exist</h1>
-                </div>
-            );
-        }
+        if (this.state.err)
+            return <p>{this.state.err}</p>
 
         return(
             <div>
                 <h1>{this.props.username}</h1>
-                <ReviewsList username={this.props.username}/>
+                {this.state.reviews?.map(rev => <ReviewView key={rev.reviewId + "_view"} review={rev}/>)}
                 <br/>
                 <SubscriptionList username={this.props.username}/>
             </div>

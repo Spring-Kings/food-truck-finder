@@ -25,12 +25,12 @@ export const loadReviewsByUser = async (
     if (name.data !== null) {
       // Get the reviews by this user
       let resp: any = await api.request({
-        url: `/reviews/truck/${userId}`,
+        url: `/reviews/user/${userId}`,
         method: "GET",
       });
 
       // Map all backend reviews to frontend reviews
-      reviews = resp.data.map(async (r: any) => {
+      reviews = resp.data.map((r: any) => {
         // Create frontend representation for 1 review, with either the username or a blank string
         return review_backendToFrontend(r, name.data.username);
       });
@@ -199,3 +199,15 @@ export const deleteReview = async (
     .catch(onFail);
   return result;
 };
+
+
+export const loadReviewById = async (reviewId: number): Promise<Review|null> => {
+  const response = await api.get(`/reviews/${reviewId}`);
+  if (response.data?.userId) {
+    const usernameResp = await api.get(`/get-username?id=${response.data.userId}`);
+    if (usernameResp.data)
+      return review_backendToFrontend(response.data, usernameResp.data);
+  }
+
+  return null;
+}

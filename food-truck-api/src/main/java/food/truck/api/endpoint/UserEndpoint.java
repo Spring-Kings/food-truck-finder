@@ -33,6 +33,12 @@ public class UserEndpoint {
     @Autowired
     private ReviewService reviewService;
 
+    @GetMapping("/get-username")
+    public String getUsername(@RequestParam long id) {
+        return userService.findUserById(id).map(User::getUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         var target = userService.findUserById(id);
@@ -89,10 +95,11 @@ public class UserEndpoint {
     }
 
     @GetMapping("/search-usernames")
-    public List<UserView> searchUsernames(@RequestParam String username) {
+    public UserView searchUsernames(@RequestParam String username) {
         return userService.searchUsernames(username).stream()
+                .findFirst()
                 .map(UserView::of)
-                .collect(Collectors.toList());
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
 
@@ -122,15 +129,6 @@ public class UserEndpoint {
         if (u.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return reviewService.findReviewsByUserId(userId);
-    }
-
-    @GetMapping("/user/reviews")
-    public List<Review> getUserReviews(@RequestParam String username) {
-        User user = userService.loadUserByUsername(username);
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return reviewService.findReviewsByUserId(user.getId());
     }
 
 }

@@ -13,7 +13,7 @@ import {
     TextField
 } from '@material-ui/core';
 import {AxiosResponse} from 'axios';
-import {privacySettingDisplayString, queryUser, User} from "../api/User";
+import {privacySettingDisplayString, queryUserById, User} from "../api/User";
 import {Label} from "@material-ui/icons";
 
 type PageState = {
@@ -54,9 +54,9 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                     <Form submitUrl="/user" submitMethod="PUT" onSuccessfulSubmit={this.onSubmitSuccess}>
                         <TextField  required label="Current Password" type="password" name="password"/>
                         <TextField label="New Password" type="password" name="newPassword"/>
-                        <TextField label="New Email" name="newEmail"/>
+                        <TextField label="New Email" name="newEmail" defaultValue={this.state.user.email}/>
                         <FormControl>
-                            <Select label="New Privacy Setting" name="newPrivacySetting" defaultValue="PUBLIC">
+                            <Select label="New Privacy Setting" name="newPrivacySetting" defaultValue={this.state.user.privacySetting}>
                                 <MenuItem value="PUBLIC">Public</MenuItem>
                                 <MenuItem value="USERS_ONLY">Users Only</MenuItem>
                                 <MenuItem value="PRIVATE">Private</MenuItem>
@@ -118,7 +118,7 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                 error: "You are not currently logged in."
             });
         } else {
-            const user = await queryUser(curUser.userID);
+            const user = await queryUserById(curUser.userID);
             console.log(user);
             if (user != null)
                 this.setState({user});
