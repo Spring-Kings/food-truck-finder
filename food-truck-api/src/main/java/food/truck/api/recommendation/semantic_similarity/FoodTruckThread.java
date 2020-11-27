@@ -1,7 +1,9 @@
 package food.truck.api.recommendation.semantic_similarity;
 
 import food.truck.api.truck.Truck;
+import org.springframework.data.util.Pair;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,16 +46,18 @@ public class FoodTruckThread extends Thread {
     }
 
     /**
-     * Update the provided map with all scores this thread computed
-     * @param final_scores The map of scores to update
+     * Update the provided scores with all scores this thread computed
+     * @param finalScores The list of scores to update
      */
-    public void populateScores(Map<Truck, Double> final_scores) {
+    public void populateScores(List<Pair<Truck, Double>> finalScores) {
         // If no scores found, return
         if (scores == null)
             return;
 
         // Add all scores in
-        for (var kv : final_scores.entrySet())
-            kv.setValue(kv.getValue() + scores.get(kv.getKey().getId()));
+        for (int i = 0; i < finalScores.size(); i++) {
+            var kv = finalScores.get(i);
+            finalScores.set(i, Pair.of(kv.getFirst(), kv.getSecond() + scores.get(kv.getFirst().getId())));
+        }
     }
 }

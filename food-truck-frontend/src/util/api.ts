@@ -11,6 +11,11 @@ api.interceptors.request.use(
         if (token) {
             config.headers["Authorization"] = token;
         }
+        const lat = localStorage.getItem("latitude");
+        const lng = localStorage.getItem("longitude");
+        if (lat && lng) {
+            config.headers["Coordinates"] = lat + "," + lng;
+        }
         return config;
     }
 );

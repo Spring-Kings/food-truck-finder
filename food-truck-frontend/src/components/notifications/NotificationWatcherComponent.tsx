@@ -4,14 +4,16 @@ import Router, {useRouter} from "next/router";
 import {Button, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
+import { StyledDialogTitle } from '../util/StyledDialogTitle';
+import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 
 function NotificationWatcherComponent(props: NotificationListProps) {
   const router = useRouter();
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   const [notify, setNotify]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
-  const reloadNotifications = () => {
-    props.loadNotificationsFromBackend();
+  const reloadNotifications = async () => {
+    await props.loadNotificationsFromBackend();
     notifyUnread();
   };
   const notifyUnread = () => {
@@ -24,30 +26,34 @@ function NotificationWatcherComponent(props: NotificationListProps) {
     setNotified(true);
     router.replace('/notifications');
   }
+
   useEffect(() => {
-    if (!initialized) {
-      reloadNotifications();
-      setInitialized(true);
-    } else {
-      const timer = setInterval(reloadNotifications, 5000);
+      if (!initialized) {
+        reloadNotifications().then(setInitialized(true));
+      }
+    },
+    [] // No state dependencies --> only run once
+  );
+  useEffect(() => {
+    if (initialized) {
+      const timer = setInterval(reloadNotifications, 15000);
       return () => clearInterval(timer);
     }
-    return () => {};
-  });
+  })
+
   return (
     <>
       <IconButton color="inherit"
                   onClick={() => Router.replace('/notifications')}>
-        { initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/> }
+        {initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/>}
       </IconButton>
-      <Dialog open={notify && !notified}>
-        <DialogTitle>You have unread notifications!</DialogTitle>
-        <DialogContent>
-          <Grid container direction="column" alignItems="center">
-            <Button onClick={() => setNotified(true)}>OK</Button>
-            <Button onClick={redirectToNotifications}>See Notifications</Button>
-          </Grid>
-        </DialogContent>
+      <Dialog open={notify && !notified} fullWidth>
+        <StyledDialogTitle onClose={() => setNotified(true)}>
+          You have unread notifications!
+        </StyledDialogTitle>
+        <DialogActions>
+          <Button onClick={redirectToNotifications}>See Notifications</Button>
+        </DialogActions>
       </Dialog>
     </>
   );

@@ -1,7 +1,8 @@
 import React from 'react';
-import {Button, FormGroup, Grid, List, TextField} from "@material-ui/core";
+import {Button, Container, FormGroup, Grid, List, ListItem, TextField} from "@material-ui/core";
 import SearchTruckRow, {SearchTruckData} from "../../components/search/SearchRow";
 import {searchTruckByName} from "../../api/Truck";
+import TruckCardComponent from "../truck/TruckCardComponent";
 
 const truck = [{
   id: -1,
@@ -18,7 +19,7 @@ type SearchTruckProps = {
   onRedirect?: () => void;
 }
 
-class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruckState>{
+class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruckState> {
   constructor(props: SearchTruckProps) {
     super(props);
 
@@ -46,7 +47,7 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
               <TextField fullWidth label="Search" onChange={(event) => {
                 this.setState({search: event.target.value.toLowerCase()})
               }} onKeyDown={event => {
-                if(event.key === 'Enter'){
+                if (event.key === 'Enter') {
                   this.handleSubmit();
                 }
               }}/>
@@ -56,11 +57,15 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
             </Grid>
           </Grid>
         </FormGroup>
-        <List>
-          {this.state.trucks.map(value => (
-            <SearchTruckRow truck={value} onRedirect={this.state.onRedirect}/>
-          ))}
-        </List>
+        <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
+          <List >
+            <List disablePadding>
+              {this.state.trucks.map(truck => (
+                <SearchTruckRow key={truck.id} truck={truck} onRedirect={this.state.onRedirect}/>
+              ))}
+            </List>
+          </List>
+        </Container>
       </>
     )
   }

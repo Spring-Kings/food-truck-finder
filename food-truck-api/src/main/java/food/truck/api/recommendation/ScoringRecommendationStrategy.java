@@ -7,23 +7,13 @@ import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
 import food.truck.api.user.UserPreferences;
+import lombok.Data;
+import org.springframework.data.util.Pair;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
-enum ScoreWeights {
-    DistWeight(3.0),
-    PriceWeight(1.5),
-    TagWeight(10.0),
-    RatingWeight(5.0),
-    SubscriptionWeight(10.0);
 
-    public final double val;
-
-    ScoreWeights(double val) {
-        this.val = val;
-    }
-}
 
 public class ScoringRecommendationStrategy implements TruckRecommendationStrategy {
     private final TruckService truckSvc;
@@ -42,17 +32,17 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
     }
 
     @Override
-    public List<Truck> selectTrucks() {
+    public List<Pair<Truck, Double>> selectTrucks() {
         var userSubs = subscriptionService.findSubsByUser(user);
 
         var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
-        var scores = new HashMap<Truck, Double>();
 
         // Run a secondary thread to acquire all truck tags
         var getTagThread = new FoodTruckThread(ftd, trucks, prefs.getTags(), ScoreWeights.TagWeight.val);
         getTagThread.start();
 
         // Compute the rest of the scores
+        var result = new ArrayList<Pair<Truck, Double>>();
         for (var truck : trucks) {
             // I think this .get() is okay because .getTrucksCloseToLocation already filtered it to trucks with a valid current location
             var truckLocation = truckSvc.getCurrentRouteLocation(truck.getId()).get().getPosition();
@@ -75,8 +65,10 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
             double subScore = 0;
             if (userSubs.stream().anyMatch(sub -> sub.getTruck().getId().equals(truck.getId())))
                 subScore = ScoreWeights.SubscriptionWeight.val;
+            else if (userSubs.stream().anyMatch(sub -> sub.getTruck().getUserId().equals(truck.getUserId())))
+                subScore = ScoreWeights.SubscibedToDifferentTruckWithSameOwnerWeight.val;
 
-            scores.put(truck, distScore + priceScore + ratingScore + subScore);
+            result.add(Pair.of(truck, distScore + priceScore + ratingScore + subScore));
         }
 
         // Rejoin the two score computations
@@ -85,10 +77,9 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        getTagThread.populateScores(scores);
+        getTagThread.populateScores(result);
 
-        // Finalize scoring and return
-        trucks.sort((a, b) -> Double.compare(scores.get(b), scores.get(a)));
-        return trucks;
+        result.sort((a, b) -> b.getSecond().compareTo(a.getSecond()));
+        return result;
     }
 }

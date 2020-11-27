@@ -13,6 +13,7 @@ export interface UserData {
   pfp: any;
   subscribedTrucks: SimpleTruck[];
   ownedTrucks: SimpleTruck[] | undefined;
+  owner: boolean;
 }
 
 // Create the user state slice
@@ -23,7 +24,8 @@ const userSlice = createSlice({
             username: "",
             pfp: undefined,
             subscribedTrucks: [],
-            ownedTrucks: undefined
+            ownedTrucks: undefined,
+            owner: false
         }
     },
     reducers: {},

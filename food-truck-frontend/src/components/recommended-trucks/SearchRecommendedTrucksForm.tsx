@@ -3,11 +3,11 @@ import {Button, Grid, Slider, Typography} from "@material-ui/core";
 import React, {Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
-import { RouteLocation } from "../map/route-map/RouteLocation";
+import {RouteLocation} from "../map/route-map/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
-import { ReactEventAdapter } from "../Form";
-import { getNearbyTruckLocationsById } from "../../api/Truck";
+import {ReactEventAdapter} from "../Form";
+import {getNearbyTruckLocationsById} from "../../api/Truck";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 
 type RecommendedTruckProps = {};
@@ -45,7 +45,7 @@ class RecommendedTrucksForm extends Component<
   constructor(props: RecommendedTruckProps) {
     super(props);
     this.state = {
-      location: { lat: 0, lng: 0 },
+      location: {lat: 0, lng: 0},
       acceptableRadius: 1,
       priceRating: 3,
       tags: []
@@ -86,7 +86,7 @@ class RecommendedTrucksForm extends Component<
             marks={MARKS}
             max={30}
             onChange={(_, val) =>
-              this.setState({ acceptableRadius: this.coerce(val) })
+              this.setState({acceptableRadius: this.coerce(val)})
             }
             style={{
               width: 200,
@@ -107,7 +107,7 @@ class RecommendedTrucksForm extends Component<
           <Typography variant="h4">Food Categories</Typography>
         </Grid>
         <Grid item>
-          <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags} />
+          <MultiField title="Desired Truck Tags" name="tags" onChange={this.changeTags}/>
         </Grid>
         <Grid item>
           <Button variant="contained" color="primary" onClick={this.submit}>
@@ -137,12 +137,12 @@ class RecommendedTrucksForm extends Component<
       let resp: any = await api.request({
         url: "/truck/recommended",
         data: {
-            acceptableRadius: this.state.acceptableRadius,
-            priceRating: this.state.priceRating,
-            tags: this.state.tags,
-            location: this.state.location,
-            numRequested: 10
-          },
+          acceptableRadius: this.state.acceptableRadius,
+          priceRating: this.state.priceRating,
+          tags: this.state.tags,
+          location: this.state.location,
+          numRequested: 10
+        },
         method: "POST",
       });
       if (resp.data !== undefined) {

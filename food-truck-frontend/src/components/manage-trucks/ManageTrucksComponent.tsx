@@ -1,17 +1,10 @@
 import React from "react";
 import Router from "next/router";
 
-import {
-  Button,
-  Card,
-  Grid,
-  CircularProgress,
-  Container,
-  Typography,
-} from "@material-ui/core";
+import {Button, Card, CircularProgress, Container, Grid, Typography,} from "@material-ui/core";
 
 import api from "../../util/api";
-import { TruckState } from "../TruckView";
+import {TruckState} from "../TruckView";
 
 interface ManageTruckProps {}
 interface ManageTruckState {
@@ -72,7 +65,7 @@ class ManageTrucksComponent extends React.Component<
 
   private renderRow(truck: TruckState) {
     return (
-      <Grid item xs>
+      <Grid item xs key={truck.id}>
         <Grid container direction="row">
           <Grid item xs>
             <Card>

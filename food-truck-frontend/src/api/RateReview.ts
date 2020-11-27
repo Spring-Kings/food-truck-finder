@@ -1,7 +1,7 @@
-import Review, { backendToFrontend as review_backendToFrontend, TruckReviews } from "../domain/truck/Review";
-import Truck, { backendToFrontend as truck_backendToFrontend } from "../domain/truck/Truck";
+import Review, {backendToFrontend as review_backendToFrontend, TruckReviews} from "../domain/truck/Review";
+import Truck, {backendToFrontend as truck_backendToFrontend} from "../domain/truck/Truck";
 import api from "../util/api";
-import { ClientResponseAction } from "./ResponseTypes";
+import {ClientResponseAction} from "./ResponseTypes";
 
 /**
  * Get all reviews by a particular user
@@ -187,7 +187,7 @@ export const deleteReview = async (
   truckId: number,
   onFail?: ClientResponseAction
 ) => {
-  var result: boolean = false;
+  let result: boolean = false;
   await api
     .request({
       url: `/reviews/truck/${truckId}`,
