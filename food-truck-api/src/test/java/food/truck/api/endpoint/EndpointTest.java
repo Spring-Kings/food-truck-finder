@@ -33,6 +33,7 @@ import java.util.List;
 public class EndpointTest {
     @Autowired
     protected TestData data;
+    // Mock AmazonS3 client so that autowiring doesn't fail and cause tests to fail.
     @MockBean
     protected AmazonS3 s3Client;
     @Autowired
