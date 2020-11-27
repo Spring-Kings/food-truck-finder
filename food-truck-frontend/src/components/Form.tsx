@@ -78,7 +78,7 @@ class Form extends Component<Props, State> {
         <Grid container spacing={2}>
           {React.Children.map(this.props.children, this.mapChild)}
           <Grid item>
-            <Button variant="contained" type="submit">Submit</Button>
+            <Button type="submit">Submit</Button>
           </Grid>
         </Grid>
       </form>

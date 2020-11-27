@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react'
-import {AppBar, Avatar, Box, createStyles, Grid, Theme, Toolbar, Typography} from '@material-ui/core'
-import {makeStyles} from "@material-ui/core/styles";
+import {AppBar, Avatar, Box, Grid, Toolbar, Typography} from '@material-ui/core'
 import LinkButton from "./LinkButton";
 import {UserData} from "../../redux/user/UserReducer";
 import NotificationWatcherComponent from "../notifications/NotificationWatcher";
 import ThemeSwitchComponent from "./theme/ThemeSwitch";
 import MenuDropdownComponent from "./MenuDropdownComponent";
 import QuickSearchComponent from "../search/QuickSearchComponent";
+import {useFlexGrowStyles} from "../theme/FoodTruckThemeProvider";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -14,16 +14,8 @@ export type AppMenuBarProps = {
   loadUserFromBackend: () => Promise<void>;
 };
 
-const useAppBarStyles = makeStyles((_theme: Theme) =>
-  createStyles({
-    root: {
-      flexGrow: 1,
-    },
-  }),
-);
-
 export function AppMenuBarComponent(props: AppMenuBarProps) {
-  const classes = useAppBarStyles();
+  const classes = useFlexGrowStyles();
 
   const loadUser = () => {
     if (localStorage.getItem("authToken") != null && props.data.username === "") {
@@ -37,15 +29,15 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     loadUser();
   });
 
-  const dashboardUrl = props.data.ownedTrucks !== undefined ? 'owner' : 'user';
+  const dashboardUrl = props.data.owner ? 'owner' : 'user';
 
   const menuBarItems = [
-    <Avatar src="/logo.png" alt="logo" variant="rounded"/>,
-    <Typography variant="h6">Stacked Trucks</Typography>,
-    <LinkButton url="/" text="Home"/>,
-    <LinkButton url="/search/truck" text="Search Trucks"/>,
-    <LinkButton url="/interactive-map" text="Nearby Trucks"/>,
-    <LinkButton url="/recommended-trucks" text="Recommended Trucks"/>,
+    { key: "avatar", val: <Avatar src="/logo.png" alt="logo" variant="rounded"/> },
+    { key: "title", val: <Typography variant="h6">Stacked Trucks</Typography> },
+    { key: "home", val: <LinkButton url="/" text="Home"/> },
+    { key: "search", val: <LinkButton url="/search/truck" text="Search Trucks"/> },
+    { key: "nearby", val: <LinkButton url="/interactive-map" text="Nearby Trucks"/> },
+    { key: "recommended", val: <LinkButton url="/recommended-trucks" text="Recommended Trucks"/> },
   ];
 
   const menuDropdown = (
@@ -61,16 +53,16 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
     <AppBar className={classes.root}>
       <Toolbar>
         <Grid container direction="row" alignContent="space-between">
-          {menuBarItems.map((item, index) => (
-              <Grid item key={index}>
-                {item}
+          {menuBarItems.map((item) => (
+              <Grid key={item.key} item>
+                {item.val}
               </Grid>
           ))}
-          <Grid item>
+          <Grid key="login/dashboard" item>
             {props.data.username === "" ? (
                 <LinkButton url="/login" text="Login"/>
             ) : (
-                <LinkButton url={`/dashboard/${dashboardUrl}`} text="Dashboard"/>
+              <LinkButton url={`/dashboard/${dashboardUrl}`} text={`${props.data.username}'s Dashboard`}/>
             )}
           </Grid>
           {menuDropdown}

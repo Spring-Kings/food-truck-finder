@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {createMuiTheme, jssPreset, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, jssPreset, makeStyles, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
 import CoolLayout, {Args} from "../layout/CoolLayout"
@@ -9,6 +9,7 @@ import grey from "@material-ui/core/colors/grey";
 import red from "@material-ui/core/colors/red";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import {ThemeData} from "../../redux/theme/ThemeReducer";
+import {createStyles, Theme} from "@material-ui/core";
 
 const jss = create({plugins: [...jssPreset().plugins, rtl()]});
 
@@ -52,12 +53,12 @@ const dense = {
 
 const lightBackground = {
   paper: grey[200],
-  'default': blueGrey[200],
+  'default': grey[200],
 }
 
 const darkBackground = {
   paper: '#181d1f',
-  'default': '#1e272b',
+  'default': '#181d1f',
 }
 
 const gridOptions = {
@@ -65,6 +66,34 @@ const gridOptions = {
   justify: 'center',
   alignItems: 'center',
   spacing: 2
+};
+
+const cardOptions = {
+  raised: false,
+};
+
+const lightCardHeaderOptions = {
+  root: {
+    backgroundColor: blueGrey[100],
+  }
+};
+
+const lightCardContentOptions = {
+  root: {
+    backgroundColor: grey[100]
+  }
+};
+
+const darkCardHeaderOptions = {
+  root: {
+    backgroundColor: blueGrey[900]
+  }
+};
+
+const darkCardContentOptions = {
+  root: {
+    backgroundColor: '#1c2427'
+  }
 };
 
 const palette = {
@@ -100,7 +129,8 @@ let themeOptions = {
     MuiTextField: {
       variant: 'filled'
     },
-    MuiGrid: gridOptions
+    MuiGrid: gridOptions,
+    MuiCard: cardOptions,
   },
   overrides: {
     MuiCssBaseline: {
@@ -110,6 +140,10 @@ let themeOptions = {
         },
       },
     },
+    MuiCardContent: darkCardContentOptions,
+    MuiCardHeader: darkCardHeaderOptions,
+    MuiCardActionArea: darkCardContentOptions,
+    MuiCardActions: darkCardContentOptions
   }
 };
 
@@ -118,6 +152,14 @@ export interface ThemeProps {
   loadTheme: () => void;
   switchTheme: () => void;
 }
+
+export const useFlexGrowStyles = makeStyles((_theme: Theme) =>
+  createStyles({
+    root: {
+      flexGrow: 1
+    },
+  }),
+);
 
 export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
   let [themeLoaded, setThemeLoaded]: [boolean, any] = useState(false);
@@ -129,6 +171,13 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
       ...themeOptions.palette,
       background: props.data.isDark ? darkBackground : lightBackground,
       type: props.data.isDark ? 'dark' : 'light'
+    },
+    overrides: {
+      ...themeOptions.overrides,
+      MuiCardContent: props.data.isDark ? darkCardContentOptions : lightCardContentOptions,
+      MuiCardHeader: props.data.isDark ? darkCardHeaderOptions : lightCardHeaderOptions,
+      MuiCardActionArea: props.data.isDark ? darkCardContentOptions : lightCardContentOptions,
+      MuiCardActions: props.data.isDark ? darkCardContentOptions : lightCardContentOptions
     }
   }));
 

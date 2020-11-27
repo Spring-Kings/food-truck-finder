@@ -1,6 +1,6 @@
 import React from 'react'
 import Form from "../components/Form";
-import {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import {Box, Grid, Switch, TextField, Typography,} from "@material-ui/core";
 import LinkButton from "../components/layout/LinkButton";
 
@@ -53,7 +53,7 @@ class RegisterPageComponent extends React.Component<{}, State> {
     this.setState({ resultText: JSON.stringify(response.data) });
   };
 
-  onFail = (formData: any, err: any) => {
+  onFail = (formData: any, err: AxiosError) => {
     let text = "Failed to register";
     if (err.response)
       text += ": " + err.response;
