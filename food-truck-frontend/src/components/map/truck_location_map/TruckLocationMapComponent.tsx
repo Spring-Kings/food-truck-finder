@@ -1,51 +1,46 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography} from "@material-ui/core";
-import Router from "next/router";
-import React, {useState} from "react";
+import {Dialog, DialogContent} from "@material-ui/core";
+import React, {useEffect, useState} from "react";
 import TruckRouteMapComponent from "..";
 import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
 import {getTruckById} from "../../../api/Truck";
-import {MoneyRating} from "../../truck/rate_and_review/ratings";
 import {blankRouteLocation, RouteLocation} from "../route-map/RouteLocation";
+import TruckCardComponent from "../../truck/TruckCardComponent";
+import {userCanEditTruck} from "../../TruckView";
+import {StyledDialogTitle} from "../../util/StyledDialogTitle";
 
 export type TruckLocationMapProps = {
-  locations: RouteLocation[]
+  locations: RouteLocation[];
+  height?: string;
 }
 
 const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
   const [viewTruck, setViewTruck]: [RouteLocation | undefined, any] = useState(blankRouteLocation());
+  const [ownsTruck, setOwnsTruck]: [boolean, any] = useState(false);
 
   const selectTruck = async (pt: RouteLocation, _latLng: any) => setViewTruck((await getTruckById(pt.stopId, DEFAULT_ERR_RESP)));
-  const viewSelectedTruck = () => {
-      if (viewTruck !== undefined) Router.replace(`/truck/${viewTruck.id}`);
-    };
   const cancelSelectedView = () => setViewTruck(undefined);
+
+  useEffect(() => {
+    if (viewTruck)
+      setOwnsTruck(userCanEditTruck(viewTruck.id as number));
+  }, [viewTruck]);
 
   return (
     <>
       {/* Dialog to show truck when clicked on */}
       <Dialog open={viewTruck !== undefined && viewTruck.id > 0}>
-        <DialogTitle>
-          {viewTruck?.name}
-        </DialogTitle>
+        <StyledDialogTitle onClose={cancelSelectedView}>
+          Truck Info
+        </StyledDialogTitle>
         <DialogContent>
-          <Typography variant="body1">
-            {viewTruck?.description}
-          </Typography>
-          <Grid container>
-            <Grid>
-              {viewTruck && viewTruck.priceRating ? <MoneyRating readOnly disabled value={viewTruck.priceRating}/> :
-                <Typography variant="body1">Unrated</Typography>}
-            </Grid>
-          </Grid>
+          {viewTruck?.id !== undefined &&
+            <TruckCardComponent id={viewTruck.id as number} userOwnsTruck={ownsTruck}/>
+          }
         </DialogContent>
-        <DialogActions>
-          <Button onClick={viewSelectedTruck}>View</Button>
-          <Button onClick={cancelSelectedView}>Cancel</Button>
-        </DialogActions>
       </Dialog>
 
       {/* Actual map */}
-      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} isRoute={false} />
+      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} isRoute={false} height={props.height}/>
     </>
   );
 };

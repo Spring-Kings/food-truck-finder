@@ -1,25 +1,17 @@
 import React, {Component} from "react";
-
 import Router from "next/router";
-
 import Button from "@material-ui/core/Button";
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Card,
   CircularProgress,
-  GridList,
-  GridListTile,
+  Grid,
   Typography,
 } from "@material-ui/core";
 
 import {UserData} from "../../../../redux/user/UserReducer";
-import TruckListComponent from "../../TruckListComponent";
 import {RouteLocation} from "../../../map/route-map/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
 import {getNearbyTruckLocations} from "../../../../api/Truck";
-import TruckLocationMapComponent from "../../../map/truck_location_map/TruckLocationMapComponent";
+import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -52,7 +44,6 @@ class UserDashboardComponent extends Component<
     };
 
     // Bind methods
-    this.viewTruck = this.viewTruck.bind(this);
     this.toOwnerDashboard = this.toOwnerDashboard.bind(this);
   }
 
@@ -78,95 +69,30 @@ class UserDashboardComponent extends Component<
 
     // If OK, return actual component
     return (
-      <React.Fragment>
-        {/** Props IDd using: https://material-ui.com/components/grid/ */}
-        <GridList
-          cols={5}
-          style={{
-            height: "100vh",
-            width: "100%",
-          }}
-        >
-          {/** Side list */}
-          <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Go to owner dashboard */}
-            {this.props.data.ownedTrucks ? (
-              <Card>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={this.toOwnerDashboard}
-                >
-                  Owner Dashboard
-                </Button>
-              </Card>
-            ) : null}
-
-            {/* Go to notifications page */}
-            <Card>
+      <>
+        {this.props.data.ownedTrucks ? (
+          <Grid container direction="row" justify="flex-start" alignItems="flex-start">
+            <Grid item>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={this.toNotifications}
+                onClick={this.toOwnerDashboard}
               >
-                Notifications
+                Owner Dashboard
               </Button>
-            </Card>
-
-            {/* Go to notifications page */}
-            <Card>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.toSearchTrucks}
-              >
-                Search Trucks
-              </Button>
-            </Card>
-
-            {/* Subscribe list */}
-            <Accordion>
-              <AccordionSummary>Subscribed Trucks</AccordionSummary>
-              <AccordionDetails>
-                <TruckListComponent
-                  trucks={this.props.data.subscribedTrucks}
-                  empty={
-                    <Card>
-                      <Button disabled={true}>No subscriptions</Button>
-                    </Card>
-                  }
-                  handleTruckIcon={<Typography>VIEW</Typography>}
-                  handleTruck={this.viewTruck}
-                />
-              </AccordionDetails>
-            </Accordion>
-          </GridListTile>
-
-          {/** Where the map would be */}
-          <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckLocationMapComponent
-              locations={this.state.nearbyTrucks}
-            />
-          </GridListTile>
-        </GridList>
-      </React.Fragment>
+            </Grid>
+          </Grid>
+        ) : null}
+        <TruckListAndMapComponent routePts={this.state.nearbyTrucks}
+                                  trucks={this.props.data.subscribedTrucks}
+                                  listLabel={'Subscribed Trucks'}
+                                  mapLabel={'Nearby Trucks'}/>
+      </>
     );
-  }
-
-  private viewTruck(id: number): void {
-    Router.replace(`/truck/${id}`);
   }
 
   private toOwnerDashboard() {
     Router.replace("/dashboard/owner");
-  }
-
-  private toNotifications() {
-    Router.replace("/notifications");
-  }
-
-  private toSearchTrucks() {
-    Router.replace("/search/truck");
   }
 }
 

@@ -14,6 +14,7 @@ import SendNotificationComponent from "./notifications/SendNotificationComponent
 import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
+import TruckRatingComponent from "./truck/TruckRatingComponent";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = loggedInUser();
@@ -34,6 +35,19 @@ export interface TruckState {
   menuContentType: string | null;
 }
 
+export const makeEmptyTruckState = (): TruckState => {
+  return {
+    id: 0,
+    userId: 0,
+    name: "",
+    description: "",
+    priceRating: null,
+    tags: [],
+    starRating: null,
+    menuContentType: null
+  };
+};
+
 interface TruckViewState {
   notFound: boolean | null;
 }
@@ -52,17 +66,10 @@ class TruckView extends Component<TruckProps, State> {
     super(props);
 
     this.state = {
+      ...makeEmptyTruckState(),
       notFound: null,
-      id: 0,
-      userId: 0,
-      name: "",
-      description: "",
-      priceRating: null,
       routePts: [],
       subscription: null,
-      tags: [],
-      starRating: null,
-      menuContentType: null
     };
   }
 
@@ -115,45 +122,38 @@ class TruckView extends Component<TruckProps, State> {
         <Grid item>
           <Typography variant="subtitle1">Description:</Typography>
         </Grid>
-        <Grid item>
+        <Grid item style={{maxWidth: '250px'}}>
           {this.state.description}
         </Grid>
       </Grid>
     );
 
-    const rating = (name: string, child: JSX.Element) => (
-      <Grid container direction="row" justify="flex-start" alignItems="flex-start" spacing={1}>
-        <Grid item>
-          <Typography variant="subtitle1">{name}</Typography>
-        </Grid>
-        <Grid item>
-          {child}
-        </Grid>
-      </Grid>
-    );
-
     const priceRating = this.state.priceRating ?
-      rating("Price Rating:", <MoneyRating readOnly precision={0.1} disabled value={this.state.priceRating}/>) : <></>;
+      <TruckRatingComponent name="Price Rating:"
+                            child={<MoneyRating readOnly precision={0.1} value={this.state.priceRating}/>}/>
+       : <></>;
     const starRating = this.state.starRating ?
-      rating("Star Rating:", <StarRating readOnly precision={0.1} disabled value={this.state.starRating}/>) : <></>;
+      <TruckRatingComponent name="Star Rating:"
+                            child={<StarRating readOnly precision={0.1} value={this.state.starRating}/>}/>
+       : <></>;
 
     const tags = (
       <>
         <Typography variant="subtitle1">Tags:</Typography>
         <List>
-          {this.state.tags.map((tag, ndx) => <ListItem key={ndx}>{tag}</ListItem>)}
+          {this.state.tags.map((tag, _ndx) => <ListItem key={`${this.state.id}-${tag}`}>{tag}</ListItem>)}
         </List>
       </>
     );
 
     const reviewButton = (
-      <ListItem>
+      <ListItem key={`${this.state.id}-reviewBtn`}>
         <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
       </ListItem>
     );
 
     const subscribeButton = (
-      <ListItem>
+      <ListItem key={`${this.state.id}-subscribeBtn`}>
         <Button color="primary"
                 onClick={this.handleSubscription}>
           {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
@@ -186,7 +186,7 @@ class TruckView extends Component<TruckProps, State> {
         <Typography variant="h4">{this.state.name}</Typography>
         <List>
           {truckInfo.map((el, index) => (
-            <ListItem key={index}>
+            <ListItem key={`${this.state.id}-${index}`}>
               {el}
             </ListItem>
           ))}

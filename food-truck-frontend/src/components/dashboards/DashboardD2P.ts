@@ -38,6 +38,7 @@ async function updateUser(
     })
     .then(
       async (response) => {
+        console.log(response.data);
         // Get trucks
         let trucks: SimpleTruck[] | undefined = undefined;
         if (response.data.owner) trucks = await requestOwnedTrucks(id);
@@ -50,6 +51,7 @@ async function updateUser(
             pfp: undefined,
             subscribedTrucks: subscribed,
             ownedTrucks: trucks,
+            owner: response.data.owner
           },
         });
       },
@@ -66,7 +68,8 @@ function logout(dispatch: Dispatch<UserAction>) {
       username: "",
       pfp: undefined,
       subscribedTrucks: [],
-      ownedTrucks: undefined
+      ownedTrucks: undefined,
+      owner: false
     }
   });
   localStorage.removeItem("authToken");

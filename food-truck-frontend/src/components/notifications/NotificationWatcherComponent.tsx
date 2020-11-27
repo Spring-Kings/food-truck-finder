@@ -4,6 +4,8 @@ import Router, {useRouter} from "next/router";
 import {Button, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
+import { StyledDialogTitle } from '../util/StyledDialogTitle';
+import DialogActions from '@material-ui/core/DialogActions/DialogActions';
 
 function NotificationWatcherComponent(props: NotificationListProps) {
   const router = useRouter();
@@ -45,14 +47,13 @@ function NotificationWatcherComponent(props: NotificationListProps) {
                   onClick={() => Router.replace('/notifications')}>
         {initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/>}
       </IconButton>
-      <Dialog open={notify && !notified}>
-        <DialogTitle>You have unread notifications!</DialogTitle>
-        <DialogContent>
-          <Grid container direction="column" alignItems="center">
-            <Button onClick={() => setNotified(true)}>OK</Button>
-            <Button onClick={redirectToNotifications}>See Notifications</Button>
-          </Grid>
-        </DialogContent>
+      <Dialog open={notify && !notified} fullWidth>
+        <StyledDialogTitle onClose={() => setNotified(true)}>
+          You have unread notifications!
+        </StyledDialogTitle>
+        <DialogActions>
+          <Button onClick={redirectToNotifications}>See Notifications</Button>
+        </DialogActions>
       </Dialog>
     </>
   );

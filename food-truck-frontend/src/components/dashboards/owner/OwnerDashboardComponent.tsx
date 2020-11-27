@@ -1,162 +1,119 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Router from "next/router";
 
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Button,
-  Card,
   CircularProgress,
-  Container,
-  GridList,
-  GridListTile,
+  Container, Dialog, DialogContent, Grid,
   Typography,
 } from "@material-ui/core";
-import TruckRouteMapComponent from "../../map";
 
-import TruckListComponent from "../TruckListComponent";
 import {UserData} from "../../../redux/user/UserReducer";
+import {loadTodaysRoute} from "../../../api/RouteLocation";
+import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
+import {RouteLocation} from "../../map/route-map/RouteLocation";
+import {useFlexGrowStyles} from "../../theme/FoodTruckThemeProvider";
+import {StyledDialogTitle} from "../../util/StyledDialogTitle";
+import CreateTruckForm from "../../CreateTruckForm";
+import TruckListAndMapComponent from "../../truck/TruckListAndMapComponent";
 
 interface OwnerDashboardProps {
   data: UserData | undefined;
   readonly [x: string]: any;
 }
 
-interface OwnerDashboardState {
-  inError: string | null;
-}
+function OwnerDashboardComponent(props: OwnerDashboardProps) {
+  const classes = useFlexGrowStyles();
+  const [inError, setInError]: [string | null, any] = useState(null);
+  const [routePts, setRoutePts]: [RouteLocation[], any] = useState([]);
+  const [creatingTruck, setCreatingTruck]: [boolean, any] = useState(false);
 
-class OwnerDashboardComponent extends React.Component<
-  OwnerDashboardProps,
-  OwnerDashboardState
-> {
-  constructor(props: OwnerDashboardProps) {
-    super(props);
-
-    this.state = {
-      inError: null,
-    };
-
-    // Bind methods
-    this.viewTruck = this.viewTruck.bind(this);
-    this.toUserDashboard = this.toUserDashboard.bind(this);
-  }
-
-  /**
-   * Used to pull subscriptions from the backend
-   */
-  componentDidMount() {
-    this.props.loadUserFromBackend().then(
-      (_response: any) => this.setState({ inError: null }),
-      (err: any) => this.setState({ inError: err })
-    );
-  }
-
-  render() {
-    // Be safe: don't show to people who don't deserve it. Of course you can hack and bypass it,
-    // but it looks better to our "customers"
-    // Uh, who's paying for this thing again?
-    if (this.props.data === undefined)
-      return (
-        <Container>
-          <CircularProgress />
-        </Container>
-      );
-    else if (this.state.inError)
-      return (
-        <Container>
-          <Typography variant="h2">Error</Typography>
-          <Typography>{this.state.inError}</Typography>
-        </Container>
-      );
-    else if (!this.props.data.ownedTrucks)
-      return (
-        <Container>
-          <Typography variant="h2">Oops!</Typography>
-          <Typography>
-            It seems you got to this corner of our site by mistake. Please
-            return to the home menu
-          </Typography>
-          <Button variant="contained" onClick={() => Router.replace("/")}>
-            HOME
-          </Button>
-        </Container>
-      );
-
-    // Return true UI
-    return (
-      <React.Fragment>
-        {/** Props IDd using: https://material-ui.com/components/grid/ */}
-        <GridList
-          cols={5}
-          style={{
-            height: "100vh",
-            width: "100%",
-          }}
-        >
-          {/** Side list */}
-          <GridListTile cols={1} style={{ height: "100vh" }}>
-            {/* Return to user dashboard */}
-            <Card>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={this.toUserDashboard}
-              >
-                USER DASHBOARD
-              </Button>
-            </Card>
-
-            {/* Subscribe list */}
-            <Accordion>
-              <AccordionSummary>My Trucks</AccordionSummary>
-              <AccordionDetails>
-                <TruckListComponent
-                  trucks={this.props.data.ownedTrucks}
-                  tail={
-                    <Card>
-                      <Button
-                        variant="contained"
-                        onClick={() => Router.replace("/create-truck")}
-                      >
-                        New...
-                      </Button>
-                    </Card>
-                  }
-                  handleTruckIcon={<Typography>View</Typography>}
-                  handleTruck={this.viewTruck}
-                />
-              </AccordionDetails>
-            </Accordion>
-
-            {/* Open manager page */}
-            <Card>
-              <Button
-                variant="contained"
-                onClick={() => Router.replace("/manage-trucks")}
-              >
-                Manage trucks
-              </Button>
-            </Card>
-          </GridListTile>
-
-          {/** Where the map would be */}
-          <GridListTile cols={4} style={{ height: "100vh" }}>
-            <TruckRouteMapComponent locations={[]} />
-          </GridListTile>
-        </GridList>
-      </React.Fragment>
-    );
-  }
-
-  private viewTruck(id: number): void {
-    Router.replace(`/truck/${id}`);
-  }
-
-  private toUserDashboard() {
+  const toUserDashboard = (): void => {
     Router.replace("/dashboard/user");
   }
+
+  useEffect(() => {
+    props.loadUserFromBackend().then(
+      (_response: any) => setInError(null),
+      (err: any) => setInError(err)
+    );
+  }, []);
+
+  useEffect(() => {
+    props.data?.ownedTrucks?.forEach(async truck => {
+      try {
+        const pts = await loadTodaysRoute(truck.id, DEFAULT_ERR_RESP);
+        setRoutePts(routePts.concat(pts));
+      } catch (err) {
+        setInError(err);
+      }
+    });
+  }, [props.data?.ownedTrucks]);
+
+  // Be safe: don't show to people who don't deserve it. Of course you can hack and bypass it,
+  // but it looks better to our "customers"
+  // Uh, who's paying for this thing again?
+  if (props.data === undefined)
+    return (
+      <Container>
+        <CircularProgress />
+      </Container>
+    );
+  else if (inError)
+    return (
+      <Container>
+        <Typography variant="h2">Error</Typography>
+        <Typography>{inError}</Typography>
+      </Container>
+    );
+  else if (!props.data.ownedTrucks)
+    return (
+      <Container>
+        <Typography variant="h2">Oops!</Typography>
+        <Typography>
+          It seems you got to this corner of our site by mistake. Please
+          return to the home menu
+        </Typography>
+        <Button variant="contained" onClick={() => Router.replace("/")}>
+          Home
+        </Button>
+      </Container>
+    );
+
+  return (
+    <>
+      <Grid container direction="row" justify="flex-start" alignItems="flex-start" className={classes.root}>
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={toUserDashboard}
+          >
+            User Dashboard
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button onClick={() => setCreatingTruck(true)}>
+            Create Truck
+          </Button>
+          <Dialog open={creatingTruck}
+                  fullWidth
+                  maxWidth="md">
+            <StyledDialogTitle onClose={() => setCreatingTruck(false)}>
+              Create Truck
+            </StyledDialogTitle>
+            <DialogContent>
+              <CreateTruckForm/>
+            </DialogContent>
+          </Dialog>
+        </Grid>
+      </Grid>
+      <TruckListAndMapComponent routePts={routePts}
+                                trucks={props.data?.ownedTrucks}
+                                listLabel={'Owned Trucks'}
+                                mapLabel={'Active Locations'}
+                                owner={true}/>
+    </>
+  );
 }
 
 export default OwnerDashboardComponent;
