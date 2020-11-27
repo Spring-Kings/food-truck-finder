@@ -50,8 +50,8 @@ class Form extends Component<Props, State> {
       }
     });
 
-    console.log("Initial state: ");
-    console.log(this.state);
+    //console.log("Initial state: ");
+    //console.log(this.state);
 
     this.onSubmit = this.onSubmit.bind(this);
     this.onValueChanged = this.onValueChanged.bind(this);
@@ -148,7 +148,7 @@ class Form extends Component<Props, State> {
           [name]: value
         }
       }),
-() => console.log(this.state)
+//() => console.log(this.state)
     );
 
   }
