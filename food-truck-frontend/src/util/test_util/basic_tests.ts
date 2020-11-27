@@ -10,7 +10,7 @@ type GenericFactory<T> = () => T;
  * Perform your run-of-the-mill snapshot test
  * @param component_callback Factory method to create the component to snapshot
  */
-const SNAPSHOT_TEST = <T>(
+export const SNAPSHOT_TEST = <T>(
   component_callback: GenericFactory<ReactElement<T>>
 ) => {
   test("Matches snapshot", () => {
@@ -18,3 +18,10 @@ const SNAPSHOT_TEST = <T>(
     expect(component).toMatchSnapshot();
   });
 };
+
+export const ACCESS_TEST = <T>(
+  test_name: string,
+  component_callback: GenericFactory<ReactElement<T>>
+) => {
+  // TODO determine how to test
+}
