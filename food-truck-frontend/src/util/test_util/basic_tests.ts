@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import { ReactElement } from "react";
-import api from "../../../util/api";
+import api from "../api";
 
 type GenericFactory<T> = () => T;
 

@@ -1,0 +1,39 @@
+{
+    "routeId": 2,
+    "truck": {
+        "id": 1,
+        "userId": 1,
+        "name": "Waluigi's Taco Stand",
+        "priceRating": 5.0,
+        "starRating": 3.0,
+        "description": "Too bad. Waluigi Time",
+        "tags": [
+            "Purple",
+            "Waa",
+            "Not Luigi",
+            "Purple Tacos"
+        ]
+    },
+    "routeName": "Week",
+    "active": true,
+    "locations": [
+        {
+            "routeLocationId": 3,
+            "arrivalTime": "19:00:33",
+            "exitTime": "07:00:33",
+            "position": {
+                "latitude": 31.558198347109116,
+                "longitude": -97.11545887398267
+            }
+        }
+    ],
+    "days": [
+        "TUESDAY",
+        "FRIDAY",
+        "MONDAY",
+        "SUNDAY",
+        "SATURDAY",
+        "WEDNESDAY",
+        "THURSDAY"
+    ]
+}

@@ -1,9 +1,9 @@
-import api from "../../../util/api";
+import api from "../api";
 
 /**
  * Description of  API test
  */
-type ApiTestDescriptor<T> = {
+export type ApiTestDescriptor<T> = {
   /* Name to display for the test */
   testName: string;
 
@@ -28,7 +28,7 @@ const API_SUITE = <T>(
   apiCalls: ApiTestDescriptor<T>[]
 ) => {
   /* Mock out Axios API */
-  jest.mock("../../util/api");
+  jest.mock("../api");
   /* Create mock request function */
   const MOCK_REQUEST = jest.fn();
 
@@ -51,9 +51,11 @@ const API_SUITE = <T>(
         );
 
         /* Make mock call and ensure returned correct representation */
-        const result: T = testCall.apiCall();
+        const result: T = await testCall.apiCall();
         expect(result).toEqual(testCall.actualResponse);
       });
     });
   });
 };
+
+export default API_SUITE;
