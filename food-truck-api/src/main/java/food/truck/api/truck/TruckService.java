@@ -54,17 +54,13 @@ public class TruckService {
         return truckRepository.findById(truckId);
     }
 
-    public Truck saveTruck(Truck truck) {
-        return truckRepository.save(truck);
-    }
-
     public Truck createTruck(Long userId, String name) {
         var t = new Truck();
         t.setName(name);
         t.setUserId(userId);
         t.setDescription("");
         t.setTags(new HashSet<>());
-        return saveTruck(t);
+        return truckRepository.save(t);
     }
 
     public void deleteTruck(long truckId) {
@@ -101,7 +97,8 @@ public class TruckService {
                     .collect(Collectors.toSet());
             truck.setTags(tags2);
         }
-        return saveTruck(truck);
+
+        return truckRepository.save(truck);
     }
 
     public Route getActiveRoute(long truckId, DayOfWeek w) {
@@ -180,7 +177,7 @@ public class TruckService {
         }
 
         t.setMenuContentType(contentType);
-        saveTruck(t);
+        truckRepository.save(t);
         return HttpStatus.OK;
     }
 }
