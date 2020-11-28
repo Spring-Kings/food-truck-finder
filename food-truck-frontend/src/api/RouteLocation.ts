@@ -72,7 +72,11 @@ export const deleteRouteLocations = async (
   onSuccess?: (res: any) => void,
   onFail?: (res: any) => void
 ) => {
-  trashedPts.forEach(pt => console.log(pt))
+  // Ignore if no locations
+  if (trashedPts.length == 0)
+    return;
+
+  // Run delete
   await api
     .request({
       url: `/truck/route/locations`,

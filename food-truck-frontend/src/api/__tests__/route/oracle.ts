@@ -15,8 +15,8 @@ export const times = [
     }
 ]
 
-// Route oracle
-const oracle = [
+// Frontend oracle
+export const FRONTEND_ORACLE = [
     {
         stopId: 1,
         routeLocationId: 1,
@@ -40,4 +40,24 @@ const oracle = [
         state: RouteLocationState.PERSISTED
     }
 ]
-export default oracle;
+
+// Backend oracle
+export const ORACLE_ROUTE_ID = 111;
+export const BACKEND_ORACLE = [
+    {
+        routeId: ORACLE_ROUTE_ID,
+        routeLocationId: 1,
+        lat: 31.65412677407011,
+        lng: -97.25308838295484,
+        arrivalTime: times[0].arrivalTime,
+        exitTime: times[0].exitTime,
+    },
+    {
+        routeId: ORACLE_ROUTE_ID,
+        routeLocationId: 2,
+        lat: 31.683346883572508,
+        lng: -97.2063964884236,
+        arrivalTime: times[1].arrivalTime,
+        exitTime: times[1].exitTime,
+    }
+]

@@ -1,5 +1,8 @@
 import api from "../api";
 
+/** Convenience shorthand so no-one needs to remember all this */
+export type Mock = jest.Mock<any, any>;
+
 /**
  * Description of  API test
  */
@@ -7,8 +10,14 @@ export type ApiTestDescriptor<T> = {
   /* Name to display for the test */
   testName: string;
 
-  /* Method performing the API call and returning the result */
-  apiCall: () => T;
+  /**
+   * Method performing the API call and returning the result desired
+   * to be tested against the oracle.
+   * 
+   * @param mock The mock Axios request method, allowing the call to
+   * return data sent to the backend if desired.
+   */
+  apiCall: (mock: Mock) => T;
 
   /* Response from the backend */
   mockResponse: any;
@@ -19,6 +28,17 @@ export type ApiTestDescriptor<T> = {
   /* Indicates whether the backend should throw for the test */
   fails?: boolean;
 };
+
+export const SUCCEED_POST = async <T>(apiCall: () => T, setupMock: (mock: Mock) => void, teardownMock: () => void) => {
+  let result: any = undefined;
+  setupMock(jest.fn().mockImplementationOnce(input => {
+    result = input.data;
+    return Promise.resolve();
+  }));
+  await apiCall();
+  teardownMock();
+  return result;
+}
 
 /**
  * Performs a full suite of tests on a mocked-out API. Takes a set of test descriptors
@@ -56,7 +76,7 @@ const API_SUITE = <T>(
         });
 
         /* Make mock call and ensure returned correct representation */
-        const result: T = await testCall.apiCall();
+        const result: T = await testCall.apiCall(MOCK_REQUEST);
         expect(result).toEqual(testCall.actualResponse);
       });
     });

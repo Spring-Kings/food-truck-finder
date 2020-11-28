@@ -68,6 +68,5 @@ export const frontendToBackend = (pt: RouteLocation, routeId: number) => {
     lat: pt.coords.lat,
     lng: pt.coords.lng,
   };
-  console.log(result)
   return result;
 }
