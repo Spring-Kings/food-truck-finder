@@ -34,28 +34,23 @@ public class UserEndpoint {
     private ReviewService reviewService;
 
     @GetMapping("/get-username")
-    public String getUsername(@RequestParam long id) {
-        return userService.findUserById(id).map(User::getUsername)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public String getUsername(@AuthenticationPrincipal AbstractUser viewer, @RequestParam long id) {
+        var user = userService.findUserById(id);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var u = user.get();
+        if (!viewer.canView(u))
+            return "Anonymous";
+        else
+            return u.getUsername();
     }
 
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         var target = userService.findUserById(id);
-        if (target.isEmpty())
+        if (target.isEmpty() || !viewer.canView(target.get()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        var t = target.get();
-
-        if (t.getPrivacySetting() == PrivacySetting.PUBLIC
-                || (t.getPrivacySetting() == PrivacySetting.USERS_ONLY && viewer instanceof User)
-                || (t.getPrivacySetting() == PrivacySetting.PRIVATE && viewer instanceof User && ((User) viewer).getId() == id)
-        ) {
-            return userService.findUserById(id)
-                    .map(UserView::of)
-                    .orElse(null);
-        }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        return UserView.of(target.get());
     }
 
     @Value
@@ -95,18 +90,18 @@ public class UserEndpoint {
     }
 
     @GetMapping("/search-usernames")
-    public UserView searchUsernames(@RequestParam String username) {
-        return userService.searchUsernames(username).stream()
-                .findFirst()
-                .map(UserView::of)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public UserView searchUsernames(@AuthenticationPrincipal AbstractUser viewer, @RequestParam String username) {
+        var user = userService.searchUsernames(username).stream().findFirst();
+        if (user.isEmpty() || !viewer.canView(user.get()))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return UserView.of(user.get());
     }
 
 
     @GetMapping("/user/{id}/subscriptions")
-    public List<Truck> getUserSubscriptions(@PathVariable long id) {
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         var user = userService.findUserById(id);
-        if (user.isEmpty())
+        if (user.isEmpty() || !viewer.canView(user.get()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return subscriptionService.findSubsByUser(user.get()).stream()
                 .map(Subscription::getTruck)
@@ -114,9 +109,9 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/subscriptions")
-    public List<Truck> getUserSubscriptions(@RequestParam String username) {
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal AbstractUser viewer, @RequestParam String username) {
         User user = userService.loadUserByUsername(username);
-        if (user == null)
+        if (user == null || !viewer.canView(user))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return subscriptionService.findSubsByUser(user).stream()
                 .map(Subscription::getTruck)
@@ -124,9 +119,9 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
-    public List<Review> getUserReviews(@PathVariable long userId) {
+    public List<Review> getUserReviews(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long userId) {
         var u = userService.findUserById(userId);
-        if (u.isEmpty())
+        if (u.isEmpty() || !viewer.canView(u.get()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return reviewService.findReviewsByUserId(userId);
     }

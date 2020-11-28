@@ -22,10 +22,14 @@ class ReviewView extends React.Component<Props, {}> {
 
     render() {
         console.log(this.props.review);
+        const username = (this.props.review.userId != -1)
+            ? <Link href={`/user/${this.props.review.username}`}>{this.props.review.username}</Link>
+            : this.props.review.username;
+
         return <Grid container key={`${this.props.review.reviewId}/cntt`} direction="column">
                 <Grid item xs key={`${this.props.review.reviewId}/name`}>
                     <Typography variant="h5">
-                        <Link href={`/user/${this.props.review.username}`}>{this.props.review.username}</Link>
+                        {username}
                     </Typography>
                 </Grid>
                 <Grid item xs key={`${this.props.review.reviewId}/time`}>

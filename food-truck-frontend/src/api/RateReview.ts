@@ -17,7 +17,7 @@ export const loadReviewsByUser = async (
   try {
     // Fetch username
     let name: any = await api.request({
-      url: `/user/${userId}`,
+      url: `/get-username?id=${userId}`,
       method: "GET",
     });
 
@@ -32,7 +32,7 @@ export const loadReviewsByUser = async (
       // Map all backend reviews to frontend reviews
       reviews = resp.data.map((r: any) => {
         // Create frontend representation for 1 review, with either the username or a blank string
-        return review_backendToFrontend(r, name.data.username);
+        return review_backendToFrontend(r, name.data);
       });
     }
   } catch (e: any) {
@@ -59,7 +59,7 @@ export const loadReviewFromTruckForUser = async (
   try {
     // Fetch username
     let name: any = await api.request({
-      url: `/user/${userId}`,
+      url: `/get-username?id=${userId}`,
       method: "GET",
     });
 
@@ -76,7 +76,7 @@ export const loadReviewFromTruckForUser = async (
 
       // Map review to a frontend review
       if (resp.data !== null)
-        review = review_backendToFrontend(resp.data, name.data.username);
+        review = review_backendToFrontend(resp.data, name.data);
     }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return null
@@ -116,15 +116,19 @@ export const loadReviewsByTruck = async (
       // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
       reviews.reviews = await Promise.all(resp.data.map(async (r: any) => {
         // Fetch username
-        let name: any = await api.request({
-          url: `/user/${r.userId}`,
-          method: "GET",
-        });
+        let name;
+        if (r.userId == -1)
+          name = {data: "Anonymous"};
+        else
+          name = await api.request({
+            url: `/get-username?id=${r.userId}`,
+            method: "GET",
+          });
         
         // Create frontend representation for 1 review, with either the username or a blank string
         return review_backendToFrontend(
           r,
-          name.data !== null ? name.data.username : ""
+          name.data ?? "Unknown"
         );
       }));
     }
@@ -204,6 +208,9 @@ export const deleteReview = async (
 export const loadReviewById = async (reviewId: number): Promise<Review|null> => {
   const response = await api.get(`/reviews/${reviewId}`);
   if (response.data?.userId) {
+    if (response.data.userId === -1)
+      return review_backendToFrontend(response.data, "Anonymous");
+
     const usernameResp = await api.get(`/get-username?id=${response.data.userId}`);
     if (usernameResp.data)
       return review_backendToFrontend(response.data, usernameResp.data);

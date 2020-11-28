@@ -66,4 +66,11 @@ public class User extends AbstractUser implements UserDetails {
     public void visit(UserVisitor v) {
         v.accept(this);
     }
+
+    @Override
+    public boolean canView(User u) {
+        if (u.privacySetting == PrivacySetting.PRIVATE)
+            return id.equals(u.id);
+        return true;
+    }
 }
