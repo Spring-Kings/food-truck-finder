@@ -1,12 +1,12 @@
 package food.truck.api.truck;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import food.truck.api.MediaTypeConverter;
 import food.truck.api.security.SecurityConstants;
 import lombok.Data;
-import org.hibernate.search.annotations.*;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.http.MediaType;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -36,10 +36,8 @@ public class Truck {
     byte[] menu;
 
     @Column(name = "menu_content_type")
-    @Convert(converter = MediaTypeConverter.class)
     @Nullable
-    @JsonIgnore
-    MediaType menuContentType;
+    String menuContentType;
 
     @Column(name = "price_rating")
     @Nullable

@@ -1,6 +1,5 @@
-import { TextField } from "@material-ui/core";
 import React from "react";
-import Form, { Props as FormProps } from "../Form";
+import Form, {Props as FormProps} from "../Form";
 
 export interface HiddenEntry {
   name: string;

@@ -31,17 +31,20 @@ public class AuthenticationEndpoint {
 
     @PostMapping("/register")
     public String register(@RequestBody @NonNull RegistrationData data) {
-        var u = userService.findUserByUsername(data.username);
-        if (u.isPresent()) {
+        if (userService.usernameIsTaken(data.username)) {
             return "Error: Username " + data.username + " already taken";
+        }
+        if (!userService.usernameIsValid(data.username)) {
+            return "Error: Username must be 3-30 characters and characters must be alphanumeric or underline.";
+        }
+        if (!userService.emailIsValid(data.email)) {
+            return "Error: Email must contain @ and be between 3 and 100 characters.";
+        }
+        if (!userService.passwordIsValid(data.password)) {
+            return "Error: Password must be 6 to 50 characters.";
+        }
 
-        }
-        // TODO: Max length for username, password, email
-        else if (!data.username.matches("[a-zA-Z0-9_]{3,}")) {
-            return "Error: Invalid username";
-        } else {
-            var user = userService.createUser(data.username, data.password, data.email, data.isOwner);
-            return "Created user with id " + user.getId();
-        }
+        var user = userService.createUser(data.username, data.password, data.email, data.isOwner);
+        return "Created user with id " + user.getId();
     }
 }

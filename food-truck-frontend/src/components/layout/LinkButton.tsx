@@ -8,17 +8,26 @@ interface ButtonLinkProps {
   action?: () => void;
 }
 
-function LinkButton(props: ButtonLinkProps) {
-  return (
-    <MenuItem onClick={() => {
-      if (props.action) {
-        props.action();
-      }
-      Router.replace(props.url);
-    }}>
-      {props.text}
-    </MenuItem>
-  );
+class LinkButton extends React.Component<ButtonLinkProps, {}> {
+  constructor(props: ButtonLinkProps) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <MenuItem onClick={this.onClick}>
+        {this.props.text}
+      </MenuItem>
+    );
+  }
+
+  onClick = () => {
+    if (this.props.action) {
+      this.props.action();
+    }
+    Router.replace(this.props.url);
+  }
+
 }
 
 export default LinkButton;

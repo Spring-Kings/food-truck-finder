@@ -1,7 +1,7 @@
 // Apply global-styles to ALL pages (so don't put stupid stuff in it)
 import '../../public/global-styles.css'
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Provider} from 'react-redux';
 import {buildStore} from '../util/redux';
 
@@ -13,7 +13,7 @@ let store = buildStore(initialState);
 
 // Create app
 const FoodTruckApp = ({Component, pageProps}) => {
-  React.useEffect(() => {
+  useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
     if (jssStyles) {

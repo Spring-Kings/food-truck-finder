@@ -2,7 +2,7 @@ import {Grid, IconButton, TextField, Typography} from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import React, {ChangeEvent, Component} from "react";
-import { ReactEventAdapter } from "../Form";
+import {ReactEventAdapter} from "../Form";
 
 type MultiProps = {
   title: string;
@@ -28,9 +28,9 @@ class MultiField extends Component<MultiProps, MultiState> {
 
   render() {
     return (
-      <Grid container spacing={0}>
+      <Grid container spacing={2}>
         <Grid item key="head">
-          <Typography variant={this.props.variant? this.props.variant : "h6"}>{this.props.title}</Typography>
+          <Typography variant={this.props.variant ? this.props.variant : "h6"}>{this.props.title}</Typography>
         </Grid>
         {this.state.defaultValue.map((val: string, ndx: number) => {
           const INDEX: number = ndx;

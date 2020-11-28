@@ -5,9 +5,7 @@ import food.truck.api.truck.TruckRepository;
 import food.truck.api.user.User;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
@@ -81,11 +79,9 @@ public class ReviewService {
 
         if (coll.size() != 0) {
             cost = coll.stream()
-                    .collect(Collectors.averagingDouble(Review::getCostRating))
-                    .doubleValue();
+                    .collect(Collectors.averagingDouble(Review::getCostRating));
             star = coll.stream()
-                    .collect(Collectors.averagingDouble(Review::getStarRating))
-                    .doubleValue();
+                    .collect(Collectors.averagingDouble(Review::getStarRating));
         }
 
         // Persist new rating

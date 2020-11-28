@@ -1,17 +1,13 @@
 import api from "../util/api";
-import {
-  backendToFrontend,
-  frontendToBackend,
-  RouteLocation,
-} from "../components/map/route-map/RouteLocation";
+import {backendToFrontend, frontendToBackend, RouteLocation,} from "../components/map/route-map/RouteLocation";
 import DayOfWeek from "../components/map/route-map/DayOfWeek";
 
 export const loadTodaysRoute = async (
   truckId: number,
   onFail?: (res: any) => void
 ) => {
-  var routePts: RouteLocation[] = [];
-  var nextStopId: number = 1;
+  let routePts: RouteLocation[] = [];
+  let nextStopId: number = 1;
 
   await api
     .request({
@@ -35,7 +31,7 @@ export const loadRouteLocations = async (
   routeId: number,
   onFail?: (res: any) => void
 ) => {
-  var routePts: RouteLocation[] = [];
+  let routePts: RouteLocation[] = [];
   await api
     .request({
       url: `/truck/route/locations/${routeId}`,
@@ -43,7 +39,7 @@ export const loadRouteLocations = async (
     })
     .then((response: any) => {
       if (response.data != undefined) {
-        var nextStopId: number = 1;
+        let nextStopId: number = 1;
         routePts = response.data.map((pt: any) =>
           backendToFrontend(pt, nextStopId++)
         );
@@ -111,7 +107,7 @@ const updateDayList = async (
   onSuccess?: (res: any) => void,
   onFail?: (res: any) => void
 ) => {
-  days.forEach(async (v) => {
+  for (const v of days) {
     await api
       .post(url, {
         routeId: routeId,
@@ -119,5 +115,5 @@ const updateDayList = async (
       })
       .then(onSuccess)
       .catch(onFail);
-  });
+  }
 };
