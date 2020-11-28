@@ -15,6 +15,9 @@ export type ApiTestDescriptor<T> = {
 
   /* Expected response of the frontend API call */
   actualResponse: any;
+
+  /* Indicates whether the backend should throw for the test */
+  fails?: boolean;
 };
 
 /**
@@ -46,13 +49,15 @@ const API_SUITE = <T>(
     apiCalls.forEach((testCall: ApiTestDescriptor<T>) => {
       test(testCall.testName, async () => {
         /* Mock out API request */
-        MOCK_REQUEST.mockImplementationOnce(() =>
-          Promise.resolve({ data: testCall.mockResponse })
-        );
+        MOCK_REQUEST.mockImplementationOnce(() => {
+          if (testCall.fails)
+            return Promise.reject("Test requested an error, so here's an error");
+          return Promise.resolve({ data: testCall.mockResponse });
+        });
 
         /* Make mock call and ensure returned correct representation */
         const result: T = await testCall.apiCall();
-        expect(result).toEqual(testCall.actualResponse);
+        expect(JSON.stringify(result)).toEqual(JSON.stringify(testCall.actualResponse));
       });
     });
   });

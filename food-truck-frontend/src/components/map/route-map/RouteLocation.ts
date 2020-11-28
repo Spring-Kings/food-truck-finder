@@ -39,6 +39,13 @@ export const blankRouteLocation = () => ({
 })
 
 export const backendToFrontend = (pt: any, stopId: number) => {
+  // Addition to enable testing--otherwise, milliseconds unpredictably set
+  let arrival = utcTimeStringToDate(pt.arrivalTime)
+  let exit = utcTimeStringToDate(pt.exitTime)
+  arrival?.setMilliseconds(0)
+  exit?.setMilliseconds(0)
+
+  // Return mapping
   return {
     stopId: stopId,
     routeLocationId: pt.routeLocationId,
@@ -46,8 +53,8 @@ export const backendToFrontend = (pt: any, stopId: number) => {
       lat: pt.position.latitude,
       lng: pt.position.longitude,
     },
-    arrivalTime: utcTimeStringToDate(pt.arrivalTime),
-    exitTime: utcTimeStringToDate(pt.exitTime),
+    arrivalTime: arrival,
+    exitTime: exit,
     state: RouteLocationState.PERSISTED,
   }
 }
