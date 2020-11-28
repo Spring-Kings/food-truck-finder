@@ -1,15 +1,11 @@
-import {
-  Button,
-  CircularProgress,
-  Container,
-  Typography,
-} from "@material-ui/core";
+import {Button, CircularProgress, Container, Typography,} from "@material-ui/core";
+import {AxiosError} from "axios";
 import React from "react";
-import { DEFAULT_ERR_RESP } from "../../api/DefaultResponses";
 import api from "../../util/api";
 import DayOfWeek from "../map/route-map/DayOfWeek";
 import RouteListRow from "../RouteListRows";
 import CreateRouteDialog from "./CreateRouteDialog";
+import Alert from '@material-ui/lab/Alert'
 
 interface RouteListTruck {
   id: string;
@@ -24,27 +20,12 @@ interface RouteListRouteInfo {
   days: DayOfWeek[];
 }
 
-const TruckObject = {
-  id: "",
-  userId: "",
-  name: "",
-  schedule: "",
-};
-
-const RouteObject = [
-  {
-    routeId: 0,
-    routeName: "",
-    active: false,
-    days: []
-  },
-];
-
 type RouteState = {
   truck: RouteListTruck | undefined;
   routeData: RouteListRouteInfo[];
 
   errorMsg: string | undefined;
+  conflictAlertVisible: boolean;
   createRoute: boolean;
 };
 
@@ -57,9 +38,10 @@ class RouteList extends React.Component<RouteProps, RouteState> {
     super(props);
     this.state = {
       truck: undefined,
-      routeData: RouteObject,
+      routeData: [],
       errorMsg: undefined,
       createRoute: false,
+      conflictAlertVisible: false
     };
 
     this.newRoute = this.newRoute.bind(this);
@@ -113,15 +95,22 @@ class RouteList extends React.Component<RouteProps, RouteState> {
       .request({
         url: `/truck/${this.props.truckId}/update-route`,
         method: "PUT",
-        data: { routeId: routeId, newActive: active }
+        data: {routeId: routeId, newActive: active}
       }).then(r => {
-        this.setState({
-          routeData: this.state.routeData.map(r => r.routeId === routeId? {
-            ...r,
-            active: active
-          } : r)
-        });
-      }).catch(DEFAULT_ERR_RESP);
+      this.setState({
+        conflictAlertVisible: false,
+        routeData: this.state.routeData.map(r => r.routeId === routeId ? {
+          ...r,
+          active: active
+        } : r)
+      });
+    })
+      .catch((e: AxiosError) => {
+        if (e.response?.status == 409) { /* 409 CONFLICT */
+          this.setState({conflictAlertVisible: true});
+        } else
+          console.log(e);
+      });
   }
 
   renderRouteRow(index: number) {
@@ -147,7 +136,11 @@ class RouteList extends React.Component<RouteProps, RouteState> {
           <Typography>{this.state.errorMsg}</Typography>
         </Container>
       );
-    else if (this.state.truck === undefined) return <CircularProgress />;
+    else if (this.state.truck === undefined) return <CircularProgress/>;
+
+    const alert = this.state.conflictAlertVisible
+      ? <Alert severity="error">Cannot enable route: Conflicts with existing active route</Alert>
+      : null;
 
     return (
       <div>
@@ -157,6 +150,7 @@ class RouteList extends React.Component<RouteProps, RouteState> {
           onFailure={this.createFailure}
           open={this.state.createRoute}
         />
+        {alert}
         <h1>{this.state.truck.name}</h1>
         <Button color="primary" variant="contained" onClick={this.newRoute}>
           Create Route
