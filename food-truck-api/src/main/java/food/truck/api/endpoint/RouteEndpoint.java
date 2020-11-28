@@ -33,6 +33,13 @@ public class RouteEndpoint {
     @Autowired
     private TruckService truckService;
 
+
+    @GetMapping("/route/{routeId}")
+    public Route getRoute(@PathVariable long routeId) {
+        return routeService.findRouteById(routeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
     @GetMapping("/route/{routeId}/days")
     public Set<DayOfWeek> getRouteDays(@PathVariable long routeId) {
         return routeService.findRouteDaysByRouteId(routeId);
@@ -49,6 +56,9 @@ public class RouteEndpoint {
     public boolean addDayToRoute(@AuthenticationPrincipal User u, @RequestBody AddRouteDayParams rd) {
         if (!routeService.userOwnsRoute(u, rd.routeId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        var route = routeService.findRouteById(rd.routeId).get();
+        if (route.isActive())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
         DayOfWeek w;
         try {
@@ -70,6 +80,9 @@ public class RouteEndpoint {
     public boolean removeDayFromRoute(@AuthenticationPrincipal User u, @RequestBody RemoveRouteDayParams rd) {
         if (!routeService.userOwnsRoute(u, rd.routeId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        var route = routeService.findRouteById(rd.routeId).get();
+        if (route.isActive())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
         DayOfWeek w;
         try {
@@ -86,7 +99,6 @@ public class RouteEndpoint {
         Optional<Truck> truck = truckService.findTruckById(truckId);
         if (truck.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
         }
 
         return routeService.findRouteByTruck(truck.get());
@@ -118,6 +130,7 @@ public class RouteEndpoint {
         if (!routeService.userOwnsRoute(u, data.routeId))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
+        // Throws a CONFLICT status code if set to active and causes conflicts
         return routeService.updateRoute(data.routeId, Optional.ofNullable(data.newName), Optional.ofNullable(data.newActive));
     }
 
@@ -165,6 +178,11 @@ public class RouteEndpoint {
         for (var d : data) {
             if (d.routeLocationId != null && !routeService.userOwnsLocation(user, d.routeLocationId))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            var route = routeService.findRouteById(d.routeId);
+            if (route.isEmpty())
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            if (route.get().isActive())
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 
             LocalTime arrival = d.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
             LocalTime exit = d.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();

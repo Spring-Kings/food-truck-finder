@@ -96,6 +96,8 @@ public class TruckService {
                     .filter(tag -> !tag.isEmpty())
                     .collect(Collectors.toSet());
             truck.setTags(tags2);
+        } else {
+            truck.setTags(null);
         }
 
         return truckRepository.save(truck);
@@ -177,6 +179,7 @@ public class TruckService {
         }
 
         t.setMenuContentType(contentType);
+
         truckRepository.save(t);
         return HttpStatus.OK;
     }

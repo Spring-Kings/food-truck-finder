@@ -37,6 +37,24 @@ public class Route {
     @ElementCollection
     Set<DayOfWeek> days = EnumSet.noneOf(DayOfWeek.class);
 
+    public boolean conflictsWith(Route other) {
+        if (!active || !other.active)
+            return false;
+
+        var intersection = EnumSet.copyOf(days);
+        intersection.retainAll(other.days);
+        if (intersection.isEmpty())
+            return false;
+
+        for (var loc1 : this.locations) {
+            for (var loc2 : other.locations) {
+                if (loc1.timeConflictsWith(loc2))
+                    return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Route{" +
