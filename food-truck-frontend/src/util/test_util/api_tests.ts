@@ -57,7 +57,7 @@ const API_SUITE = <T>(
 
         /* Make mock call and ensure returned correct representation */
         const result: T = await testCall.apiCall();
-        expect(JSON.stringify(result)).toEqual(JSON.stringify(testCall.actualResponse));
+        expect(result).toEqual(testCall.actualResponse);
       });
     });
   });

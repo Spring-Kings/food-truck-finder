@@ -1,0 +1,68 @@
+[
+    {
+        "routeLocationId": 1,
+        "route": {
+            "routeId": 1,
+            "truck": {
+                "id": 1,
+                "userId": 1,
+                "name": "Waluigi's Taco Stand",
+                "menuContentType": "image/png",
+                "priceRating": 5.0,
+                "starRating": 3.0,
+                "description": "Too bad. Waluigi Time",
+                "tags": [
+                    "Purple",
+                    "Waa",
+                    "Not Luigi",
+                    "Purple Tacos"
+                ]
+            },
+            "routeName": "Weekend",
+            "active": true,
+            "days": [
+                "SUNDAY",
+                "SATURDAY"
+            ]
+        },
+        "arrivalTime": "19:50:02",
+        "exitTime": "22:50:02",
+        "position": {
+            "latitude": 31.65412677407011,
+            "longitude": -97.25308838295484
+        }
+    },
+    {
+        "routeLocationId": 2,
+        "route": {
+            "routeId": 1,
+            "truck": {
+                "id": 1,
+                "userId": 1,
+                "name": "Waluigi's Taco Stand",
+                "menuContentType": "image/png",
+                "priceRating": 5.0,
+                "starRating": 3.0,
+                "description": "Too bad. Waluigi Time",
+                "tags": [
+                    "Purple",
+                    "Waa",
+                    "Not Luigi",
+                    "Purple Tacos"
+                ]
+            },
+            "routeName": "Weekend",
+            "active": true,
+            "days": [
+                "SUNDAY",
+                "SATURDAY"
+            ]
+        },
+        "arrivalTime": "23:00:25",
+        "exitTime": "05:59:25",
+        "position": {
+            "latitude": 31.683346883572508,
+            "longitude": -97.2063964884236
+        }
+    }
+]

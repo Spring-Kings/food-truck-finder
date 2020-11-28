@@ -18,12 +18,20 @@
     "active": true,
     "locations": [
         {
-            "routeLocationId": 3,
-            "arrivalTime": "19:00:33",
-            "exitTime": "07:00:33",
+            "routeLocationId": 1,
+            "arrivalTime": "19:50:02",
+            "exitTime": "22:50:02",
             "position": {
-                "latitude": 31.558198347109116,
-                "longitude": -97.11545887398267
+                "latitude": 31.65412677407011,
+                "longitude": -97.25308838295484
+            }        },
+        {
+            "routeLocationId": 2,
+            "arrivalTime": "23:00:25",
+            "exitTime": "05:59:25",
+            "position": {
+                "latitude": 31.683346883572508,
+                "longitude": -97.2063964884236
             }
         }
     ],

@@ -1,28 +1,37 @@
 import * as RouteLocationApi from "../RouteLocation";
 
-import mock_route from "./route/mock_backend_response.json";
-import mock_route_locs from "./route/frontend_oracle.json";
+import todaysRoute_response from "./route/todaysRoute_response.json";
+import oracle from "./route/oracle";
+import loadRouteLocations_response from "./route/loadRouteLocations_response.json";
 import API_SUITE from "../../util/test_util/api_tests";
 
-// Create oracle
-const today = new Date(Date.now()).toISOString().split("T")[0];
-let mock_result_data = mock_route_locs.map(mrl => ({
-  ...mrl,
-  arrivalTime: `${today}${mrl.arrivalTime}`,
-  exitTime: `${today}${mrl.exitTime}`
-}));
-
-API_SUITE("Test Route Location API", [
+API_SUITE("Test loadTodaysRoute", [
   {
-    testName: "loadTodaysRoute parses a route properly",
+    testName: "Parses a route properly",
     apiCall: async () => await RouteLocationApi.loadTodaysRoute(1, fail),
-    mockResponse: mock_route,
-    actualResponse: mock_result_data
+    mockResponse: todaysRoute_response,
+    actualResponse: oracle
   },
   {
-    testName: "loadTodaysRoute returns empty correctly",
+    testName: "Returns empty on failure",
     apiCall: async () => await RouteLocationApi.loadTodaysRoute(1, _err => {}),
-    mockResponse: mock_route,
+    mockResponse: todaysRoute_response,
+    actualResponse: [],
+    fails: true
+  }
+]);
+
+API_SUITE("Test loadRouteLocations", [
+  {
+    testName: "Parses a route properly",
+    apiCall: async () => await RouteLocationApi.loadRouteLocations(1, fail),
+    mockResponse: loadRouteLocations_response,
+    actualResponse: oracle
+  },
+  {
+    testName: "Returns empty correctly",
+    apiCall: async () => await RouteLocationApi.loadRouteLocations(1, _err => {}),
+    mockResponse: loadRouteLocations_response,
     actualResponse: [],
     fails: true
   }
