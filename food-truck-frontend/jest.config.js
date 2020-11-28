@@ -1,5 +1,8 @@
 module.exports = {
-    testRegex: "/__tests__/.*(test|spec)\\.[jt]sx?$",
+    testRegex: "/__tests?__/.*(test|spec)\\.[jt]sx?$",
+    
+    // Learned from: https://gist.github.com/gaearon/e7d97cdf38a2907924ea12e4ebdf3c85
+    testEnvironment: "node",
     testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
     setupFilesAfterEnv: ["<rootDir>/setupTests.js"],
     transformIgnorePatterns: [

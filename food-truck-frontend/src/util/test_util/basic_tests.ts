@@ -1,6 +1,6 @@
 import { shallow } from "enzyme";
 import { ReactElement } from "react";
-import api from "../api";
+import mockUserData from "./token_mock.json"
 
 type GenericFactory<T> = () => T;
 
@@ -8,14 +8,27 @@ type GenericFactory<T> = () => T;
 
 /**
  * Perform your run-of-the-mill snapshot test
+ * @param testName Header for the test itself
  * @param component_callback Factory method to create the component to snapshot
  */
 export const SNAPSHOT_TEST = <T>(
+  testName: string,
+  mockApi: () => void,
+  unmockApi: () => void,
   component_callback: GenericFactory<ReactElement<T>>
 ) => {
-  test("Matches snapshot", () => {
-    const component = shallow(component_callback());
-    expect(component).toMatchSnapshot();
+  describe(testName, () => {  
+    /** Mock out modules */
+    beforeAll(() => mockApi());
+
+    /** Clear out all the mocks */
+    afterAll(() => unmockApi());
+
+    /* Snapshot */
+    test("Matches snapshot", () => {
+      const component = shallow(component_callback());
+      expect(component.html()).toMatchSnapshot();
+    });
   });
 };
 

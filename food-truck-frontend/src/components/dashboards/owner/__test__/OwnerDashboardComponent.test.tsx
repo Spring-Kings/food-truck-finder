@@ -8,10 +8,9 @@ import {
   RouteLocation,
   RouteLocationState,
 } from "../../../map/route-map/RouteLocation";
+import { SNAPSHOT_TEST } from "../../../../util/test_util/basic_tests";
 
-const MOCK_REQUEST = jest.fn();
-
-const LOC: RouteLocation = {
+const mockLOC: RouteLocation = {
   routeLocationId: 0,
   arrivalTime: new Date(),
   exitTime: new Date(),
@@ -20,28 +19,15 @@ const LOC: RouteLocation = {
   state: RouteLocationState.PERSISTED,
 };
 
-describe("Test owner dashboard", () => {
-  /* Mock out route API */
-  beforeAll(() => {
-    jest.mock("../../../../api/RouteLocation", () => {
-      loadTodaysRoute: MOCK_REQUEST;
-    });
-  });
-
-  /* Clear the mock request, to ensure no cross-test contamination */
-  afterEach(() => {
-    MOCK_REQUEST.mockClear();
-  });
-
-  /* Snapshot */
-  test("Matches snapshot", () => {
-    MOCK_REQUEST.mockImplementationOnce(() => [LOC]);
-    const component = shallow(
-      <OwnerDashboardComponent
-        data={user_data}
-        loadUserFromBackend={() => {}}
-      />
-    );
-    expect(component).toMatchSnapshot();
-  });
-});
+SNAPSHOT_TEST(
+  "Test owner dashboard",
+  () => {
+    jest.mock("../../../../api/RouteLocation", () => ({
+      loadTodaysRoute: jest.fn().mockImplementation(() => [mockLOC]),
+    }));
+  },
+  () => jest.unmock("../../../../api/RouteLocation"),
+  () => (
+    <OwnerDashboardComponent data={user_data} loadUserFromBackend={() => {}} />
+  )
+);

@@ -1,0 +1,17 @@
+{
+  "username": "Waluigi",
+  "pfp": null,
+  "subscribedTrucks": [
+    {
+      "name": "Daisy's Delirium",
+      "id": 987654321
+    }
+  ],
+  "ownedTrucks": [
+    {
+      "name": "Waluigi's Taco Stand",
+      "id": 123456789
+    }
+  ],
+  "owner": true
+}
