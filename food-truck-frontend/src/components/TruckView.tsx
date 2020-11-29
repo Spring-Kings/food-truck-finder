@@ -1,7 +1,6 @@
 import React, {Component} from "react";
 import {Button, Container, Grid, Link, List, ListItem, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import api from "../util/api";
 import Router from "next/router";
 import loggedInUser from "../util/token";
 import TruckRouteMapComponent from "./map";
@@ -16,6 +15,7 @@ import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 import TruckRatingComponent from "./truck/TruckRatingComponent";
 import Truck from "../domain/Truck";
 import Subscription from "../domain/Subscription";
+import {getTruckById} from "../api/TruckApi";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = loggedInUser();
@@ -50,29 +50,17 @@ class TruckView extends Component<TruckProps, State> {
 
   async componentDidMount() {
     try {
-      await api
-        .get(`/truck/${this.props.truckId}`, {})
-        .then((res) => this.setState(res ? res.data : null))
-        .catch((err) => {
-          if (err.response) {
-            console.log("Got error response code");
-          } else if (err.request) {
-            console.log("Did not receive Truck response");
-          } else {
-            console.log(err);
-          }
-          this.setState({err: "Couldn't retrieve truck"});
-          return;
-        });
+      const truck = await getTruckById(this.props.truckId, DEFAULT_ERR_RESP);
+      if (truck === null) {
+        this.setState({err: "Couldn't get truck"});
+        return;
+      }
 
-      const subs = await getSubscriptionForTruck(this.props.truckId)
-      this.setState({subscription: subs})
+      const sub = await getSubscriptionForTruck(this.props.truckId);
+      const routePts = await loadCurrentRoute(this.props.truckId, DEFAULT_ERR_RESP);
 
-      // Load today's route
-      this.setState({
-        ...this.state,
-        routePts: await loadCurrentRoute(this.props.truckId, DEFAULT_ERR_RESP),
-      });
+      this.setState({subscription: sub, routePts, truck})
+
     } catch (err) {
       console.log(err);
     }
@@ -81,7 +69,7 @@ class TruckView extends Component<TruckProps, State> {
   render() {
     if (this.state.err) {
       return <p>{this.state.err}</p>
-    } else if (!this.state.truck || !this.state.routePts) {
+    } else if (!this.state.truck) {
       return (
         <Container>
           <CircularProgress/>
@@ -113,7 +101,8 @@ class TruckView extends Component<TruckProps, State> {
       <>
         <Typography variant="subtitle1">Tags:</Typography>
         <List>
-          {this.state.truck.tags.map((tag, _ndx) => <ListItem key={`${this.props.truckId}-${tag}`}>{tag}</ListItem>)}
+          {this.state.truck.tags.map((tag: string, _ndx: number) => <ListItem
+            key={`${this.props.truckId}-${tag}`}>{tag}</ListItem>)}
         </List>
       </>
     );
@@ -201,7 +190,12 @@ class TruckView extends Component<TruckProps, State> {
         <Grid container direction="row" justify="flex-start" align-items="flex-start">
           {truckInfoView}
           <Grid item xs>
-            <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+            {
+              this.state.routePts
+                ? <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+                : <p>Not currently on a route.</p>
+            }
+
           </Grid>
         </Grid>
         {userCanEditTruck(this.state.truck.userId) && ownerButtons}

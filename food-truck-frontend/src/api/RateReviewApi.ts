@@ -14,13 +14,15 @@ export const loadReviewsByUser = async (
   userId: number,
   onFail?: ClientResponseAction
 ): Promise<Review[] | null> => {
-  let reviews: Review[] = [];
 
   try {
     // Fetch username
     let name = await getUsername(userId);
-    if (name === null)
-      throw 'User not found';
+    if (name == null) {
+      if (onFail)
+        onFail("User not found");
+      return null;
+    }
 
     // Get the reviews by this user
     let resp: any = await api.request({
@@ -30,8 +32,8 @@ export const loadReviewsByUser = async (
 
     // Map all backend reviews to frontend reviews
     return resp.data
-      .map((r: any) => parse(ReviewMeta, review_backendToFrontend(r, name.data)))
-      .filter(r => r != null)
+      .map((r: any) => parse(ReviewMeta, review_backendToFrontend(r, name as string)))
+      .filter((r: Review | null) => r != null)
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
     if (onFail) onFail(e);
@@ -66,7 +68,7 @@ export const loadReviewFromTruckForUser = async (
       method: "GET",
     });
 
-    return parse(ReviewMeta, review_backendToFrontend(resp.data, name.data));
+    return parse(ReviewMeta, review_backendToFrontend(resp.data, name));
 
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return null
@@ -97,15 +99,19 @@ export const loadReviewsByTruck = async (
 
     // Map all backend reviews to frontend reviews
     // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
-    const promises = resp.data.map(async (r) => {
-      const name = await getUsername(r.userId) ?? throw 'User not found';
+    const promises: Promise<Review | null>[] = resp.data.map(async (r: any) => {
+      const name = await getUsername(r.userId)
+      if (!name)
+        throw 'User not found';
       const rev: Review | null = parse(ReviewMeta, review_backendToFrontend(r, name))
       return rev;
     })
 
-    const reviews: Review[] = await Promise.all(promises)
-      .filter(r => r != null);
-    const truck = await getTruckById(truckId)
+    const reviews: Review[] = (await Promise.all(promises))
+      .filter(r => r != null) as Review[];
+
+    const truck = await getTruckById(truckId, () => {
+    })
     if (truck !== null) {
       return {
         reviews,
@@ -176,8 +182,10 @@ export const deleteReview = async (
 export const loadReviewById = async (reviewId: number): Promise<Review | null> => {
   const response = await api.get(`/reviews/${reviewId}`);
   if (response.data?.userId) {
-    const usernameResp = await getUsername(response.data.userId);
-    return parse(ReviewMeta, review_backendToFrontend(response.data, usernameResp.data));
+    const username = await getUsername(response.data.userId);
+    if (!username)
+      return null;
+    return parse(ReviewMeta, review_backendToFrontend(response.data, username));
   }
 
   return null;

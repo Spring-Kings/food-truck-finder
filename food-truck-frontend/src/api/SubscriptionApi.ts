@@ -4,11 +4,15 @@ import {parse} from "../util/type-checking";
 
 export const getSubscriptionForTruck = async (truckId: number): Promise<Subscription | null> => {
   let res = await api.get(`/truck/${truckId}/subscription`);
+  if (res.data == null)
+    return null;
   return parse(SubscriptionMeta, res.data);
 }
 
 export const subscribeToTruck = async (truckId: number): Promise<Subscription | null> => {
   let res = await api.post(`/truck/${truckId}/subscribe`);
+  if (res.data == null)
+    return null;
   return parse(SubscriptionMeta, res.data);
 }
 

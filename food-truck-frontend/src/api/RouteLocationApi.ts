@@ -25,7 +25,7 @@ export const loadRouteLocations = async (
   onFail?: (res: any) => void
 ) => {
   const resp = await api.get(`/truck/route/locations/${routeId}`);
-  if (resp.data) {
+  if (resp.data !== null) {
     let nextStopId = 1;
     return resp.data.map((pt: any) => parse(
       RouteLocationMeta, backendToFrontend(pt, nextStopId++)

@@ -1,5 +1,5 @@
 import React from 'react';
-import {NextRouter, useRouter} from 'next/router';
+import {useRouter} from 'next/router';
 import UserDetails from "../../components/UserDetails";
 
 
@@ -13,7 +13,7 @@ function renderError(){
 
 
 function CustomerDetailPage(){
-    const router: NextRouter = useRouter();
+    /*const router: NextRouter = useRouter();
     const {username} = router.query;
 
     if(username == undefined){
@@ -23,11 +23,16 @@ function CustomerDetailPage(){
         return renderError();
     }
 
-    return (
-        <div>
-            <UserDetails username={username}/>
-        </div>
-    );
+    return <UserDetails username={username}/>*/
+
+    const router = useRouter();
+    if (router.query.username) {
+        return (
+          <UserDetails username={(router.query.username as unknown) as string}/>
+        );
+    }
+
+    return renderError()
 
 }
 

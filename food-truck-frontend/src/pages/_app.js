@@ -7,6 +7,7 @@ import {buildStore} from '../util/redux';
 
 import Head from 'next/head';
 import FoodTruckThemeProvider from '../components/theme/Theme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 let initialState = {};
 let store = buildStore(initialState);
@@ -22,16 +23,20 @@ const FoodTruckApp = ({Component, pageProps}) => {
   }, []);
 
   return (
-    <Provider store={store}>
-      <Head>
-        <title>Stacked Trucks</title>
-        <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-      </Head>
+      <Provider store={store}>
+          <Head>
+              <title>Stacked Trucks</title>
+              <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width"/>
+          </Head>
 
-      <FoodTruckThemeProvider>
-        <Component {...pageProps} />
-      </FoodTruckThemeProvider>
-    </Provider>
+
+          <MuiThemeProvider>
+              <FoodTruckThemeProvider>
+                  <Component {...pageProps} />
+              </FoodTruckThemeProvider>
+          </MuiThemeProvider>
+
+      </Provider>
   )
 };
 
