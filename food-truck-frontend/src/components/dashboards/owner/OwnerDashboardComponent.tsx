@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from "react";
 import Router from "next/router";
 
-import {
-  Button,
-  CircularProgress,
-  Container, Dialog, DialogContent, Grid,
-  Typography,
-} from "@material-ui/core";
+import {Button, CircularProgress, Container, Dialog, DialogContent, Grid, Typography,} from "@material-ui/core";
 
 import {UserData} from "../../../redux/user/UserReducer";
-import {loadTodaysRoute} from "../../../api/RouteLocation";
+import {loadCurrentRoute} from "../../../api/RouteLocationApi";
 import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
-import {RouteLocation} from "../../map/route-map/RouteLocation";
+import {RouteLocation} from "../../../domain/RouteLocation";
 import {useFlexGrowStyles} from "../../theme/FoodTruckThemeProvider";
 import {StyledDialogTitle} from "../../util/StyledDialogTitle";
 import CreateTruckForm from "../../CreateTruckForm";
@@ -42,8 +37,11 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
   useEffect(() => {
     props.data?.ownedTrucks?.forEach(async truck => {
       try {
-        const pts = await loadTodaysRoute(truck.id, DEFAULT_ERR_RESP);
-        setRoutePts(routePts.concat(pts));
+        const pts = await loadCurrentRoute(truck.id, DEFAULT_ERR_RESP);
+        if (pts != null)
+          setRoutePts(routePts.concat(pts));
+        else
+          setInError("Couldn't load route")
       } catch (err) {
         setInError(err);
       }

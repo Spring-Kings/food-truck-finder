@@ -1,20 +1,10 @@
 import loggedInUser from "../util/token";
 import Form from "../components/Form";
 import React from 'react'
-import {
-    Button,
-    FormControl,
-    FormControlLabel,
-    FormHelperText, FormLabel,
-    Grid,
-    MenuItem,
-    Select,
-    Switch,
-    TextField
-} from '@material-ui/core';
+import {Button, FormControl, FormHelperText, Grid, MenuItem, Select, Switch, TextField} from '@material-ui/core';
 import {AxiosResponse} from 'axios';
-import {privacySettingDisplayString, queryUserById, User} from "../api/User";
-import {Label} from "@material-ui/icons";
+import {privacySettingDisplayString, User} from "../domain/User";
+import {loadUserById} from "../api/UserApi";
 
 type PageState = {
     editMode: boolean,
@@ -118,7 +108,7 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
                 error: "You are not currently logged in."
             });
         } else {
-            const user = await queryUserById(curUser.userID);
+            const user = await loadUserById(curUser.userID);
             console.log(user);
             if (user != null)
                 this.setState({user});

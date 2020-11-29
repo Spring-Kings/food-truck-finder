@@ -1,10 +1,9 @@
 import React, {Component} from "react";
-import {Button, Container, Grid, Typography, Link} from "@material-ui/core";
+import {Button, Container, Grid, Typography} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review, {TruckReviews} from "../../../domain/truck/Review";
-import {loadReviewsByTruck} from "../../../api/RateReview";
+import {TruckReviews} from "../../../domain/Review";
+import {loadReviewsByTruck} from "../../../api/RateReviewApi";
 import {DEFAULT_ERR_KICK} from "../../../api/DefaultResponses";
-import {MoneyRating, StarRating} from "./ratings";
 import Router from "next/router";
 import RatingView from "./RatingView";
 import ReviewView from "./ReviewView";
@@ -14,7 +13,7 @@ interface RateProps {
 }
 
 export interface RateState {
-    reviews: TruckReviews | undefined;
+    reviews: TruckReviews | undefined | null;
 }
 
 class TruckReviewPage extends Component<RateProps, RateState> {

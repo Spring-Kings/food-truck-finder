@@ -1,8 +1,8 @@
 import React, {Component} from "react";
 import {Button, Container, FormControlLabel, Grid, Switch, TextField, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review, {emptyReview} from "../../../domain/truck/Review";
-import {deleteReview, getSaveReviewUrl, loadReviewFromTruckForUser,} from "../../../api/RateReview";
+import Review, {emptyReview, isExtended} from "../../../domain/Review";
+import {deleteReview, getSaveReviewUrl, loadReviewFromTruckForUser,} from "../../../api/RateReviewApi";
 import NotFound from "../../NotFound";
 import loggedInUser, {UserInfo} from "../../../util/token";
 import {MoneyRating, StarRating} from "./ratings";
@@ -17,7 +17,7 @@ interface RateProps {
 export interface RateState {
   review: Review;
   user: UserInfo | null | undefined;
-  old_review_text: string;
+  old_review_text: string | null;
 }
 
 /** Number of rows for the review field */
@@ -90,8 +90,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             label="Leave Extended Review"
             control={
               <Switch
-                value={this.state.review.extended}
-                checked={this.state.review.extended}
+                value={isExtended(this.state.review)}
+                checked={isExtended(this.state.review)}
                 onChange={this.switchExtended}
               />
             }
@@ -110,8 +110,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
               name="costRating"
               defaultValue={this.state.review.costRating}
             />
-            {this.state.review.extended &&
-              <TextField
+            {isExtended(this.state.review) &&
+            <TextField
                 label="Review"
                 variant="outlined"
                 name="reviewText"
@@ -119,7 +119,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
                 multiline
                 fullWidth
                 rows={NUM_ROWS}
-              />
+            />
             }
           </Form>
         </Grid>
@@ -131,13 +131,12 @@ class RateReviewComponent extends Component<RateProps, RateState> {
   }
 
   private switchExtended(_: any, checked: boolean) {
-    let review_text: string = checked? this.state.old_review_text : "";
+    let review_text: string | null = checked ? this.state.old_review_text : null;
     this.setState({
       old_review_text: this.state.review.review,
       review: {
         ...this.state.review,
         review: review_text,
-        extended: checked
       },
     });
   }

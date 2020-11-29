@@ -1,19 +1,18 @@
 import React from 'react';
-import ReviewsList from "./ReviewsList";
 import SubscriptionList from "./SubscriptionList";
-import api from "../util/api";
-import {User, queryUserByName} from "../api/User";
-import Review from "../domain/truck/Review";
-import {loadReviewsByUser} from "../api/RateReview";
+import {User} from "../domain/User";
+import Review from "../domain/Review";
+import {loadReviewsByUser} from "../api/RateReviewApi";
 import ReviewView from "./truck/rate_and_review/ReviewView";
 import {Grid} from "@material-ui/core";
+import {loadUserByName} from "../api/UserApi";
 
 type UserDetailsProps = {
     username: string
 }
 
 type UserDetailsState = {
-    user: User|null,
+    user: User | null,
     reviews: Review[]|null
     err: string|null
 }
@@ -29,7 +28,7 @@ class UserDetails extends React.Component<UserDetailsProps, UserDetailsState>{
     }
 
     async componentDidMount() {
-        const user = await queryUserByName(this.props.username);
+        const user = await loadUserByName(this.props.username);
         if (user == null) {
             this.setState({err: "User not found."});
             return;

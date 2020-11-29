@@ -1,8 +1,7 @@
 import {Grid, Link, Typography} from "@material-ui/core";
 import React from "react";
-import Review from "../../../domain/truck/Review";
+import Review from "../../../domain/Review";
 import {MoneyRating, StarRating} from "./ratings";
-import {loadReviewById} from "../../../api/RateReview";
 
 type Props = {
     review: Review

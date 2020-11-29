@@ -1,6 +1,6 @@
 import {Dispatch} from "redux";
 import {NotificationAction, NotificationActionTypes} from "../../redux/notifications/NotificationActions";
-import {getNotifications} from "../../api/Notification";
+import {getNotifications} from "../../api/NotificationApi";
 
 async function updateNotifications(dispatch: Dispatch<NotificationAction>)
   : Promise<void> {
@@ -8,11 +8,13 @@ async function updateNotifications(dispatch: Dispatch<NotificationAction>)
   getNotifications()
     .then(
       (notifications) => {
-        // Dispatch update
-        dispatch({
-          type: NotificationActionTypes.LOAD_NOTIFICATIONS,
-          payload: {notifications: notifications}
-        });
+        if (notifications) {
+          // Dispatch update
+          dispatch({
+            type: NotificationActionTypes.LOAD_NOTIFICATIONS,
+            payload: {notifications: notifications}
+          });
+        }
       },
       (err) => {
         console.log(err);

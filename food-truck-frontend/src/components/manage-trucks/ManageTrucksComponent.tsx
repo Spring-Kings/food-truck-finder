@@ -4,11 +4,11 @@ import Router from "next/router";
 import {Button, Card, CircularProgress, Container, Grid, Typography,} from "@material-ui/core";
 
 import api from "../../util/api";
-import {TruckState} from "../TruckView";
+import Truck from "../../domain/Truck";
 
 interface ManageTruckProps {}
 interface ManageTruckState {
-  trucks: TruckState[] | undefined;
+  trucks: Truck[] | undefined;
   errorMsg: string | undefined;
 }
 
@@ -63,7 +63,7 @@ class ManageTrucksComponent extends React.Component<
     );
   }
 
-  private renderRow(truck: TruckState) {
+  private renderRow(truck: Truck) {
     return (
       <Grid item xs key={truck.id}>
         <Grid container direction="row">

@@ -1,16 +1,12 @@
 import React, {Component} from "react";
 import Router from "next/router";
 import Button from "@material-ui/core/Button";
-import {
-  CircularProgress,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import {CircularProgress, Grid, Typography,} from "@material-ui/core";
 
 import {UserData} from "../../../../redux/user/UserReducer";
-import {RouteLocation} from "../../../map/route-map/RouteLocation";
+import {RouteLocation} from "../../../../domain/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
-import {getNearbyTruckLocations} from "../../../../api/Truck";
+import {getNearbyTruckLocations} from "../../../../api/TruckApi";
 import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
 
 // Dashboard props
@@ -51,7 +47,9 @@ class UserDashboardComponent extends Component<
     // Load
     try {
       if (this.props.data != null) {
-        let trucks: RouteLocation[] = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
+        let trucks = await getNearbyTruckLocations(DEFAULT_ERR_RESP);
+        if (!trucks)
+          throw "Couldn't get trucks"
         this.setState({inError: null, nearbyTrucks: trucks});
       } else
         await this.props.loadUserFromBackend();

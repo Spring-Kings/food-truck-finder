@@ -1,5 +1,6 @@
 package food.truck.api.reviews_and_subscriptions;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import food.truck.api.truck.Truck;
 import food.truck.api.user.User;
 import lombok.Data;
@@ -16,7 +17,8 @@ public class Subscription {
     Long id;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     User user;
 
     @ManyToOne
