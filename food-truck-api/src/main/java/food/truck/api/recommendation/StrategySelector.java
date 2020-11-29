@@ -24,8 +24,8 @@ public class StrategySelector {
 
         }
         if(!prefs.isActive()){
-            return new PassiveGuestRecommendationStrategy(truckSvc, u.getPosition(), prefs);
+            return new GuestRecommendationStrategy(truckSvc, u.getPosition());
         }
-        return new GuestRecommendationStrategy(truckSvc, u.getPosition());
+        return new GuestSearchRecommendationStrategy(truckSvc, u.getPosition(), prefs);
     }
 }

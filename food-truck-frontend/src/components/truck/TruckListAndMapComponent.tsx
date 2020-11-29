@@ -63,7 +63,7 @@ function TruckListAndMapComponent(props: Props) {
                     </List>
                 </Container>
             </GridListTile> :
-            <div></div>
+            null
         }
 
     </GridList>
