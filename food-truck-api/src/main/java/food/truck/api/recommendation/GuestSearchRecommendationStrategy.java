@@ -30,7 +30,7 @@ public class GuestSearchRecommendationStrategy implements TruckRecommendationStr
         Double value;
 
         trucks.stream().forEach(t -> {
-            if(prefs.getTruckIds().contains(t.getId() + "")) {
+            if(prefs.getTruckIds().contains(t.getId())) {
                 t.getTags().stream().forEach(tag -> {
                     if (tags.containsKey(tag)) {
                         tags.replace(tag, tags.get(tag) + 1.0);
@@ -63,7 +63,7 @@ public class GuestSearchRecommendationStrategy implements TruckRecommendationStr
             priceScore = (t.getPriceRating() != null) ? t.getPriceRating() : 0;
             ratingScore = (t.getStarRating() != null) ? ScoreWeights.RatingWeight.val * (t.getStarRating() - 3) : 0;
 
-            if(prefs.getTruckIds().contains(t.getId() + "")){
+            if(prefs.getTruckIds().contains(t.getId())){
                 value = (value *1.5) + 2.0;
             }
 
