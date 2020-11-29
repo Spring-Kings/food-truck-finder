@@ -12,6 +12,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import os
 import spacy
+from werkzeug.exceptions import abort
 
 app = Flask(__name__)
 # Learned via: https://stackoverflow.com/questions/54171101/restrict-access-to-a-flask-rest-api
@@ -40,6 +41,10 @@ def get_similarity():
     all_truck_tags = data["trucks"]
     search_tags = data["tags"]
     result = {}
+
+    # If the parameters provided were invalid, abort
+    if all_truck_tags is None or search_tags is None:
+        abort(400)
 
     # Go through all provided Truck tags
     for truck in all_truck_tags:
