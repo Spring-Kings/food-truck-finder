@@ -65,16 +65,13 @@ jobs:
         run: |
           mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.web
           mv ./docker/food-truck-frontend.Dockerfile ./food-truck-frontend/Dockerfile.web
-          mv ./food-truck-similarity/food-truck-similarity.Dockerfile ./food-truck-similarity/food-truck-similarity.Dockerfile.web
-
-      # docker build -t "spring-kings:web" -f Dockerfile.web -m 512M .
-      # docker push registry.heroku.com/sprig-kings/web
+          mv ./food-truck-semantic/food-truck-similarity.Dockerfile ./food-truck-semantic/food-truck-similarity.Dockerfile.web
 
       - name: Push to Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          cd ./food-truck-similarity
+          cd ./food-truck-semantic
           heroku container:push -a spring-kings-similarity web --recursive
           heroku container:release -a spring-kings-similarity web
           heroku ps:scale -a spring-kings-similarity web=1
