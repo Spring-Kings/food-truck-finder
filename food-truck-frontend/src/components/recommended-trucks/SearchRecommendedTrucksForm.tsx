@@ -140,6 +140,7 @@ class RecommendedTrucksForm extends Component<
             acceptableRadius: this.state.acceptableRadius,
             priceRating: this.state.priceRating,
             tags: this.state.tags,
+            truckIds: [],
             location: this.state.location,
             active: true,
             numRequested: 10

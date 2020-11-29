@@ -29,7 +29,7 @@ public class PassiveGuestRecommendationStrategy implements TruckRecommendationSt
         HashMap<String, Double> tags = new HashMap<>();
 
         trucks.stream().forEach(t -> {
-            if(prefs.getTags().contains(t.getId() + "")) {
+            if(prefs.getTruckIds().contains(t.getId() + "")) {
                 t.getTags().stream().forEach(tag -> {
                     if (tags.containsKey(tag)) {
                         tags.replace(tag, tags.get(tag) + 1.0);
@@ -49,7 +49,7 @@ public class PassiveGuestRecommendationStrategy implements TruckRecommendationSt
                 }
             }
 
-            if(prefs.getTags().contains(t.getId() + "")){
+            if(prefs.getTruckIds().contains(t.getId() + "")){
                 value += 1.0;
             }
             result.add(Pair.of(t, value));

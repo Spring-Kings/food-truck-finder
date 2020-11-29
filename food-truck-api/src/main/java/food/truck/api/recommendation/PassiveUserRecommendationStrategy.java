@@ -62,7 +62,7 @@ public class PassiveUserRecommendationStrategy implements TruckRecommendationStr
                 }
             }
 
-            if(prefs.getTags().contains(t.getId() + "")){
+            if(prefs.getTruckIds().contains(t.getId() + "")){
                 value += max + 1.0;
             }
             result.add(Pair.of(t, value));

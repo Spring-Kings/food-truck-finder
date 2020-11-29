@@ -75,7 +75,8 @@ class UserDashboardComponent extends Component<
         data: {
           acceptableRadius: 20,
           priceRating: 0,
-          tags: localStorage.getItem("prevSearch") ? JSON.parse(`${localStorage.getItem("prevSearch")}`) : [],
+          truckIds: localStorage.getItem("prevSearch") ? JSON.parse(`${localStorage.getItem("prevSearch")}`) : [],
+          tags: [],
           location: this.state.location,
           active: false,
           numRequested: 10

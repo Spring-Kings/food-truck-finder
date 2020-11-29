@@ -10,5 +10,6 @@ public class UserPreferences {
     double priceRating;
     int numRequested;
     boolean active;
+    Set<String> truckIds;
     Set<String> tags;
 }
