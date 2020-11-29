@@ -61,14 +61,16 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
                 <td>{daysWeek}</td>
                 <td>
                     <FormControlLabel
-                        label="Active"
-                        control={<Switch checked={this.props.active}
-                                    onChange={(_, checked) => this.props.toggleActive(this.props.routeId, checked)} />
-                        }
+                      label="Active"
+                      control={<Switch checked={this.props.active}
+                                       onChange={(_, checked) => this.props.toggleActive(this.props.routeId, checked)}/>
+                      }
                     />
                 </td>
-                <td><IconButton onClick={() => Router.replace(`/routes/edit/${this.props.routeId}`)}><EditIcon /></IconButton></td>
-                <td><IconButton onClick={this.props.removeRow}><DeleteForeverIcon /></IconButton></td>
+                <td><IconButton disabled={this.props.active}
+                                onClick={() => Router.replace(`/routes/edit/${this.props.routeId}`)}><EditIcon/></IconButton>
+                </td>
+                <td><IconButton onClick={this.props.removeRow}><DeleteForeverIcon/></IconButton></td>
             </tr>
         );
     }
