@@ -17,6 +17,9 @@ public class StrategySelector {
 
     public TruckRecommendationStrategy selectStrategy(AbstractUser u, UserPreferences prefs) {
         if (u instanceof User) {
+            if(!prefs.isActive()){
+               return new PassiveUserRecommendationStrategy(truckSvc, subSvc, (User) u, prefs);
+            }
             return new ScoringRecommendationStrategy(truckSvc, subSvc, (User) u, prefs);
 
         }
