@@ -27,8 +27,10 @@ public class PassiveUserRecommendationStrategy implements TruckRecommendationStr
 
     @Override
     public List<Pair<Truck, Double>> selectTrucks() {
+
+        int RADIUS = 30;
         List<Subscription> userSubs = subscriptionService.findSubsByUser(user);
-        List<Truck> trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), 20);
+        List<Truck> trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), RADIUS);
 
         Double max = 0.0;
         HashMap<String, Double> tags = new HashMap<>();
@@ -50,6 +52,7 @@ public class PassiveUserRecommendationStrategy implements TruckRecommendationStr
             }
         }
 
+        max--;
         Double value;
         for(Truck t : trucks) {
             value = 0.0;
@@ -59,6 +62,9 @@ public class PassiveUserRecommendationStrategy implements TruckRecommendationStr
                 }
             }
 
+            if(prefs.getTags().contains(t.getId() + "")){
+                value += max + 1.0;
+            }
             result.add(Pair.of(t, value));
         }
 

@@ -23,6 +23,9 @@ public class StrategySelector {
             return new ScoringRecommendationStrategy(truckSvc, subSvc, (User) u, prefs);
 
         }
+        if(!prefs.isActive()){
+            return new PassiveGuestRecommendationStrategy(truckSvc, u.getPosition(), prefs);
+        }
         return new GuestRecommendationStrategy(truckSvc, u.getPosition());
     }
 }
