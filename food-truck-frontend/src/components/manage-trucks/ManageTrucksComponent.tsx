@@ -3,7 +3,7 @@ import Router from "next/router";
 
 import {Button, Card, CircularProgress, Container, Grid, Typography,} from "@material-ui/core";
 
-import api from "../../util/api";
+import { getTrucksForCurrentUser } from "../../api/Truck";
 import {TruckState} from "../TruckView";
 
 interface ManageTruckProps {}
@@ -26,16 +26,8 @@ class ManageTrucksComponent extends React.Component<
   }
 
   componentDidMount() {
-    api
-      .request({
-        url: `/truck/owner`,
-        method: "GET",
-      })
-      .then((response) => this.setState({ trucks: response.data }))
-      .catch((err) => {
-        console.log(err);
-        this.setState({ errorMsg: err });
-      });
+    getTrucksForCurrentUser((err: any) => this.setState({ errorMsg: err }))
+      .then((response) => this.setState({ trucks: response.data }));
   }
 
   render() {

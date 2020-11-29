@@ -49,6 +49,18 @@ export const getTruckById = async (truckId: number, onFail: (err: any) => void) 
     return undefined;
 }
 
+export const getTrucksForCurrentUser = async (onFail?: (err: any) => void) => {
+  try {
+    return (await api.request({
+        url: `/truck/owner`,
+        method: "GET",
+      })).data;
+  } catch (error) {
+    if (onFail)
+      onFail(error);
+  }
+}
+
 export const searchTruckByName = async (search: string, onFail: (err: any) => void) => {
   let result = await api.get(`/truck/search?search=${search}`)
     .catch(onFail);

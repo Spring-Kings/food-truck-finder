@@ -1,9 +1,5 @@
-import configureMockStore, {
-  MockStore,
-  MockStoreEnhanced,
-} from "redux-mock-store";
+import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import { createMock } from "ts-auto-mock";
 import { makeEmptyTruckState } from "../../components/TruckView";
 import { StoreState } from "../redux";
 import user_data from "./user_data.json";
