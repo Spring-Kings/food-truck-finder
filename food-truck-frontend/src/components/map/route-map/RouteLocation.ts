@@ -29,12 +29,25 @@ export interface RouteLocation {
   readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
 }
 
+export const wrapsAroundMidnight = (loc: RouteLocation) => loc.exitTime < loc.arrivalTime;
+
+export const locationsConflict = (loc1: RouteLocation, loc2: RouteLocation) => {
+  if (!wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2))
+    return loc1.arrivalTime <= loc2.exitTime && loc1.exitTime >= loc2.arrivalTime;
+  else if (wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2))
+    return loc1.exitTime >= loc2.arrivalTime || loc1.arrivalTime <= loc2.exitTime;
+  else if (!wrapsAroundMidnight(loc1) && wrapsAroundMidnight(loc2))
+    return loc1.arrivalTime <= loc2.exitTime || loc1.exitTime >= loc2.arrivalTime;
+  else
+    return true; // If both wrap around, that means they conflict at midnight
+}
+
 export const blankRouteLocation = () => ({
   routeLocationId: -1,
   arrivalTime: new Date(),
   exitTime: new Date(),
   stopId: 0,
-  coords: { lat: 0, lng: 0},
+  coords: {lat: 0, lng: 0},
   state: RouteLocationState.CREATED,
 })
 
