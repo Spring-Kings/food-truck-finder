@@ -86,6 +86,3 @@ def get_similarity_for(truck_tags, search_tags):
 
     # Return the percent of the search tags that were exact or fuzzy matched
     return result / len(search_tags)
-
-
-app.run()
