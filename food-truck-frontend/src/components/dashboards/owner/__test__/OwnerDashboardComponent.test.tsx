@@ -3,7 +3,6 @@ import React from "react";
 import * as route from "../../../../api/RouteLocation";
 import OwnerDashboardComponent from "../OwnerDashboardComponent";
 import user_data from "../../../../util/test_util/user_data.json";
-import { shallow } from "enzyme";
 import {
   RouteLocation,
   RouteLocationState,
@@ -19,14 +18,12 @@ const mockLOC: RouteLocation = {
   state: RouteLocationState.PERSISTED,
 };
 
+jest.mock("../../../../api/RouteLocation", () => ({
+  loadTodaysRoute: jest.fn().mockImplementation(() => [mockLOC]),
+}));
+
 SNAPSHOT_TEST(
   "Test owner dashboard",
-  () => {
-    jest.mock("../../../../api/RouteLocation", () => ({
-      loadTodaysRoute: jest.fn().mockImplementation(() => [mockLOC]),
-    }));
-  },
-  () => jest.unmock("../../../../api/RouteLocation"),
   () => (
     <OwnerDashboardComponent data={user_data} loadUserFromBackend={() => {}} />
   )

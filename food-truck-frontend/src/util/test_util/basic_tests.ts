@@ -13,17 +13,9 @@ type GenericFactory<T> = () => T;
  */
 export const SNAPSHOT_TEST = <T>(
   testName: string,
-  mockApi: () => void,
-  unmockApi: () => void,
   component_callback: GenericFactory<ReactElement<T>>
 ) => {
   describe(testName, () => {  
-    /** Mock out modules */
-    beforeAll(() => mockApi());
-
-    /** Clear out all the mocks */
-    afterAll(() => unmockApi());
-
     /* Snapshot */
     test("Matches snapshot", () => {
       const component = shallow(component_callback());

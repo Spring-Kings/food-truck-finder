@@ -1,6 +1,9 @@
 import React from "react";
 
-import * as truck from "../../../../../api/Truck";
+jest.mock("../../../../../api/Truck", () => ({
+  getNearbyTruckLocations: jest.fn().mockImplementation(() => [mockLOC]),
+}));
+
 import UserDashboardComponent from "../UserDashboardComponent";
 import user_data from "../../../../../util/test_util/user_data.json";
 import {
@@ -20,14 +23,6 @@ const mockLOC: RouteLocation = {
 
 SNAPSHOT_TEST(
   "Snapshot test user dashboard",
-  () => {
-    jest.mock("../../../../../api/Truck", () => ({
-      getNearbyTruckLocations: jest.fn().mockImplementation(() => [mockLOC]),
-    }));
-  },
-  () => {
-    jest.unmock("../../../../../api/Truck");
-  },
   () => {
     return (<UserDashboardComponent data={user_data} loadUserFromBackend={() => {}} />);
   }
