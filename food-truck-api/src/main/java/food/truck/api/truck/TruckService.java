@@ -1,5 +1,8 @@
 package food.truck.api.truck;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import food.truck.api.Position;
 import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
@@ -36,6 +39,8 @@ public class TruckService {
     private RouteService routeService;
     @Autowired
     private RouteRepository routeRepository;
+    @Autowired
+    private AmazonS3 s3Client;
 
     public List<Truck> findTruck(String name) {
         return truckRepository.findByName(name);
@@ -49,17 +54,13 @@ public class TruckService {
         return truckRepository.findById(truckId);
     }
 
-    public Truck saveTruck(Truck truck) {
-        return truckRepository.save(truck);
-    }
-
     public Truck createTruck(Long userId, String name) {
         var t = new Truck();
         t.setName(name);
         t.setUserId(userId);
         t.setDescription("");
         t.setTags(new HashSet<>());
-        return saveTruck(t);
+        return truckRepository.save(t);
     }
 
     public void deleteTruck(long truckId) {
@@ -95,8 +96,11 @@ public class TruckService {
                     .filter(tag -> !tag.isEmpty())
                     .collect(Collectors.toSet());
             truck.setTags(tags2);
+        } else {
+            truck.setTags(null);
         }
-        return saveTruck(truck);
+
+        return truckRepository.save(truck);
     }
 
     public Route getActiveRoute(long truckId, DayOfWeek w) {
@@ -161,8 +165,14 @@ public class TruckService {
             return HttpStatus.PAYLOAD_TOO_LARGE;
         }
 
+        var fileObjKeyName = "menu/" + truckId;
+        var bucketName = System.getenv("S3_BUCKET_NAME");
         try {
-            t.setMenu(file.getBytes());
+            var metadata = new ObjectMetadata();
+            metadata.setContentType(contentType);
+            metadata.setContentLength(file.getBytes().length);
+            var request = new PutObjectRequest(bucketName, fileObjKeyName, file.getInputStream(), metadata);
+            s3Client.putObject(request);
         } catch (IOException e) {
             log.info("Couldn't upload menu", e);
             return HttpStatus.INTERNAL_SERVER_ERROR;
@@ -170,7 +180,7 @@ public class TruckService {
 
         t.setMenuContentType(contentType);
 
-        saveTruck(t);
+        truckRepository.save(t);
         return HttpStatus.OK;
     }
 }
