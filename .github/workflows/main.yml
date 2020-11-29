@@ -65,7 +65,7 @@ jobs:
         run: |
           mv ./docker/food-truck-api.Dockerfile ./food-truck-api/Dockerfile.web
           mv ./docker/food-truck-frontend.Dockerfile ./food-truck-frontend/Dockerfile.web
-          mv ./food-truck-semantic/food-truck-similarity.Dockerfile ./food-truck-semantic/food-truck-similarity.Dockerfile.web
+          mv ./food-truck-semantic/food-truck-similarity.Dockerfile ./food-truck-semantic/Dockerfile.web
 
       - name: Push to Heroku
         env:
