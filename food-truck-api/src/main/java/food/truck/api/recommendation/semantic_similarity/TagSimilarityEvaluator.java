@@ -3,6 +3,7 @@ package food.truck.api.recommendation.semantic_similarity;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,9 +15,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2
-public class FoodTruckDictionary {
+public class TagSimilarityEvaluator {
 
     private static final String SIMILARITY_URL = System.getenv("SIMILARITY_URL");
+
+    @Autowired
+    WebClient webClient;
 
     @Value
     public static class SimilarityRequest {
@@ -45,8 +49,7 @@ public class FoodTruckDictionary {
         // Make request
         try {
             // Learned setting content type: https://stackoverflow.com/questions/55451598/spring-webflux-webclient-content-type-headers-set-issue
-            @NonNull var response = WebClient.create()
-                    .post()
+            @NonNull var response = webClient.post()
                     .uri(URI.create(SIMILARITY_URL + "/compare"))
                     .header("Content-Type", "application/json")
                     .body(BodyInserters.fromValue(body))

@@ -3,7 +3,6 @@ package food.truck.api.recommendation.semantic_similarity;
 import food.truck.api.truck.Truck;
 import org.springframework.data.util.Pair;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,13 +10,13 @@ import java.util.Set;
 /**
  * Provides a secondary thread to compute tag scores for all trucks
  */
-public class FoodTruckThread extends Thread {
+public class TagSimilarityEvaluatorThread extends Thread {
 
     /** All similarity scores, in (TruckId,Score) pairs */
     private Map<Long, Double> scores = null;
 
     /** Dictionary used to run the scoring */
-    private final FoodTruckDictionary dict;
+    private final TagSimilarityEvaluator evaluator;
 
     /** All nearby trucks, as provided by caller */
     private final List<SimilarityTruck> nearbyTrucks;
@@ -28,11 +27,11 @@ public class FoodTruckThread extends Thread {
     /** The score weighting for this category */
     private final Double score;
 
-    public FoodTruckThread(FoodTruckDictionary ftd, List<Truck> trucks, Set<String> tags, double score) {
-        this.dict = ftd;
+    public TagSimilarityEvaluatorThread(TagSimilarityEvaluator evaluator, List<Truck> trucks, Set<String> tags, double score) {
         this.nearbyTrucks = SimilarityTruck.toSimilarityTrucks(trucks);
         this.tags = tags;
         this.score = score;
+        this.evaluator = evaluator;
     }
 
     @Override
@@ -42,7 +41,7 @@ public class FoodTruckThread extends Thread {
             return;
 
         // Compute all scores
-        scores = dict.getSimilarityScore(score, nearbyTrucks, tags);
+        scores = evaluator.getSimilarityScore(score, nearbyTrucks, tags);
     }
 
     /**

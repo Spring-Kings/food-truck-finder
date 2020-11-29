@@ -40,13 +40,14 @@ import java.util.Set;
 public class TruckEndpoint {
     private final TruckService truckService;
     private final SubscriptionService subscriptionService;
-    private final StrategySelector ss;
+
+    @Autowired
+    StrategySelector ss;
 
     @Autowired
     public TruckEndpoint(TruckService truckService, SubscriptionService subscriptionService) {
         this.truckService = truckService;
         this.subscriptionService = subscriptionService;
-        this.ss = new StrategySelector(truckService, subscriptionService);
     }
 
     @Autowired

@@ -1,35 +1,27 @@
 package food.truck.api.recommendation;
 
-import food.truck.api.recommendation.semantic_similarity.FoodTruckDictionary;
-import food.truck.api.recommendation.semantic_similarity.FoodTruckThread;
+import food.truck.api.recommendation.semantic_similarity.TagSimilarityEvaluator;
+import food.truck.api.recommendation.semantic_similarity.TagSimilarityEvaluatorThread;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.User;
 import food.truck.api.user.UserPreferences;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-
+@AllArgsConstructor
 public class ScoringRecommendationStrategy implements TruckRecommendationStrategy {
     private final TruckService truckSvc;
     private final SubscriptionService subscriptionService;
     private final User user;
     private final UserPreferences prefs;
-
-    // Since we're instantiating this with 'new', I can't @Autowire it
-    private final FoodTruckDictionary ftd = new FoodTruckDictionary();
-
-    public ScoringRecommendationStrategy(TruckService truckSvc, SubscriptionService subscriptionService, User user, UserPreferences prefs) {
-        this.truckSvc = truckSvc;
-        this.subscriptionService = subscriptionService;
-        this.user = user;
-        this.prefs = prefs;
-    }
+    private final TagSimilarityEvaluator evaluator;
 
     @Override
     public List<Pair<Truck, Double>> selectTrucks() {
@@ -38,7 +30,7 @@ public class ScoringRecommendationStrategy implements TruckRecommendationStrateg
         var trucks = truckSvc.getTrucksCloseToLocation(user.getPosition(), prefs.getAcceptableRadius());
 
         // Run a secondary thread to acquire all truck tags
-        var getTagThread = new FoodTruckThread(ftd, trucks, prefs.getTags(), ScoreWeights.TagWeight.val);
+        var getTagThread = new TagSimilarityEvaluatorThread(evaluator, trucks, prefs.getTags(), ScoreWeights.TagWeight.val);
         getTagThread.start();
 
         // Compute the rest of the scores
