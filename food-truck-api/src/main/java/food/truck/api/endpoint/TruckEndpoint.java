@@ -239,23 +239,6 @@ public class TruckEndpoint {
         }
     }
 
-    @GetMapping("/truck/{truckId}/menu")
-    public ResponseEntity<byte[]> getMenu(@PathVariable long truckId) {
-        var truck = truckService.findTruckById(truckId);
-        if (truck.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        var t = truck.get();
-
-        var menu = t.getMenu();
-        if (menu == null || menu.length == 0 || t.getMenuContentType() == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-        var headers = new HttpHeaders();
-        var mediaType = MediaType.parseMediaType(t.getMenuContentType());
-        headers.setContentType(mediaType);
-        return new ResponseEntity<>(menu, headers, HttpStatus.OK);
-    }
-
     @Secured("ROLE_OWNER")
     @PostMapping("/truck/{truckId}/upload-menu")
     public void uploadMenu(@AuthenticationPrincipal User u, @PathVariable long truckId, @RequestParam("file") MultipartFile file) {

@@ -161,7 +161,7 @@ class TruckView extends Component<TruckProps, State> {
       </ListItem>
     );
 
-    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.state.id}/menu`;
+    const menuUrl = `${process.env.S3_URL}/menu/${this.state.id}`;
     let menuButton;
     if (this.state.menuContentType === 'application/pdf')
       menuButton = <Button><Link href={menuUrl} color="initial">View Menu PDF</Link></Button>
