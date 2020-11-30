@@ -18,7 +18,7 @@
     * Configure Lombok
         * Install Lombok Plugin for IntelliJ (IntelliJ IDEA > Preferences > Plugins ... Search for "Lombok" by Michail Plushnikov)
         * Enable Annotation Processing in IntelliJ Compliation (IntelliJ IDEA > Preferences > Build, Execution, Deployment > Compiler > Annotation Processors > Check "Enable annotation processing")
-* Deploy MySql: `docker-compose -f ./docker/local.docker-compose.yml up -d`
+* Deploy MySQL, Localstack, Flask: `docker-compose -f ./docker/local.docker-compose.yml up -d`
     * If you need to stop the containers (`docker-compose -f ./docker/local.docker-compose.yml stop` or ctrl+C), you can 
     restart the containers with: `docker-compose -f ./docker/local.docker-compose.yml start`   
 * From IntelliJ, create the default `food-truck-finder` database on the server: File > New > Data Source > Mysql  
@@ -33,7 +33,7 @@
     * For the food-truck-finder database, right click and navigate to New > Database
     * Add a new database named food-truck-finder and hit OK
 
-* Startup the API from IntelliJ SpringBoot Run Configuration
+* Start the API from IntelliJ SpringBoot Run Configuration
     * Specify VM Options
 	```
 	-Dspring.profiles.active=dev
@@ -66,47 +66,3 @@
 **Issue**: `docker-compose up` fails with
 `ERROR: Couldn't connect to Docker daemon. You might need to start Docker for Mac.`  
 **Solution**: Ensure Docker Desktop for Mac is running locally (Spotlight Search Cmd+Space > Docker)
-
-## Liquibase
-* Changes are split up by domain and within each domain, are split between schema and data operations.
-    * Example directory layout:  
-    ```  
-	 src/main/resources/db  
-	 +-- changelog  
-	 +-- db.changelog-0.0.1.yaml  
-	 |   +-- db.changelog-master.yaml  
-	 +-- orders  
-	 |   +-- schema  
-	 |   +-- data  
-	 +-- campaigns  
-	 |   +-- schema  
-	 |   +-- data  
-	 +-- ...  
-	 |   +-- schema  
-	 |   +-- data  
-	```
-  
-* The changelog directory contains the master changelog and each commit/feature changelog.
-
-* Determine the appropriate domain for the required DB changes, then split out between DDL (CREATE, ALTER, DROP, 
-TRUNCATE, GRANT, REVOKE) and DML (SELECT, INSERT, UPDATE,  DELETE, MERGE) into schema and data directories, respectively. 
-Each DDL changeset will need an appropriate rollback command since all DDL commands have implicit commits. DML changes 
-do not need a rollback command as they will commit only at the end of completing the changes, and will not partial 
-commit if a failure occurs part-way through.
-
-* Create a changelog specific to the table that is being altered and increment the version as appropriate 
-(i.e. schema/country-0.0.1.yaml is the first changeset to establish the country table, schema/country-0.0.2.yaml is a 
-changeset to add a column to the country table).
-
-* Create an overarching changelog for all of the changes associated with the commit/feature. i.e. changelog-0.0.1.yaml 
-includes all the changes for setting up the country and country_subdivision tables associated with user story 56. 
-Include a top-line comment on this change log and include the story number and title of the story for easy reference. 
-Add the versioned changelog into the master changelog file.
-
-* Changeset IDs: If you are creating a table or the first to insert data into a table, start the id with the ticket 
-number and add a brief description of the action and table being affected (i.e. 56-create-country-schema). Each 
-changeset id needs to be a unique identifier since that id is the primary key of the changelog table.
-
-* Define the desired context(s) for the changes. For the project, the available environments are development & ci. Comma-separated contexts indicate "OR" -- for instance `context: "development, ci"` will apply 
-the changes to development or ci, depending on the defined spring profile. Read more on Liquibase contexts 
-[here](https://docs.liquibase.com/concepts/advanced/contexts.html). 
