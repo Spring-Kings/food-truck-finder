@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {NotificationListProps} from "./NotificationListComponent";
-import Router, {useRouter} from "next/router";
+import {useRouter} from "next/router";
 import {Button, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@material-ui/core";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
@@ -24,7 +24,7 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   };
   const redirectToNotifications = () => {
     setNotified(true);
-    router.replace('/notifications');
+    router.push('/notifications');
   }
 
   useEffect(() => {
@@ -44,7 +44,7 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   return (
     <>
       <IconButton color="inherit"
-                  onClick={() => Router.replace('/notifications')}>
+                  onClick={() => router.push('/notifications')}>
         {initialized && notify ? <NotificationsActiveIcon/> : <NotificationsIcon/>}
       </IconButton>
       <Dialog open={notify && !notified} fullWidth>

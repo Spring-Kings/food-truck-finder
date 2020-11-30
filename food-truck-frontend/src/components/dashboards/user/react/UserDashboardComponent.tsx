@@ -92,7 +92,7 @@ class UserDashboardComponent extends Component<
   }
 
   private toOwnerDashboard() {
-    Router.replace("/dashboard/owner");
+    Router.push("/dashboard/owner");
   }
 }
 

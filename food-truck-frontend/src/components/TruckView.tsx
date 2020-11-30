@@ -238,15 +238,15 @@ class TruckView extends Component<TruckProps, State> {
   }
 
   editTruck = () => {
-    Router.replace(`/truck/edit/${this.state.id}`);
+    Router.push(`/truck/edit/${this.state.id}`);
   };
   
   reviewTruck = () => {
-    Router.replace(`/truck/reviews/create/${this.state.id}`);
+    Router.push(`/truck/reviews/create/${this.state.id}`);
   };
 
   readReviews = () => {
-    Router.replace(`/truck/reviews/${this.state.id}`);
+    Router.push(`/truck/reviews/${this.state.id}`);
   };
 
   handleSubscription = () => {
