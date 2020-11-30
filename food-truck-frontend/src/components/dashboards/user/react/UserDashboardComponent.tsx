@@ -6,7 +6,7 @@ import {CircularProgress, Grid, Typography,} from "@material-ui/core";
 import {RecommendedSimpleTruck, UserData} from "../../../../redux/user/UserReducer";
 import {RouteLocation} from "../../../../domain/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
-import {getNearbyTruckLocations, getNearbyTruckLocationsById} from "../../../../api/TruckApi";
+import {getNearbyTruckLocations} from "../../../../api/TruckApi";
 import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
 import api from "../../../../util/api";
 import {LatLng} from "@google/maps";
@@ -52,6 +52,12 @@ class UserDashboardComponent extends Component<
   }
 
   async componentDidMount() {
+    this.setState({
+      location: {
+        lat: Number(localStorage.getItem("latitude")),
+        lng: Number(localStorage.getItem("longitude"))
+      }
+    })
 
     // Load
     try {
