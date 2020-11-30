@@ -3,7 +3,7 @@ import Form from "../../../components/Form";
 import {makeEmptyTruckState, TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import {
   Button,
   Card,
@@ -25,6 +25,7 @@ interface EditTruckState {
 type TruckComponentState = TruckState & EditTruckState;
 
 function EditTruck(props: TruckProps) {
+  const router = useRouter();
   const classes = useFlexGrowStyles();
   const [state, setState]: [TruckComponentState, any] = useState({
     ...makeEmptyTruckState(),
@@ -55,7 +56,7 @@ function EditTruck(props: TruckProps) {
     getTruckById(props.truckId, (err) => {
       console.log(`Could not load truck card: ${err}`);
       // Cancel
-      Router.replace("/");
+      router.push("/");
     })
       .then(truck => {
         console.table(truck);
@@ -63,12 +64,12 @@ function EditTruck(props: TruckProps) {
         if (truck && userCanEditTruck(truck.userId))
           setState(truck);
         else
-          Router.replace("/");
+        router.push("/");
       });
   }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
-    Router.replace(`/truck/${state.id}`);
+    router.push(`/truck/${state.id}`);
   }
 
   const onFail = (formData: any, response: AxiosError) => {
@@ -85,7 +86,7 @@ function EditTruck(props: TruckProps) {
         message: `Failed to update truck details: ${JSON.stringify(err)}`
       })
     })
-      .then(res => Router.replace('/'));
+      .then(res => router.push('/'));
   }
 
   if (state.userId == -1)

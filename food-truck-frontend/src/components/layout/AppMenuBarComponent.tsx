@@ -7,6 +7,7 @@ import ThemeSwitchComponent from "./theme/ThemeSwitch";
 import MenuDropdownComponent from "./MenuDropdownComponent";
 import QuickSearchComponent from "../search/QuickSearchComponent";
 import {useFlexGrowStyles} from "../theme/FoodTruckThemeProvider";
+import {validateAuthentication} from "../../api/User";
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -27,6 +28,12 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
   }
   useEffect(() => {
     loadUser();
+  });
+
+  // Check if the user is authenticated every minute, and log out if the request fails.
+  useEffect(() => {
+    const timer = setInterval(() => validateAuthentication(props.logoutUser), 60000);
+    return () => clearInterval(timer);
   });
 
   const dashboardUrl = props.data.owner ? 'owner' : 'user';

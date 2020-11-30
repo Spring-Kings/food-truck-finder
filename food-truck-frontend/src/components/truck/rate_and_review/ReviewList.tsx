@@ -98,7 +98,7 @@ class ReviewListComponent extends Component<RateProps, RateState> {
     </Grid>)
 
   private returnTruckPage() {
-    Router.replace(`/truck/${this.props.truckId}`)
+    Router.push(`/truck/${this.props.truckId}`)
   }
 }
 

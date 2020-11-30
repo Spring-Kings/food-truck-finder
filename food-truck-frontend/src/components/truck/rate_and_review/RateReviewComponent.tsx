@@ -112,7 +112,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
         <Grid item key="hidden_review_form">
           <Form
             submitUrl={getSaveReviewUrl(this.props.truckId)}
-            onSuccessfulSubmit={() => Router.replace(`/truck/reviews/${this.props.truckId}`)}
+            onSuccessfulSubmit={() => Router.push(`/truck/reviews/${this.props.truckId}`)}
           >
             <StarRating
               name="score"
@@ -156,7 +156,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
 
   private deleteReview() {
     if (confirm("Are you sure you want to delete your review?") && deleteReview(this.props.truckId, DEFAULT_ERR_RESP))
-      Router.replace(`/truck/reviews/${this.props.truckId}`);
+      Router.push(`/truck/reviews/${this.props.truckId}`);
   }
 }
 
