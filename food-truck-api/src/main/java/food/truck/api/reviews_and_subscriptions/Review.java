@@ -2,6 +2,7 @@ package food.truck.api.reviews_and_subscriptions;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import food.truck.api.truck.Truck;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,7 @@ public class Review {
     @JsonIgnore
     Truck truck;
 
+    @JsonProperty("truckId")
     long truckId() {
         return truck.getId();
     }

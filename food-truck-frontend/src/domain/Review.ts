@@ -44,6 +44,8 @@ export function backendToFrontend(obj: any, username: string): any {
     ...obj,
     reviewId: obj.id,
     timestamp: new Date(obj.day_time),
+    truckId: obj.truckId,
+    review: obj.reviewText,
     username
   }
 }
