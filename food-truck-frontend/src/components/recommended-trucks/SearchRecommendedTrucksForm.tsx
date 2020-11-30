@@ -137,12 +137,14 @@ class RecommendedTrucksForm extends Component<
       let resp: any = await api.request({
         url: "/truck/recommended",
         data: {
-          acceptableRadius: this.state.acceptableRadius,
-          priceRating: this.state.priceRating,
-          tags: this.state.tags,
-          location: this.state.location,
-          numRequested: 10
-        },
+            acceptableRadius: this.state.acceptableRadius,
+            priceRating: this.state.priceRating,
+            tags: this.state.tags,
+            truckIds: localStorage.getItem("prevSearch") ? JSON.parse(`${localStorage.getItem("prevSearch")}`) : [],
+            location: this.state.location,
+            active: true,
+            numRequested: 10
+          },
         method: "POST",
       });
       if (resp.data !== undefined) {

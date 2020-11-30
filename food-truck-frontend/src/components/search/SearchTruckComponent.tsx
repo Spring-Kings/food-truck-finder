@@ -39,13 +39,19 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
   }
 
   render() {
+    if(this.state.trucks.length > 0 && this.state.trucks[0].id != -1) {
+      let truckIds: number[] = [];
+      this.state.trucks.map((t) => {truckIds.push(t.id)});
+      localStorage.setItem("prevSearch", `${JSON.stringify(truckIds)}`);
+    }
+
     return (
       <>
         <FormGroup row>
           <Grid container direction="row">
             <Grid item xs={10}>
               <TextField fullWidth label="Search" onChange={(event) => {
-                this.setState({search: event.target.value.toLowerCase()})
+                this.setState({search: event.target.value.toLowerCase()});
               }} onKeyDown={event => {
                 if (event.key === 'Enter') {
                   this.handleSubmit();
