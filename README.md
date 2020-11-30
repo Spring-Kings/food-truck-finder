@@ -36,11 +36,18 @@
 * Startup the API from IntelliJ SpringBoot Run Configuration
     * Specify VM Options
 	```
-	-Dspring.profiles.active=development
+	-Dspring.profiles.active=dev
 	```
+    * Specify Environment Variables
     ```
-    GET localhost:8080/ping
-    pong!
+    GOOGLE_SMTP_USERNAME=your.smtp.email@gmail.com
+    GOOGLE_SMTP_PASSWORD=your_smtp_password
+    SIMILARITY_URL=http://localhost:5000
+    S3_URL=http://localhost:4572
+    S3_BUCKET_NAME=ftbucket
+    AWS_ACCESS_KEY_ID=development
+    AWS_SECRET_ACCESS_KEY=development
+    S3_REGION=us-east-2
     ```
  
 ### food-truck-frontend: Frontend Setup
