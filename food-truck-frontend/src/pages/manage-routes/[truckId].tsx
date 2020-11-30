@@ -2,7 +2,7 @@ import React from 'react';
 import {NextRouter, useRouter} from "next/router";
 import RouteList from "../../components/route/RouteList";
 
-function ManageRoutes(){
+function ManageRoutes() {
     const router: NextRouter = useRouter();
     const {truckId}= router.query;
 
