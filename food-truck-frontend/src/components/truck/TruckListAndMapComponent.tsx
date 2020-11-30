@@ -8,7 +8,7 @@ import {RecommendedSimpleTruck, SimpleTruck} from "../../redux/user/UserReducer"
 interface Props {
   routePts: RouteLocation[];
   trucks?: SimpleTruck[];
-  recommendedTrucks: RecommendedSimpleTruck[] | undefined;
+  recommendedTrucks?: RecommendedSimpleTruck[];
   owner?: boolean;
   listLabel: string;
   mapLabel: string;
