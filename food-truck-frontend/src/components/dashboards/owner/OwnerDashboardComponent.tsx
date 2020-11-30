@@ -109,6 +109,7 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
       </Grid>
       <TruckListAndMapComponent routePts={routePts}
                                 trucks={props.data?.ownedTrucks}
+                                recommendedTrucks={undefined}
                                 listLabel={'Owned Trucks'}
                                 mapLabel={'Active Locations'}
                                 owner={true}/>
