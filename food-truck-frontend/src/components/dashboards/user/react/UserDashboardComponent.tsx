@@ -7,11 +7,13 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import {UserData} from "../../../../redux/user/UserReducer";
+import {RecommendedSimpleTruck, UserData} from "../../../../redux/user/UserReducer";
 import {RouteLocation} from "../../../map/route-map/RouteLocation";
 import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
-import {getNearbyTruckLocations} from "../../../../api/Truck";
+import {getNearbyTruckLocations, getNearbyTruckLocationsById} from "../../../../api/Truck";
 import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
+import api from "../../../../util/api";
+import {LatLng} from "@google/maps";
 
 // Dashboard props
 interface UserDashboardProps {
@@ -24,6 +26,9 @@ interface UserDashboardProps {
 interface UserDashboardState {
   inError: string | null;
   nearbyTrucks: RouteLocation[];
+  recommendedTrucks: RecommendedSimpleTruck[],
+  location: LatLng,
+  nearBy: boolean;
   // TODO tighten typing
   viewTruck: any | undefined;
 }
@@ -40,6 +45,9 @@ class UserDashboardComponent extends Component<
     this.state = {
       inError: null,
       nearbyTrucks: [],
+      recommendedTrucks: [],
+      location: {lat: 0, lng: 0},
+      nearBy: true,
       viewTruck: undefined
     };
 
@@ -48,6 +56,7 @@ class UserDashboardComponent extends Component<
   }
 
   async componentDidMount() {
+
     // Load
     try {
       if (this.props.data != null) {
@@ -57,9 +66,33 @@ class UserDashboardComponent extends Component<
         await this.props.loadUserFromBackend();
     } catch (err) {
       console.log(err);
-      this.setState({ inError: err });
+      this.setState({inError: err});
+    }
+
+    try {
+      let resp: any = await api.request({
+        url: "/truck/recommended",
+        data: {
+          acceptableRadius: 20,
+          priceRating: 0,
+          truckIds: localStorage.getItem("prevSearch") ? JSON.parse(`${localStorage.getItem("prevSearch")}`) : [],
+          tags: [],
+          location: this.state.location,
+          active: false,
+          numRequested: 10
+        },
+        method: "POST",
+      });
+      if (resp.data !== undefined) {
+        this.setState({ recommendedTrucks: resp.data })
+      }
+
+    } catch (err) {
+      DEFAULT_ERR_RESP(err);
     }
   }
+
+
 
   render() {
     // Ensure the state is OK
@@ -86,8 +119,10 @@ class UserDashboardComponent extends Component<
         <TruckListAndMapComponent routePts={this.state.nearbyTrucks}
                                   trucks={this.props.data.subscribedTrucks}
                                   listLabel={'Subscribed Trucks'}
+                                  recommendedTrucks={this.state.recommendedTrucks}
                                   mapLabel={'Nearby Trucks'}/>
       </>
+
     );
   }
 
