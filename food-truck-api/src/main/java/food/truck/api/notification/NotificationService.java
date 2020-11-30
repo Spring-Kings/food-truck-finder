@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,6 +76,7 @@ public class NotificationService {
         return subscriptions.stream()
             .flatMap(sub -> findNotificationsBySubscriptionId(sub.getId()).stream())
             .map(NotificationView::of)
+            .sorted(Comparator.comparing(NotificationView::getTime))
             .collect(Collectors.toList());
     }
 
@@ -83,6 +85,7 @@ public class NotificationService {
         return subscriptions.stream()
             .flatMap(sub -> findNotificationsBySubscriptionId(sub.getId()).stream())
             .map(NotificationView::of)
+            .sorted(Comparator.comparing(NotificationView::getTime))
             .collect(Collectors.toList());
     }
 
