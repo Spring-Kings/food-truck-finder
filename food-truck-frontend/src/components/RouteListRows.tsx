@@ -68,7 +68,7 @@ class RouteListRow extends React.Component<RouteRowProps, RouteRowState>{
                     />
                 </td>
                 <td><IconButton disabled={this.props.active}
-                                onClick={() => Router.replace(`/routes/edit/${this.props.routeId}`)}><EditIcon/></IconButton>
+                                onClick={() => Router.push(`/routes/edit/${this.props.routeId}`)}><EditIcon/></IconButton>
                 </td>
                 <td><IconButton onClick={this.props.removeRow}><DeleteForeverIcon/></IconButton></td>
             </tr>

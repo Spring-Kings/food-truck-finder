@@ -9,5 +9,7 @@ public class UserPreferences {
     double acceptableRadius;
     double priceRating;
     int numRequested;
+    boolean active;
+    Set<Long> truckIds;
     Set<String> tags;
 }

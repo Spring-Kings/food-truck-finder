@@ -122,7 +122,7 @@ class TruckView extends Component<TruckProps, State> {
       </ListItem>
     );
 
-    const menuUrl = `${process.env.FOOD_TRUCK_API_URL}/truck/${this.props.truckId}/menu`;
+    const menuUrl = `${process.env.S3_URL}/menu/${this.props.truckId}`;
     let menuButton;
     if (this.state.truck.menuContentType === 'application/pdf')
       menuButton = <Button><Link href={menuUrl} color="initial">View Menu PDF</Link></Button>
@@ -204,15 +204,15 @@ class TruckView extends Component<TruckProps, State> {
   }
 
   editTruck = () => {
-    Router.replace(`/truck/edit/${this.props.truckId}`);
+    Router.push(`/truck/edit/${this.props.truckId}`);
   };
   
   reviewTruck = () => {
-    Router.replace(`/truck/reviews/create/${this.props.truckId}`);
+    Router.push(`/truck/reviews/create/${this.props.truckId}`);
   };
 
   readReviews = () => {
-    Router.replace(`/truck/reviews/${this.props.truckId}`);
+    Router.push(`/truck/reviews/${this.props.truckId}`);
   };
 
   handleSubscription = () => {

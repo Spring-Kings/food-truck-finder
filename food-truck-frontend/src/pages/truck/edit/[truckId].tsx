@@ -3,7 +3,7 @@ import Form from "../../../components/Form";
 import {TruckProps, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField,} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
@@ -17,6 +17,7 @@ type TruckComponentState = {
 };
 
 function EditTruck(props: TruckProps) {
+  const router = useRouter();
   const classes = useFlexGrowStyles();
   const [state, setState]: [TruckComponentState, any] = useState({
     truck: null,
@@ -48,20 +49,20 @@ function EditTruck(props: TruckProps) {
     getTruckById(props.truckId, (err) => {
       console.log(`Could not load truck card: ${err}`);
       // Cancel
-      Router.replace("/");
+      router.push("/");
     })
       .then(truck => {
         // If the response indicates they own the truck, show them. Otherwise, kick out.
         if (truck && userCanEditTruck(truck.userId))
           setState({truck});
         else
-          Router.replace("/");
+        router.push("/");
       });
   }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
     if (state.truck)
-      Router.replace(`/truck/${state.truck.id}`);
+      router.push(`/truck/${state.truck.id}`);
   }
 
   const onFail = (formData: any, response: AxiosError) => {
@@ -74,7 +75,7 @@ function EditTruck(props: TruckProps) {
     deleteTruck(state.truck.id, err => {
       setState({message: `Failed to update truck details: ${JSON.stringify(err)}`})
     })
-      .then(res => Router.replace('/'));
+      .then(res => router.push('/'));
   }
 
   if (!state.truck)

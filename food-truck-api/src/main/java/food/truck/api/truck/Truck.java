@@ -28,13 +28,6 @@ public class Truck {
     @Column(name = "name", nullable = false)
     String name;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @Nullable
-    @Column(name = "menu", length = SecurityConstants.MAX_UPLOAD_SIZE)
-    byte[] menu;
-
     @Column(name = "menu_content_type")
     @Nullable
     String menuContentType;

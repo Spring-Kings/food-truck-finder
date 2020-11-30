@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Card, CardActions, CardContent, CardHeader, Grid, Switch, Typography} from "@material-ui/core";
 import {deleteNotification, Notification, setNotificationAsRead} from "../../api/NotificationApi";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 interface NotificationProps {
   notification: Notification;
@@ -18,6 +18,7 @@ const timeOptions = {
 };
 
 function NotificationComponent(props: NotificationProps) {
+  const router = useRouter();
   const [read, setRead]: [boolean, any] = useState(props.notification.read);
 
   const modify = <>
@@ -72,7 +73,7 @@ function NotificationComponent(props: NotificationProps) {
         <CardActions>
           <Grid container direction="row" justify="flex-end" alignItems="flex-end">
             <Grid item>
-              <Button onClick={() => Router.replace(`/truck/${props.notification.truck.id}`)}>View Truck</Button>
+              <Button onClick={() => router.push(`/truck/${props.notification.truck.id}`)}>View Truck</Button>
             </Grid>
             {props.notification.type === "SUBSCRIPTION" ? modify : 
               <Grid item>

@@ -13,7 +13,7 @@ import {
   Grid,
   Theme
 } from "@material-ui/core";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import {MoneyRating, StarRating} from "./rate_and_review/ratings";
 import {makeStyles} from "@material-ui/core/styles";
 import SendNotificationComponent from "../notifications/SendNotificationComponent";
@@ -35,17 +35,24 @@ interface TruckCardProps {
 }
 
 function TruckCardComponent(props: TruckCardProps) {
+  const router = useRouter();
   const classes = useTruckDescriptionStyles();
   const [truck, setTruck]: [Truck, any] = useState(emptyTruck());
   const [sendingNotification, setSendingNotification]: [boolean, any] = useState(false);
 
-  const redirect = (url: string): void => {
+  const redirect = (url: string, id: number): void => {
     if (props.onRedirect) props.onRedirect();
-    Router.replace(url).then(() => Router.reload());
+    router.push({
+      pathname: url,
+      query: { truckId: id }
+    }).then(() => {
+      if (router.pathname === url)
+        router.reload();
+    });
   }
-  const viewTruck = (id: number): void => redirect(`/truck/${id}`);
-  const editTruck = (id: number): void => redirect(`/truck/edit/${id}`);
-  const manageRoutes = (id: number): void => redirect(`/manage-routes/${id}`);
+  const viewTruck = (id: number): void => redirect(`/truck/[truckId]`, id);
+  const editTruck = (id: number): void => redirect(`/truck/edit/[truckId]`, id);
+  const manageRoutes = (id: number): void => redirect(`/manage-routes/[truckId]`, id);
 
   useEffect(() => {
     getTruckById(props.id, (err) => console.log(`Could not load truck card: ${err}`))

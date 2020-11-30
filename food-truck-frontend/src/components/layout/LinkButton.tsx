@@ -25,7 +25,7 @@ class LinkButton extends React.Component<ButtonLinkProps, {}> {
     if (this.props.action) {
       this.props.action();
     }
-    Router.replace(this.props.url);
+    Router.push(this.props.url);
   }
 
 }

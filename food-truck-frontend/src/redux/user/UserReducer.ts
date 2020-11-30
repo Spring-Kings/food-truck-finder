@@ -7,6 +7,11 @@ export interface SimpleTruck {
     id: number;
 }
 
+export interface RecommendedSimpleTruck {
+    first: SimpleTruck;
+    second: number;
+}
+
 // The data field for the state
 export interface UserData {
   username: string;

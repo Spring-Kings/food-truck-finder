@@ -4,7 +4,7 @@ import {AxiosError, AxiosResponse} from 'axios';
 import {Grid, TextField, Typography} from '@material-ui/core'
 import {UserData} from "../../redux/user/UserReducer";
 import LinkButton from "../layout/LinkButton";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 interface LoginProps {
   data: UserData;
@@ -12,12 +12,13 @@ interface LoginProps {
 }
 
 function LoginComponent(props: LoginProps) {
+  const router = useRouter();
   const [resultText, setResultText]: [string, any] = useState("");
 
   useEffect(() => {
     if (props.data.username != "") {
       const dashboardType = props.data.owner ? 'owner' : 'user';
-      Router.replace(`/dashboard/${dashboardType}`);
+      router.push(`/dashboard/${dashboardType}`);
     }
   });
 

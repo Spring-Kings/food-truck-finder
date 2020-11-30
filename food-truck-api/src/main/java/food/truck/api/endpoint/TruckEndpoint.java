@@ -40,13 +40,14 @@ import java.util.Set;
 public class TruckEndpoint {
     private final TruckService truckService;
     private final SubscriptionService subscriptionService;
-    private final StrategySelector ss;
+
+    @Autowired
+    StrategySelector ss;
 
     @Autowired
     public TruckEndpoint(TruckService truckService, SubscriptionService subscriptionService) {
         this.truckService = truckService;
         this.subscriptionService = subscriptionService;
-        this.ss = new StrategySelector(truckService, subscriptionService);
     }
 
     @Autowired
@@ -229,23 +230,6 @@ public class TruckEndpoint {
                 .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
                 .findFirst()
                 .ifPresent(subscriptionService::deleteSubscription);
-    }
-
-    @GetMapping("/truck/{truckId}/menu")
-    public ResponseEntity<byte[]> getMenu(@PathVariable long truckId) {
-        var truck = truckService.findTruckById(truckId);
-        if (truck.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        var t = truck.get();
-
-        var menu = t.getMenu();
-        if (menu == null || menu.length == 0 || t.getMenuContentType() == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-        var headers = new HttpHeaders();
-        var mediaType = MediaType.parseMediaType(t.getMenuContentType());
-        headers.setContentType(mediaType);
-        return new ResponseEntity<>(menu, headers, HttpStatus.OK);
     }
 
     @Secured("ROLE_OWNER")

@@ -6,6 +6,8 @@ import DayOfWeek from "../map/route-map/DayOfWeek";
 import RouteListRow from "../RouteListRows";
 import CreateRouteDialog from "./CreateRouteDialog";
 import Alert from '@material-ui/lab/Alert'
+import getUserInfo from "../../util/token";
+import Router from "next/router";
 
 interface RouteListTruck {
   id: string;
@@ -55,6 +57,10 @@ class RouteList extends React.Component<RouteProps, RouteState> {
       .get(`/truck/${this.props.truckId}`)
       .then((res) => {
         if (res.data) {
+          // Redirect user if they are not the truck owner.
+          if (getUserInfo()?.userID !== res.data.userId) {
+            Router.push('/');
+          }
           this.setState({ truck: res.data });
           this.fetchRoutes();
         } else {

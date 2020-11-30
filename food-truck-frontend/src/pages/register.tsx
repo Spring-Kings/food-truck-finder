@@ -3,6 +3,7 @@ import Form from "../components/Form";
 import {AxiosError, AxiosResponse} from "axios";
 import {Box, Grid, Switch, TextField, Typography,} from "@material-ui/core";
 import LinkButton from "../components/layout/LinkButton";
+import Router from 'next/router';
 
 type State = {
   resultText: string;
@@ -51,6 +52,7 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
   onSubmit = (formData: any, response: AxiosResponse<any>) => {
     this.setState({ resultText: JSON.stringify(response.data) });
+    Router.push('/login');
   };
 
   onFail = (formData: any, err: AxiosError) => {
