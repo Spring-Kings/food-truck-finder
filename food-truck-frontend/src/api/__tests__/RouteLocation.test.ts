@@ -1,8 +1,8 @@
 import * as RouteLocationApi from "../RouteLocation";
 
-import todaysRoute_response from "./route/todaysRoute_response.json";
-import { FRONTEND_ORACLE, BACKEND_ORACLE, ORACLE_ROUTE_ID } from "./route/oracle";
-import loadRouteLocations_response from "./route/loadRouteLocations_response.json";
+import todaysRoute_response from "../../util/test_util/route/todaysRoute_response.json";
+import { FRONTEND_ORACLE, BACKEND_ORACLE, ORACLE_ROUTE_ID } from "../../util/test_util/route/oracle";
+import loadRouteLocations_response from "../../util/test_util/route/loadRouteLocations_response.json";
 import API_SUITE, { Mock, SUCCEED_POST } from "../../util/test_util/api_tests";
 import api from "../../util/api";
 

@@ -87,6 +87,19 @@ export const deleteRouteLocations = async (
     .catch(onFail);
 };
 
+export const loadRouteIsActive = async (id: number, onFail?: (err: any) => void) => {
+  try {
+    let response = (await api.get(`/route/${id}`));
+    if (response && response.data && response.data.isActive)
+      return true;
+    return false;
+  } catch (error) {
+    if (onFail)
+      onFail(error);
+  }
+  return undefined;
+}
+
 export const updateRouteDays = async (
   routeId: number,
   days: DayOfWeek[],

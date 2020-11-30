@@ -8,6 +8,7 @@ import {locationsConflict, RouteLocation, RouteLocationState} from "./RouteLocat
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
+  loadRouteIsActive,
   loadRouteLocations,
   updateRouteDays,
   updateRouteLocations,
@@ -68,20 +69,23 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
 
   async componentDidMount() {
     await this.loadRoute();
-    api.get(`/route/${this.props.routeId}`)
-      .then((resp) => {
-        if (resp.data.active === false)
-          this.setState({status: Status.OK});
-        else
-          this.setState({
-            status: Status.BAD_ROUTE,
-            errorMessage: "Only non-active routes can be edited."
-          });
-      })
-      .catch(_ => this.setState({
-        status: Status.BAD_ROUTE,
-        errorMessage: "The route appears to be invalid."
-      }));
+
+    // Load whether the route is active; on failure, record
+    let isActive: boolean | undefined = await loadRouteIsActive(this.props.routeId, _ => this.setState({
+      status: Status.BAD_ROUTE,
+      errorMessage: "The route appears to be invalid."
+    }));
+
+    // If an error was not returned, then set status on it
+    if (isActive !== undefined) {
+      if (isActive === false)
+        this.setState({status: Status.OK});
+      else
+        this.setState({
+          status: Status.BAD_ROUTE,
+          errorMessage: "Only non-active routes can be edited."
+        });
+    }
   }
 
   saveDays(days: DayOfWeek[], trashedDays: DayOfWeek[]) {

@@ -1,6 +1,5 @@
 import React from "react";
 
-import * as route from "../../../../api/RouteLocation";
 import OwnerDashboardComponent from "../OwnerDashboardComponent";
 import user_data from "../../../../util/test_util/user_data.json";
 import {
