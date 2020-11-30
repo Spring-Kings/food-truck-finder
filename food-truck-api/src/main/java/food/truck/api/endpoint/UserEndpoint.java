@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
@@ -35,6 +36,12 @@ public class UserEndpoint {
 
     @Autowired
     private ReviewService reviewService;
+
+    @GetMapping("/authenticated")
+    @Secured("ROLE_USER")
+    public boolean userIsAuthenticated(@AuthenticationPrincipal User user) {
+        return true;
+    }
 
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {

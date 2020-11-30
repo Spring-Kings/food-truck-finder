@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import Router from "next/router";
+import { useRouter } from "next/router";
 
 import {
   Button,
@@ -23,13 +23,14 @@ interface OwnerDashboardProps {
 }
 
 function OwnerDashboardComponent(props: OwnerDashboardProps) {
+  const router = useRouter();
   const classes = useFlexGrowStyles();
   const [inError, setInError]: [string | null, any] = useState(null);
   const [routePts, setRoutePts]: [RouteLocation[], any] = useState([]);
   const [creatingTruck, setCreatingTruck]: [boolean, any] = useState(false);
 
   const toUserDashboard = (): void => {
-    Router.replace("/dashboard/user");
+    router.push("/dashboard/user");
   }
 
   useEffect(() => {
@@ -74,7 +75,7 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
           It seems you got to this corner of our site by mistake. Please
           return to the home menu
         </Typography>
-        <Button variant="contained" onClick={() => Router.replace("/")}>
+        <Button variant="contained" onClick={() => router.push("/")}>
           Home
         </Button>
       </Container>

@@ -38,7 +38,7 @@ class CreateTruckForm extends Component<{}, State> {
 
   onSubmit = (formData: any, response: AxiosResponse) => {
     this.setState({result: `Created truck with id: ${response.data.id}`});
-    Router.replace(`/truck/${response.data.id}`);
+    Router.push(`/truck/${response.data.id}`);
   }
 
   onFail = (formData: any, response: AxiosError) => {

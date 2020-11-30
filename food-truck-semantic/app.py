@@ -17,7 +17,7 @@ from werkzeug.exceptions import abort
 app = Flask(__name__)
 # Learned via: https://stackoverflow.com/questions/54171101/restrict-access-to-a-flask-rest-api
 cors = CORS(app, resources={"/*": {"origins": os.environ.get("FOOD_TRUCK_API")}})
-nlp = spacy.load("en_vectors_web_lg")
+nlp = spacy.load("en_core_web_md")
 
 # Load constants for the comparisons
 MIN_FOR_EXACT = os.environ.get("MIN_FOR_EXACT") or 0.98

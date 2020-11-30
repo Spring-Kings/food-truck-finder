@@ -29,7 +29,6 @@ class HomePageComponent extends React.Component {
 
                 <Typography variant="h5">Truck Owner Zone</Typography>
                 <NextLink href="/dashboard/owner" passHref>Owner Dashboard</NextLink><br/>
-                <NextLink href="/manage-trucks" passHref>Manage Trucks</NextLink><br/>
                 <NextLink href="/create-truck" passHref>Create Truck Page</NextLink><br/><br/>
             </>
         )
