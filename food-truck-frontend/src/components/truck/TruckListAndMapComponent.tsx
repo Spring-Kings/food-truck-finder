@@ -56,7 +56,7 @@ function TruckListAndMapComponent(props: Props) {
                             props.recommendedTrucks.map(truck => (
                                 <ListItem key={truck.first.id} style={{minWidth: '100%'}} disableGutters>
                                     <TruckCardComponent id={truck.first.id}
-                                                        userOwnsTruck={props.owner !== undefined ? props.owner : false}/>
+                                                        userOwnsTruck={false}/>
                                 </ListItem>
                             ))
                         }
