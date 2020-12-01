@@ -22,33 +22,44 @@ export const loadRoutes = async (
 
 export const loadCurrentRoute = async (
   truckId: number,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ): Promise<RouteLocation[] | null> => {
   let routePts: RouteLocation[] = [];
   let nextStopId: number = 1;
 
-  const resp = await api.get(`/truck/${truckId}/active-route`);
-  if (resp.data?.locations)
-    return resp.data.locations
-      .map((loc: any) => parse(
-        RouteLocationMeta, backendToFrontend(loc, nextStopId++)
-      ))
+  try {
+    const resp = await api.get(`/truck/${truckId}/active-route`);
+    if (resp.data?.locations)
+      return resp.data.locations
+        .map((loc: any) => parse(
+          RouteLocationMeta, backendToFrontend(loc, nextStopId++)
+        ))
+  } catch (e) {
+    onFail(e)
+    return null
+  }
+  onFail("Failed to load route")
 
   return null;
 };
 
 export const loadRouteLocations = async (
   routeId: number,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
-  const resp = await api.get(`/truck/route/locations/${routeId}`);
-  if (resp.data !== null) {
-    let nextStopId = 1;
-    return resp.data.map((pt: any) => parse(
-      RouteLocationMeta, backendToFrontend(pt, nextStopId++)
-    ))
+  try {
+    const resp = await api.get(`/truck/route/locations/${routeId}`);
+    if (resp.data !== null) {
+      let nextStopId = 1;
+      return resp.data.map((pt: any) => parse(
+        RouteLocationMeta, backendToFrontend(pt, nextStopId++)
+      ))
+    }
+  } catch (e) {
+    onFail(e)
+    return null
   }
-
+  onFail("Failed to load route locations")
   return null;
 };
 
@@ -56,7 +67,7 @@ export const updateRouteLocations = async (
   routeId: number,
   routePts: RouteLocation[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await api
     .request({
@@ -72,7 +83,7 @@ export const deleteRouteLocations = async (
   routeId: number,
   trashedPts: RouteLocation[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   trashedPts.forEach(pt => console.log(pt))
   await api
@@ -90,7 +101,7 @@ export const updateRouteDays = async (
   days: DayOfWeek[],
   trashedDays: DayOfWeek[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await updateDayList(routeId, days, `/route/add-day`, onSuccess, onFail);
   await updateDayList(
@@ -107,7 +118,7 @@ const updateDayList = async (
   days: DayOfWeek[],
   url: string,
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   for (const v of days) {
     await api

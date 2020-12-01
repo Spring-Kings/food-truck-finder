@@ -17,6 +17,8 @@ import RoutesView from "./map/route-map/RoutesView";
 import Truck from "../domain/Truck";
 import Subscription from "../domain/Subscription";
 import {getTruckById} from "../api/TruckApi";
+import NextLink from 'next/link'
+import {getUsername} from "../api/UserApi";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = loggedInUser();
@@ -32,6 +34,7 @@ export interface TruckProps {
 
 type State = {
   truck: Truck | null;
+  ownerName: string;
   routePts: RouteLocation[] | null;
   subscription: Subscription | null;
   err: string | null;
@@ -46,6 +49,7 @@ class TruckView extends Component<TruckProps, State> {
       err: null,
       routePts: [],
       subscription: null,
+      ownerName: ""
     };
   }
 
@@ -57,10 +61,11 @@ class TruckView extends Component<TruckProps, State> {
         return;
       }
 
+      const ownerName = await getUsername(truck.userId) ?? "Unknown";
       const sub = await getSubscriptionForTruck(this.props.truckId);
       const routePts = await loadCurrentRoute(this.props.truckId, DEFAULT_ERR_RESP);
 
-      this.setState({subscription: sub, routePts, truck})
+      this.setState({subscription: sub, routePts, truck, ownerName})
 
     } catch (err) {
       console.log(err);
@@ -88,6 +93,16 @@ class TruckView extends Component<TruckProps, State> {
         </Grid>
       </Grid>
     );
+
+    const ownerLink = (
+      this.state.ownerName === 'Anonymous'
+        ? <span>Owned by an anonymous user</span>
+        : <span>Owned by: {this.state.ownerName} <br/>
+          <NextLink passHref href={`/user/${this.state.ownerName}`}>
+            <Button>View Profile</Button>
+          </NextLink>
+        </span>
+    )
 
     const priceRating = this.state.truck.priceRating ?
       <TruckRatingComponent name="Price Rating:"
@@ -134,13 +149,19 @@ class TruckView extends Component<TruckProps, State> {
       <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
     );
 
+    const viewSubscribersButton = (
+      <Button color="primary" onClick={this.viewSubscribers}>View Subscribers</Button>
+    );
+
     const truckInfo = [
       description,
+      ownerLink,
       priceRating,
       starRating,
       tags,
       menuButton,
-      viewReviewsButton
+      viewReviewsButton,
+      viewSubscribersButton
     ];
 
     const truckInfoView = (
@@ -215,13 +236,17 @@ class TruckView extends Component<TruckProps, State> {
   editTruck = () => {
     Router.push(`/truck/edit/${this.props.truckId}`);
   };
-  
+
   reviewTruck = () => {
     Router.push(`/truck/reviews/create/${this.props.truckId}`);
   };
 
   readReviews = () => {
     Router.push(`/truck/reviews/${this.props.truckId}`);
+  };
+
+  viewSubscribers = () => {
+    Router.push(`/truck/subscribers/${this.props.truckId}`);
   };
 
   handleSubscription = () => {
