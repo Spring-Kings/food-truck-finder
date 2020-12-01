@@ -8,8 +8,9 @@ export interface SimpleTruck {
 }
 
 export interface RecommendedSimpleTruck {
-    first: SimpleTruck;
-    second: number;
+    truck: SimpleTruck;
+    score: number;
+    loc: any;
 }
 
 // The data field for the state

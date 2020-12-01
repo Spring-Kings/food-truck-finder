@@ -96,12 +96,8 @@ class TruckView extends Component<TruckProps, State> {
 
     const ownerLink = (
       this.state.ownerName === 'Anonymous'
-        ? <span>Owned by an anonymous user</span>
-        : <span>Owned by: {this.state.ownerName} <br/>
-          <NextLink passHref href={`/user/${this.state.ownerName}`}>
-            <Button>View Profile</Button>
-          </NextLink>
-        </span>
+        ? <Typography>Owned by an anonymous user</Typography>
+        : <Button onClick={() => Router.push(`/user/${this.state.ownerName}`)}>{`View Owner ${this.state.ownerName}'s Profile`}</Button>
     )
 
     const priceRating = this.state.truck.priceRating ?
@@ -155,13 +151,13 @@ class TruckView extends Component<TruckProps, State> {
 
     const truckInfo = [
       description,
-      ownerLink,
       priceRating,
       starRating,
       tags,
       menuButton,
       viewReviewsButton,
-      viewSubscribersButton
+      viewSubscribersButton,
+      ownerLink
     ];
 
     const truckInfoView = (
@@ -215,18 +211,18 @@ class TruckView extends Component<TruckProps, State> {
       <GridList cols={6}
                 spacing={8}
                 style={{
-                  height: "100vh",
+                  height: "auto",
                   width: "100%",
                 }}>
-        <GridListTile cols={2} style={{ height: '50vh' }}>
+        <GridListTile cols={2} style={{ height: 'auto' }}>
           {truckInfoView}
         </GridListTile>
         {userCanEditTruck(this.state.truck.userId) && 
-        <GridListTile cols={2} style={{ height: '50vh' }}>
+        <GridListTile cols={2} style={{ height: 'auto' }}>
           {ownerButtons}
         </GridListTile>
         }
-        <GridListTile cols={6} style={{ height: '50vh' }}>
+        <GridListTile cols={6} style={{ height: 'auto' }}>
           <RoutesView truckId={this.state.truck.id}/>
         </GridListTile>
       </GridList>
