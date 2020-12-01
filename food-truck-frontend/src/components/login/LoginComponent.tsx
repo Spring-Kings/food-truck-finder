@@ -25,7 +25,7 @@ function LoginComponent(props: LoginProps) {
   const onSubmit = (formData: any, response: AxiosResponse<any>) => {
     const token = response.headers['token'];
     localStorage.setItem('authToken', token);
-    setResultText(`Set token to ${token}`);
+    setResultText(`Successfully logged in. Redirecting to dashboard...`);
     props.loadUserFromBackend().catch(err => console.log(err));
   }
 
