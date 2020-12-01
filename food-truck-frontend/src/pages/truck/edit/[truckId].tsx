@@ -61,7 +61,8 @@ function EditTruck(props: TruckProps) {
   }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
-    router.push(`/truck/${state.truck.id}`);
+    if (state.truck !== null)
+      router.push(`/truck/${state.truck?.id}`);
   };
 
   const onFail = (formData: any, response: AxiosError) => {
@@ -81,13 +82,14 @@ function EditTruck(props: TruckProps) {
   };
 
   const deleteMenuCallback = () => {
+    if (state.truck === null) return;
     deleteTruckMenu(state.truck.id, err => {
       setState({
         ...state,
         message: `Failed to delete menu: ${JSON.stringify(err)}`
       })
     })
-      .then(res => router.push(`/truck/${state.truck.id}`));
+      .then(res => router.push(`/truck/${state.truck?.id}`));
   };
 
   if (!state.truck)
@@ -97,7 +99,10 @@ function EditTruck(props: TruckProps) {
     <Grid container alignItems="stretch">
       <Grid container direction="row" alignItems="flex-start" className={classes.root}>
         <Grid item>
-          <Button onClick={() => router.push(`/truck/${state.truck.id}`)}>Back to Truck</Button>
+          <Button onClick={() => {
+            if (state.truck !== null)
+              router.push(`/truck/${state.truck.id}`)
+          }>Back to Truck</Button>
         </Grid>
         <Grid item className={classes.root}>
           <Card>
