@@ -15,10 +15,10 @@ import {
   loadUserDefaultLocation,
   saveUserLatLng,
 } from "../../../util/position";
+import Router from "next/router";
 
 type ChangeLocationProps = {
   hideMap: () => void;
-  updateLocation: () => void;
 };
 
 const ChangeLocationMap = (props: ChangeLocationProps) => {
@@ -49,16 +49,17 @@ const ChangeLocationMap = (props: ChangeLocationProps) => {
         <Button
           onClick={() => {
             saveUserLatLng(location);
-            props.updateLocation();
             props.hideMap();
+            Router.reload();
           }}
         >
           Save Location
         </Button>
         <Button
           onClick={() => {
-            loadUserDefaultLocation(true, props.updateLocation);
+            loadUserDefaultLocation(true);
             props.hideMap();
+            Router.reload();
           }}
         >
           Reset Location
@@ -71,7 +72,6 @@ const ChangeLocationMap = (props: ChangeLocationProps) => {
 type ChangeUserLocationProps = {
   showMap: boolean;
   setShowMap: (isOpen: boolean) => void;
-  updateLocation: () => void;
 };
 
 const ChangeUserLocationButton = (props: ChangeUserLocationProps) => {
@@ -81,7 +81,7 @@ const ChangeUserLocationButton = (props: ChangeUserLocationProps) => {
   return (
     <>
       <Dialog fullWidth={true} open={props.showMap}>
-        {props.showMap && <ChangeLocationMap hideMap={hideMapAction} updateLocation={props.updateLocation} />}
+        {props.showMap && <ChangeLocationMap hideMap={hideMapAction} />}
       </Dialog>
       <Fab
         onClick={showMapAction}

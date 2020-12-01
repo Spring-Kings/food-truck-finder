@@ -56,7 +56,6 @@ export class TruckRouteMapComponent extends React.Component<
       <ChangeUserLocationButton
         showMap={this.state.openChangeLocationDialog}
         setShowMap={this.openCloseLocationDialog}
-        updateLocation={this.updateLocation}
       />
     ) : <div/>;
 
