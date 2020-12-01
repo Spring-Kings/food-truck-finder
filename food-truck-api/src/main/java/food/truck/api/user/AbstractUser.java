@@ -8,10 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AbstractUser {
+public abstract class AbstractUser {
     protected Position position;
 
     public void visit(UserVisitor v) {
         v.accept(this);
     }
+    public abstract boolean canView(User u);
 }

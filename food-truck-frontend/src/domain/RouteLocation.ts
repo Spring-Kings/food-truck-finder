@@ -1,33 +1,24 @@
-import {LatLngLiteral} from "@google/maps";
-import {utcTimeStringToDate} from "../../../util/date-conversions";
+import {utcTimeStringToDate} from "../util/date-conversions";
+import * as t from 'io-ts'
+import DateMeta from "../metaclasses/DateMeta";
+import LatLngLiteralMeta from "../metaclasses/LatLngLiteralMeta";
 
-/**
- * CREATED: Just created, not sent to backend
- * PERSISTED: Loaded from backend
- * DELETED: PERSISTED and deleted in the frontend
- */
-export enum RouteLocationState {
-  CREATED,
-  PERSISTED,
-  DELETED,
-}
+export const RouteLocationMeta = t.type({
+  routeLocationId: t.number,
+  arrivalTime: DateMeta,
+  exitTime: DateMeta,
+  stopId: t.number,
+  coords: LatLngLiteralMeta,
 
-// Diff from backend structure:
-// - Missing routeId
-// / Lat/Lng => LatLngLiteral
-// + Added stopId
-// + Added state
-export interface RouteLocation {
-  routeLocationId: number;
-  arrivalTime: Date;
-  exitTime: Date;
+  /**
+   * CREATED: Just created, not sent to backend
+   * PERSISTED: Loaded from backend
+   * DELETED: PERSISTED and deleted in the frontend
+   */
+  state: t.union([t.literal('CREATED'), t.literal('PERSISTED'), t.literal('DELETED')])
+}, "RouteLocation")
 
-  stopId: number;
-  coords: LatLngLiteral;
-  state: RouteLocationState;
-
-  readonly [x: string]: number | LatLngLiteral | Date | RouteLocationState;
-}
+export type RouteLocation = t.TypeOf<typeof RouteLocationMeta>
 
 export const wrapsAroundMidnight = (loc: RouteLocation) => loc.exitTime < loc.arrivalTime;
 
@@ -48,22 +39,20 @@ export const blankRouteLocation = () => ({
   exitTime: new Date(),
   stopId: 0,
   coords: {lat: 0, lng: 0},
-  state: RouteLocationState.CREATED,
+  state: 'CREATED'
 })
 
-export const backendToFrontend = (pt: any, stopId: number) => {
-  return {
-    stopId: stopId,
-    routeLocationId: pt.routeLocationId,
-    coords: {
-      lat: pt.position.latitude,
-      lng: pt.position.longitude,
-    },
-    arrivalTime: utcTimeStringToDate(pt.arrivalTime),
-    exitTime: utcTimeStringToDate(pt.exitTime),
-    state: RouteLocationState.PERSISTED,
-  }
-}
+export const backendToFrontend = (obj: any, stopId: number) => ({
+  ...obj,
+  stopId,
+  coords: {
+    lat: obj.position.latitude,
+    lng: obj.position.longitude
+  },
+  arrivalTime: utcTimeStringToDate(obj.arrivalTime),
+  exitTime: utcTimeStringToDate(obj.exitTime),
+  state: "PERSISTED"
+})
 
 export const frontendToBackend = (pt: RouteLocation, routeId: number) => {
   let result: any = {
@@ -74,6 +63,5 @@ export const frontendToBackend = (pt: RouteLocation, routeId: number) => {
     lat: pt.coords.lat,
     lng: pt.coords.lng,
   };
-  console.log(result)
   return result;
 }

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import {Grid, Card, CardContent, Button, Switch, Typography, CardActions, Box, CardHeader} from "@material-ui/core";
-import {deleteNotification, Notification, setNotificationAsRead} from "../../api/Notification";
+import {Button, Card, CardActions, CardContent, CardHeader, Grid, Switch, Typography} from "@material-ui/core";
+import {deleteNotification, Notification, setNotificationAsRead} from "../../api/NotificationApi";
 import { useRouter } from "next/router";
 
 interface NotificationProps {
