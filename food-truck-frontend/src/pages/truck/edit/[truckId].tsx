@@ -8,7 +8,7 @@ import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
-import {deleteTruck, getTruckById} from "../../../api/TruckApi";
+import {getTruckById, deleteTruck, deleteTruckMenu} from "../../../api/Truck";
 import Truck from "../../../domain/Truck";
 
 type TruckComponentState = {
@@ -61,13 +61,16 @@ function EditTruck(props: TruckProps) {
   }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
-    if (state.truck)
-      router.push(`/truck/${state.truck.id}`);
-  }
+    if (state.truck !== null)
+      router.push(`/truck/${state.truck?.id}`);
+  };
 
   const onFail = (formData: any, response: AxiosError) => {
-    setState({message: `Failed to update truck details: ${JSON.stringify(response)}`});
-  }
+    setState({
+      ...state,
+      message: `Failed to update truck details: ${JSON.stringify(response)}`
+    });
+  };
 
   const deleteTruckCallback = () => {
     if (!state.truck)
@@ -76,7 +79,18 @@ function EditTruck(props: TruckProps) {
       setState({message: `Failed to update truck details: ${JSON.stringify(err)}`})
     })
       .then(res => router.push('/'));
-  }
+  };
+
+  const deleteMenuCallback = () => {
+    if (state.truck === null) return;
+    deleteTruckMenu(state.truck.id, err => {
+      setState({
+        ...state,
+        message: `Failed to delete menu: ${JSON.stringify(err)}`
+      })
+    })
+      .then(res => router.push(`/truck/${state.truck?.id}`));
+  };
 
   if (!state.truck)
     return <CircularProgress/>
@@ -84,6 +98,14 @@ function EditTruck(props: TruckProps) {
   return (
     <Grid container alignItems="stretch">
       <Grid container direction="row" alignItems="flex-start" className={classes.root}>
+        <Grid item>
+          <Button onClick={() => {
+            if (state.truck !== null)
+              router.push(`/truck/${state.truck.id}`);
+          }}>
+          Back to Truck
+          </Button>
+        </Grid>
         <Grid item className={classes.root}>
           <Card>
             <CardHeader title="Edit Truck Details"/>
@@ -108,7 +130,7 @@ function EditTruck(props: TruckProps) {
         </Grid>
         <Grid item direction="column" className={classes.root}>
           <Card>
-            <CardHeader title="Upload Menu"/>
+            <CardHeader title="Menu and Danger Zone"/>
             <CardContent>
               <Grid container>
                 <Grid item>
@@ -118,6 +140,11 @@ function EditTruck(props: TruckProps) {
                       <input className="hidden" type="file" id="fileInput" name="file" onChange={onMenuChange}/>
                     </Button>
                   </form>
+                </Grid>
+                <Grid item>
+                  <Button color="secondary" onClick={deleteMenuCallback}>
+                    Delete Menu
+                  </Button>
                 </Grid>
                 <Grid item>
                   <Button color="secondary"

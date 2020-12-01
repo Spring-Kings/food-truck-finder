@@ -52,7 +52,12 @@ class RegisterPageComponent extends React.Component<{}, State> {
 
   onSubmit = (formData: any, response: AxiosResponse<any>) => {
     this.setState({ resultText: JSON.stringify(response.data) });
-    Router.push('/login');
+    const msg: string = response.data;
+    // Error messages from /register all start with this string.
+    // The successful scenario does not.
+    if (!msg.startsWith('Error:')) {
+      Router.push('/login');
+    }
   };
 
   onFail = (formData: any, err: AxiosError) => {
