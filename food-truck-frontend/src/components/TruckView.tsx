@@ -149,7 +149,7 @@ class TruckView extends Component<TruckProps, State> {
         <CardContent>
           <List>
             {this.state.truck !== null && truckInfo.map((el, index) => (
-              <ListItem key={`${this.state.truck.id}-${index}`}>
+              <ListItem key={`${this.state.truck?.id}-${index}`}>
                 {el}
               </ListItem>
             ))}
