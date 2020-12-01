@@ -9,7 +9,7 @@ import {ReactEventAdapter} from "../Form";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 import {getLocationFromStorage} from "../../util/position";
 import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
-import {RouteLocation} from "../../domain/RouteLocation";
+import {backendToFrontend, RouteLocation} from "../../domain/RouteLocation";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
@@ -61,7 +61,7 @@ class RecommendedTrucksForm extends Component<
   }
 
   getRouteLocations(trucks: RecommendedSimpleTruck[]) {
-    return trucks.map((t, ndx) => t.loc)
+    return trucks.map((t) => backendToFrontend(t.loc, t.truck.id))
   }
 
   render() {
