@@ -17,8 +17,8 @@ function InteractiveMapPage() {
       });
     });
     return(
-        ready && <TruckLocationMapComponent locations={locations} />
-            || <p>Please wait...</p>
+        ready? <TruckLocationMapComponent locations={locations} allowChangeLocation={true} />
+            : <p>Please wait...</p>
     )
 }
 

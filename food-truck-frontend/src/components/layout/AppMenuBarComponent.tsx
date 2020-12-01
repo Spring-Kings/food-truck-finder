@@ -8,6 +8,7 @@ import MenuDropdownComponent from "./MenuDropdownComponent";
 import QuickSearchComponent from "../search/QuickSearchComponent";
 import {useFlexGrowStyles} from "../theme/FoodTruckThemeProvider";
 import {validateAuthentication} from "../../api/User";
+import LocationLoaderComponent from '../map/LocationLoaderComponent';
 
 export type AppMenuBarProps = {
   data: UserData,
@@ -73,6 +74,7 @@ export function AppMenuBarComponent(props: AppMenuBarProps) {
             )}
           </Grid>
           {menuDropdown}
+          <LocationLoaderComponent />
         </Grid>
       </Toolbar>
     </AppBar>
