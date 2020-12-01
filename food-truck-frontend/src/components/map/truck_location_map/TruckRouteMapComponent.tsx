@@ -8,7 +8,7 @@ import {
   Marker,
   Polyline,
 } from "@react-google-maps/api/dist";
-import { RouteLocation } from "../route-map/RouteLocation";
+import { RouteLocation } from "../../../domain/RouteLocation";
 import { getLocationFromStorage } from "../../../util/position";
 import ChangeUserLocationButton from "./ChangeUserLocationButton";
 

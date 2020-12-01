@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import { StyledDialogTitle } from "../../util/StyledDialogTitle";
 import TruckRouteMapComponent from "..";
-import { RouteLocation } from "../route-map/RouteLocation";
+import { RouteLocation } from "../../../domain/RouteLocation";
 import LocationSearchingIcon from "@material-ui/icons/LocationSearching";
 import { Fab } from "@material-ui/core";
 import {
