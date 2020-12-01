@@ -2,11 +2,11 @@ import {Box, Grid, Typography} from "@material-ui/core";
 import React from 'react';
 import NextLink from 'next/link'
 import TruckLocationMapComponent from "../components/map/truck_location_map/TruckLocationMapComponent";
-import {backendToFrontend, RouteLocation, RouteLocationState} from "../components/map/route-map/RouteLocation";
 import {RecommendedSimpleTruck} from "../redux/user/UserReducer";
 import api from "../util/api";
 import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
 import RecommendTruckMap from "../components/truck/RecommendTruckMap";
+import {backendToFrontend} from "../domain/RouteLocation";
 
 require('dotenv').config();
 

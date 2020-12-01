@@ -2,9 +2,9 @@ import React from 'react';
 import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
 import {Box, Typography} from "@material-ui/core";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
-import {RouteLocation} from "../map/route-map/RouteLocation";
 import api from "../../util/api";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
+import {RouteLocation} from "../../domain/RouteLocation";
 
 interface RecommendMapProps{
     recommendedTrucks: RouteLocation[];
