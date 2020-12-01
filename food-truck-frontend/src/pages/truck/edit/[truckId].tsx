@@ -8,7 +8,7 @@ import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
-import {getTruckById, deleteTruck, deleteTruckMenu} from "../../../api/Truck";
+import {deleteTruck, deleteTruckMenu, getTruckById} from "../../../api/TruckApi";
 import Truck from "../../../domain/Truck";
 import { MoneyRating } from "../../../components/truck/rate_and_review/ratings";
 

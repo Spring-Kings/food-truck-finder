@@ -183,8 +183,9 @@ public class RouteEndpoint {
 
             LocalTime arrival = d.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
             LocalTime exit = d.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();
-            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit)) {
                 good = false;
+            }
         }
         return good;
     }
