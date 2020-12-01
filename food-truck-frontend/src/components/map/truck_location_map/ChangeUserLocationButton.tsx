@@ -18,6 +18,7 @@ import {
 
 type ChangeLocationProps = {
   hideMap: () => void;
+  updateLocation: () => void;
 };
 
 const ChangeLocationMap = (props: ChangeLocationProps) => {
@@ -48,6 +49,7 @@ const ChangeLocationMap = (props: ChangeLocationProps) => {
         <Button
           onClick={() => {
             saveUserLatLng(location);
+            props.updateLocation();
             props.hideMap();
           }}
         >
@@ -55,7 +57,7 @@ const ChangeLocationMap = (props: ChangeLocationProps) => {
         </Button>
         <Button
           onClick={() => {
-            loadUserDefaultLocation(true);
+            loadUserDefaultLocation(true, props.updateLocation);
             props.hideMap();
           }}
         >
@@ -69,6 +71,7 @@ const ChangeLocationMap = (props: ChangeLocationProps) => {
 type ChangeUserLocationProps = {
   showMap: boolean;
   setShowMap: (isOpen: boolean) => void;
+  updateLocation: () => void;
 };
 
 const ChangeUserLocationButton = (props: ChangeUserLocationProps) => {
@@ -78,7 +81,7 @@ const ChangeUserLocationButton = (props: ChangeUserLocationProps) => {
   return (
     <>
       <Dialog fullWidth={true} open={props.showMap}>
-        {props.showMap && <ChangeLocationMap hideMap={hideMapAction} />}
+        {props.showMap && <ChangeLocationMap hideMap={hideMapAction} updateLocation={props.updateLocation} />}
       </Dialog>
       <Fab
         onClick={showMapAction}

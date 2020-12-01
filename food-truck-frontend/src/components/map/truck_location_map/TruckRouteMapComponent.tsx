@@ -47,9 +47,7 @@ export class TruckRouteMapComponent extends React.Component<
   }
 
   componentDidMount() {
-    this.setState({
-      coordinates: getLocationFromStorage(),
-    });
+    this.updateLocation();
   }
 
   render() {
@@ -58,6 +56,7 @@ export class TruckRouteMapComponent extends React.Component<
       <ChangeUserLocationButton
         showMap={this.state.openChangeLocationDialog}
         setShowMap={this.openCloseLocationDialog}
+        updateLocation={this.updateLocation}
       />
     ) : <div/>;
 
@@ -111,4 +110,6 @@ export class TruckRouteMapComponent extends React.Component<
   private openCloseLocationDialog = (isOpen: boolean) => {
     this.setState({ openChangeLocationDialog: isOpen });
   };
+
+  private updateLocation = () => this.setState({ coordinates: getLocationFromStorage() });
 }
