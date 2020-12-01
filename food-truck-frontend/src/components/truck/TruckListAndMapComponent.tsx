@@ -18,7 +18,7 @@ function TruckListAndMapComponent(props: Props) {
   return (
     <GridList cols={5}
               style={{
-                height: "100vh",
+                height: "auto",
                 width: "100%",
               }}>
       <GridListTile cols={2} style={{ height: '50vh' }}>
@@ -37,7 +37,7 @@ function TruckListAndMapComponent(props: Props) {
           </List>
         </Container>
       </GridListTile>
-      <GridListTile cols={3} style={{ height: '50vh' }}>
+      <GridListTile cols={3} style={{ height: 'auto' }}>
         <Box py={0.5} px={3}>
           <Typography variant="h6">{props.mapLabel}</Typography>
         </Box>
