@@ -1,4 +1,4 @@
-import {utcTimeStringToDate} from "../util/date-conversions";
+import {secondsWithinDay, utcTimeStringToDate} from "../util/date-conversions";
 import * as t from 'io-ts'
 import DateMeta from "../metaclasses/DateMeta";
 import LatLngLiteralMeta from "../metaclasses/LatLngLiteralMeta";
@@ -20,17 +20,23 @@ export const RouteLocationMeta = t.type({
 
 export type RouteLocation = t.TypeOf<typeof RouteLocationMeta>
 
-export const wrapsAroundMidnight = (loc: RouteLocation) => loc.exitTime < loc.arrivalTime;
+export const wrapsAroundMidnight = (loc: RouteLocation) => secondsWithinDay(loc.exitTime) < secondsWithinDay(loc.arrivalTime);
 
 export const locationsConflict = (loc1: RouteLocation, loc2: RouteLocation) => {
-  if (!wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2))
-    return loc1.arrivalTime <= loc2.exitTime && loc1.exitTime >= loc2.arrivalTime;
-  else if (wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2))
-    return loc1.exitTime >= loc2.arrivalTime || loc1.arrivalTime <= loc2.exitTime;
-  else if (!wrapsAroundMidnight(loc1) && wrapsAroundMidnight(loc2))
-    return loc1.arrivalTime <= loc2.exitTime || loc1.exitTime >= loc2.arrivalTime;
-  else
+  const arrival1 = secondsWithinDay(loc1.arrivalTime);
+  const exit1 = secondsWithinDay(loc1.exitTime);
+  const arrival2 = secondsWithinDay(loc2.arrivalTime);
+  const exit2 = secondsWithinDay(loc2.exitTime);
+
+  if (!wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2)) {
+    return arrival1 <= exit2 && exit1 >= arrival2;
+  } else if (wrapsAroundMidnight(loc1) && !wrapsAroundMidnight(loc2)) {
+    return exit1 >= arrival2 || arrival1 <= exit2;
+  } else if (!wrapsAroundMidnight(loc1) && wrapsAroundMidnight(loc2)) {
+    return arrival1 <= exit2 || exit1 >= arrival2;
+  } else {
     return true; // If both wrap around, that means they conflict at midnight
+  }
 }
 
 export const blankRouteLocation = () => ({

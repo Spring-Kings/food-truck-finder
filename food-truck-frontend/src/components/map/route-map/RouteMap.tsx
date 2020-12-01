@@ -141,12 +141,15 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private checkForConflicts = (): string | null => {
+    console.log("Checking for conflicts")
     const locs = this.state.routePts;
     for (let i = 0; i < locs.length; ++i) {
       for (let j = i + 1; j < locs.length; ++j) {
         const loc1 = locs[i];
         const loc2 = locs[j];
-        if (locationsConflict(loc1, loc2)) {
+        const doesConflict = locationsConflict(loc1, loc2)
+        console.log("Conflicts? ", doesConflict)
+        if (doesConflict) {
           return `Stop #${loc1.stopId} (${toTimeString(loc1.arrivalTime)} - ${toTimeString(loc1.exitTime)})` +
             ` conflicts with stop #${loc2.stopId} (${toTimeString(loc2.arrivalTime)} - ${toTimeString(loc2.exitTime)})`
         }
@@ -182,7 +185,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   private addPoint(e: any) {
     const id: number = this.state.nextStopId;
     const time = new Date();
-    time.setUTCSeconds(0, 0);
+    time.setSeconds(0, 0);
     const pts = this.state.routePts.concat({
       stopId: id,
       routeLocationId: -1,

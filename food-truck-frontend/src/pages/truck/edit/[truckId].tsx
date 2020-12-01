@@ -3,12 +3,12 @@ import Form from "../../../components/Form";
 import {TruckProps, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField,} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
-import {getTruckById, deleteTruck, deleteTruckMenu} from "../../../api/Truck";
+import {deleteTruck, deleteTruckMenu, getTruckById} from "../../../api/TruckApi";
 import Truck from "../../../domain/Truck";
 
 type TruckComponentState = {
