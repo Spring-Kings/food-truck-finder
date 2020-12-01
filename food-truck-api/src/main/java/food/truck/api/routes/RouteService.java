@@ -212,7 +212,7 @@ public class RouteService {
      *         returns it assuming that the range wraps at midnight. If start and end
      *         are the same time, it automatically returns false.
      */
-    private static boolean fallsOnDayInterval(LocalTime now, LocalTime start, LocalTime end) {
+    public static boolean fallsOnDayInterval(LocalTime now, LocalTime start, LocalTime end) {
         long startSecond = getSecond(start), endSecond = getSecond(end), nowSecond = getSecond(now);
         if (startSecond < endSecond)
             return nowSecond >= startSecond && nowSecond < endSecond;
