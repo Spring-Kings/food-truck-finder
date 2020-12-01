@@ -20,11 +20,14 @@ export const getLocationFromStorage = (): LatLngLiteral => {
     };
 }
 
-/** Request to load the location of the user */
-export const loadUserDefaultLocation = () => {
+/**
+ * Request to load the location of the user
+ * @param force Whether or not to force a reloading of local storage's cache
+ */
+export const loadUserDefaultLocation = (force?: boolean) => {
     if (!navigator.geolocation)
         console.log("Geolocation not supported")
-    else if (localStorage.getItem("latitude") === null || localStorage.getItem("longitude") === null)
+    else if (force || localStorage.getItem("latitude") === null || localStorage.getItem("longitude") === null)
         navigator.geolocation.getCurrentPosition(saveUserLocation, geoLocationError);
 }
 
