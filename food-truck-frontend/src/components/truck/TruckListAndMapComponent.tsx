@@ -12,6 +12,7 @@ interface Props {
   owner?: boolean;
   listLabel: string;
   mapLabel: string;
+  allowChangeLocation?: boolean;
 }
 
 function TruckListAndMapComponent(props: Props) {
@@ -41,7 +42,7 @@ function TruckListAndMapComponent(props: Props) {
         <Box py={0.5} px={3}>
           <Typography variant="h6">{props.mapLabel}</Typography>
         </Box>
-        <TruckLocationMapComponent locations={props.routePts} height="50vh"/>
+        <TruckLocationMapComponent allowChangeLocation={props.allowChangeLocation} locations={props.routePts} height="50vh"/>
       </GridListTile>
 
       { props.recommendedTrucks !== undefined ?

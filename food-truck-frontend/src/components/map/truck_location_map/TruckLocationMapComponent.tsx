@@ -12,6 +12,7 @@ import Truck, {emptyTruck} from "../../../domain/Truck";
 export type TruckLocationMapProps = {
   locations: RouteLocation[];
   height?: string;
+  allowChangeLocation?: boolean;
 }
 
 const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
@@ -41,7 +42,7 @@ const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
       </Dialog>
 
       {/* Actual map */}
-      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} isRoute={false} height={props.height}/>
+      <TruckRouteMapComponent {...props} onMarkerClick={selectTruck} allowChangeLocation={props.allowChangeLocation} isRoute={false} height={props.height}/>
     </>
   );
 };

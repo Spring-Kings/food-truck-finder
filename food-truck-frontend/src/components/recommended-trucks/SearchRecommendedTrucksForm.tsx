@@ -7,6 +7,7 @@ import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import {ReactEventAdapter} from "../Form";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
+import { getLocationFromStorage } from "../../util/position";
 import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
 import {backendToFrontend, RouteLocation} from "../../domain/RouteLocation";
 
@@ -54,14 +55,9 @@ class RecommendedTrucksForm extends Component<
   }
 
   componentDidMount() {
-    navigator.geolocation.getCurrentPosition((location) =>
-      this.setState({
-        location: {
-          lat: location.coords.latitude,
-          lng: location.coords.longitude,
-        },
-      })
-    );
+    this.setState({
+      location: getLocationFromStorage()
+    });
   }
 
   getRouteLocations(trucks: RecommendedSimpleTruck[]) {
@@ -70,7 +66,7 @@ class RecommendedTrucksForm extends Component<
 
   render() {
     if (this.state.selectedTrucks != undefined)
-      return <TruckLocationMapComponent locations={this.state.selectedTrucks} />;
+      return <TruckLocationMapComponent locations={this.state.selectedTrucks} allowChangeLocation={true} />;
 
     return (
       <Grid container alignItems="flex-start" spacing={1}>

@@ -9,6 +9,7 @@ import {DEFAULT_ERR_RESP} from "../../../../api/DefaultResponses";
 import TruckListAndMapComponent from "../../../truck/TruckListAndMapComponent";
 import api from "../../../../util/api";
 import {LatLng} from "@google/maps";
+import { getLocationFromStorage } from "../../../../util/position";
 import {getNearbyTruckLocations} from "../../../../api/TruckApi";
 
 // Dashboard props
@@ -53,10 +54,7 @@ class UserDashboardComponent extends Component<
 
   async componentDidMount() {
     this.setState({
-      location: {
-        lat: Number(localStorage.getItem("latitude")),
-        lng: Number(localStorage.getItem("longitude"))
-      }
+      location: getLocationFromStorage()
     })
 
     // Load
@@ -124,7 +122,8 @@ class UserDashboardComponent extends Component<
                                   trucks={this.props.data.subscribedTrucks}
                                   listLabel={'Subscribed Trucks'}
                                   recommendedTrucks={this.state.recommendedTrucks}
-                                  mapLabel={'Nearby Trucks'}/>
+                                  mapLabel={'Nearby Trucks'}
+                                  allowChangeLocation={true}/>
       </>
 
     );

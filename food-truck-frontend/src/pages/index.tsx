@@ -67,45 +67,6 @@ class HomePageComponent extends React.Component<HomePageProps, HomePageState> {
     getRouteLocations(trucks: RecommendedSimpleTruck[]) {
         return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
     }
-
-    async componentDidMount() {
-        if (!navigator.geolocation)
-            console.log("Geolocation not supported")
-        else
-            navigator.geolocation.getCurrentPosition(this.geoLocationSuccess, this.geoLocationError);
-
-        try {
-            let resp: any = await api.request({
-                url: "/truck/recommended",
-                data: {
-                    acceptableRadius: 20,
-                    priceRating: 0,
-                    truckIds: localStorage.getItem("prevSearch") ? JSON.parse(`${localStorage.getItem("prevSearch")}`) : [],
-                    tags: [],
-                    active: false,
-                    numRequested: 10
-                },
-                method: "POST",
-            });
-            if (resp.data !== undefined) {
-                this.setState({ recommendedTrucks: resp.data })
-            }
-
-        } catch (err) {
-            DEFAULT_ERR_RESP(err);
-        }
-    }
-
-    geoLocationSuccess(position: Position) {
-        localStorage.setItem("longitude", String(position.coords.longitude));
-        localStorage.setItem("latitude", String(position.coords.latitude));
-        console.log("Set position to " + position.coords.latitude + "," + position.coords.longitude);
-    }
-
-    geoLocationError() {
-        console.log("Geolocation failure");
-    }
-
 }
 
 function HomePage() {
