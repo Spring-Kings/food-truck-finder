@@ -27,9 +27,9 @@ class RecommendTruckMap extends React.Component<RecommendMapProps, RecommendMapS
         return (
             <>
             <Box py={0.5} px={3}>
-                <Typography variant="h6">Recommended Trucks</Typography>
+                <Typography variant="h6">Find a Truck...</Typography>
             </Box>
-            <TruckLocationMapComponent locations={this.props.recommendedTrucks} height="50vh" allowChangeLocation={true}/>
+            <TruckLocationMapComponent locations={this.props.recommendedTrucks} height="100vh" allowChangeLocation={true}/>
             </>
         );
     }
