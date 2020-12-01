@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Button, Container, Grid, Link, List, ListItem, Typography,} from "@material-ui/core";
+import {Button, Card, CardContent, CardHeader, Container, Grid, GridList, GridListTile, Link, List, ListItem, Typography} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Router from "next/router";
 import loggedInUser from "../util/token";
@@ -13,6 +13,7 @@ import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from ".
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 import TruckRatingComponent from "./truck/TruckRatingComponent";
+import RoutesView from "./map/route-map/RoutesView";
 import Truck from "../domain/Truck";
 import Subscription from "../domain/Subscription";
 import {getTruckById} from "../api/TruckApi";
@@ -143,63 +144,71 @@ class TruckView extends Component<TruckProps, State> {
     ];
 
     const truckInfoView = (
-      <Grid item>
-        <Typography variant="h4">{this.state.truck.name}</Typography>
-        <List>
-          {truckInfo.map((el, index) => (
-            <ListItem key={`${this.props.truckId}-${index}`}>
-              {el}
-            </ListItem>
-          ))}
-          {!userCanEditTruck(this.state.truck.userId) && loggedInUser() !== null &&
-          <>
-            {reviewButton}
-            {subscribeButton}
-          </>
-          }
-        </List>
-      </Grid>
+      <Card>
+        <CardHeader title={this.state.truck.name}/>
+        <CardContent>
+          <List>
+            {this.state.truck !== null && truckInfo.map((el, index) => (
+              <ListItem key={`${this.state.truck?.id}-${index}`}>
+                {el}
+              </ListItem>
+            ))}
+            {this.state.truck !== null && !userCanEditTruck(this.state.truck.userId) && loggedInUser() !== null &&
+            <>
+              {reviewButton}
+              {subscribeButton}
+            </>
+            }
+          </List>
+        </CardContent>
+      </Card>
     );
 
     const ownerButtons = (
-      <>
-        <Grid item>
-          <Typography variant="h4">Owner Zone</Typography>
-        </Grid>
-        <Grid item>
-          <Button color="primary"
-                  onClick={this.editTruck}>
-            Edit
-          </Button>
-        </Grid>
-        <Grid item>
-          <Grid container spacing={0}>
+      <Card>
+        <CardHeader title="Owner Zone"/>
+        <CardContent>
+          <Grid container>
             <Grid item>
-              <Typography variant="subtitle1">Send Notification To Subscribers:</Typography>
+              <Button color="primary"
+                      onClick={this.editTruck}>
+                Edit Truck
+              </Button>
             </Grid>
             <Grid item>
-              <SendNotificationComponent truckId={this.props.truckId}/>
+              <Grid container spacing={0}>
+                <Grid item>
+                  <Typography variant="subtitle1">Send Notification To Subscribers:</Typography>
+                </Grid>
+                <Grid item>
+                  <SendNotificationComponent truckId={this.props.truckId}/>
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </>
+        </CardContent>
+      </Card>
     );
 
     return (
-      <Grid container justify="flex-start" alignItems="flex-start">
-        <Grid container direction="row" justify="flex-start" align-items="flex-start">
+      <GridList cols={6}
+                spacing={8}
+                style={{
+                  height: "100vh",
+                  width: "100%",
+                }}>
+        <GridListTile cols={2} style={{ height: '50vh' }}>
           {truckInfoView}
-          <Grid item xs>
-            {
-              this.state.routePts
-                ? <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
-                : <p>Not currently on a route.</p>
-            }
-
-          </Grid>
-        </Grid>
-        {userCanEditTruck(this.state.truck.userId) && ownerButtons}
-      </Grid>
+        </GridListTile>
+        {userCanEditTruck(this.state.truck.userId) && 
+        <GridListTile cols={2} style={{ height: '50vh' }}>
+          {ownerButtons}
+        </GridListTile>
+        }
+        <GridListTile cols={6} style={{ height: '50vh' }}>
+          <RoutesView truckId={this.state.truck.id}/>
+        </GridListTile>
+      </GridList>
     );
   }
 

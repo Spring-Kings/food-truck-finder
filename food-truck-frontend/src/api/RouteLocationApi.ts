@@ -1,7 +1,24 @@
 import api from "../util/api";
 import {backendToFrontend, frontendToBackend, RouteLocation, RouteLocationMeta,} from "../domain/RouteLocation";
 import DayOfWeek from "../components/map/route-map/DayOfWeek";
+import { Route } from "next/dist/next-server/server/router";
+import { AxiosResponse } from "axios";
 import {parse} from "../util/type-checking";
+
+export const loadRoutes = async (
+  truckId: number,
+  onFail?: (res: any) => void
+) => {
+  let routes: Route[] = [];
+  await api.get(`/truck/${truckId}/routes`, {})
+    .then(
+      (res: AxiosResponse<Route[]>) => {
+        routes = res.data;
+      },
+      (err) => { if (onFail) onFail(err); }
+    );
+  return routes;
+}
 
 export const loadCurrentRoute = async (
   truckId: number,

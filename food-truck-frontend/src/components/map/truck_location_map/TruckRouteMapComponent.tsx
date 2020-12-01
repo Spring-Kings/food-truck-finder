@@ -63,7 +63,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
           >
             {this.props.locations.flatMap((pt) => (
               <Marker
-                key={pt.stopId}
+                key={`${pt.stopId}-route-map`}
                 draggable={this.props.onDrag !== undefined}
                 position={pt.coords}
                 onDragEnd={(e) => this.trigger(this.props.onDrag, pt, e)}
