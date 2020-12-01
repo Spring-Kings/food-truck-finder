@@ -7,9 +7,7 @@ import TruckLocationMapComponent from "../components/map/truck_location_map/Truc
 function InteractiveMapPage(){
   let [locations, setLocations]: [RouteLocation[], any] = useState([]);
   useEffect(() => {
-    (async () => {
-      setLocations(await getNearbyTruckLocations(DEFAULT_ERR_RESP));
-    })();
+    (async () => setLocations(await getNearbyTruckLocations(DEFAULT_ERR_RESP)))();
   }, []);
   return (
     <TruckLocationMapComponent locations={locations} />
