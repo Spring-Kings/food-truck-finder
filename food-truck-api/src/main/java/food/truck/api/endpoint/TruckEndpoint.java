@@ -226,14 +226,10 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/subscription")
     public Optional<SubscriptionView> subscribedToTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var subs = subscriptionService.findSubsByUser(u);
-        var iter = subs.stream()
-            .filter(sub -> sub.getTruck().getId().equals(truckId))
-            .map(SubscriptionView::of)
-            .iterator();
-        if (iter.hasNext()) {
-            return Optional.of(iter.next());
-        }
-        return Optional.empty();
+        return subs.stream()
+                .filter(sub -> sub.getTruck().getId().equals(truckId))
+                .map(SubscriptionView::of)
+                .findFirst();
     }
 
     @Secured({"ROLE_USER"})
@@ -245,14 +241,10 @@ public class TruckEndpoint {
         }
         var truck = t.get();
         var subs = subscriptionService.findSubsByUser(u);
-        var filteredSubs = subs
-                .stream()
+        subs.stream()
                 .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
-                .iterator();
-        if (filteredSubs.hasNext()) {
-            var sub = filteredSubs.next();
-            subscriptionService.deleteSubscription(sub);
-        }
+                .findFirst()
+                .ifPresent(subscriptionService::deleteSubscription);
     }
 
     @Secured("ROLE_OWNER")
@@ -262,6 +254,17 @@ public class TruckEndpoint {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
         var result = truckService.tryUploadMenu(truckId, file);
+        if (result != HttpStatus.OK)
+            throw new ResponseStatusException(result);
+    }
+
+    @Secured("ROLE_OWNER")
+    @DeleteMapping("/truck/{truckId}/delete-menu")
+    public void uploadMenu(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        if (!truckService.userOwnsTruck(u, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        var result = truckService.tryDeleteMenu(truckId);
         if (result != HttpStatus.OK)
             throw new ResponseStatusException(result);
     }

@@ -1,25 +1,19 @@
 import api from "../util/api";
-import {TruckState} from "../components/TruckView";
+import {parse} from "../util/type-checking";
+import {Notification, NotificationMeta} from "../domain/Notification";
 
-export interface Notification {
-  id: number;
-  message: string;
-  truck: TruckState;
-  time: Date;
-  read: boolean;
-  type: string;
-}
-
-export const getNotifications = async () => {
+export const getNotifications = async (): Promise<Notification[] | null> => {
   let notifications: Notification[] = [];
-
-  await api.get(`/notifications`, {})
-    .then((response: any) => {
-      if (response.data) {
-        notifications = response.data;
-      }
-    });
-
+  const response = await api.get('/notifications');
+  if (response.data == null)
+    return null;
+  if (response.data) {
+    for (const n of response.data) {
+      const parsed = parse(NotificationMeta, n);
+      if (parsed !== null)
+        notifications.push(parsed)
+    }
+  }
   return notifications;
 }
 
@@ -28,11 +22,11 @@ export const sendNotification = async (
   message: string,
   onFail?: (res: any) => void
 ) => {
-  let config = {
+  let data = {
     truckId: truckId,
     message: message,
   };
-  await api.post(`/truck/notification`, config)
+  await api.post(`/truck/notification`, data)
     .catch(onFail);
 }
 

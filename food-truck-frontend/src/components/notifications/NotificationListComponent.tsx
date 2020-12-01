@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Box, Grid, Typography} from "@material-ui/core";
 import NotificationComponent from "./NotificationComponent";
-import {Notification} from "../../api/Notification";
+import Notification from "../../domain/Notification";
 import {NotificationData} from "../../redux/notifications/NotificationReducer";
 
 export type NotificationListProps = {
