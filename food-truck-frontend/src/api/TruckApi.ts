@@ -5,7 +5,7 @@ import * as t from 'io-ts'
 import Truck, {TruckMeta} from "../domain/Truck";
 
 export const getNearbyTruckLocations = async (
-  onFail: (err: any) => void
+  onFail: (err: any) => void = console.log
 ): Promise<RouteLocation[] | null> => {
   const nearbyTrucks = parse(t.array(TruckMeta), (await api.post('/truck/nearby')).data);
   if (nearbyTrucks === null) {
@@ -18,7 +18,7 @@ export const getNearbyTruckLocations = async (
 
 export const getNearbyTruckLocationsById = async (
   ids: number[],
-  onFail: (err: any) => void
+  onFail: (err: any) => void = console.log
 ): Promise<RouteLocation[] | null> => {
   let result: RouteLocation[] = [];
   try {
@@ -30,30 +30,47 @@ export const getNearbyTruckLocationsById = async (
       })
     ).data.map((pt: any, ndx: number) => parse(RouteLocationMeta, backendToFrontend(pt, ids[ndx])));
   } catch (err) {
-    result = [];
     onFail(err);
+    return null;
   }
   return result;
 };
 
-export const getTruckById = async (truckId: number, onFail: (err: any) => void): Promise<Truck | null> => {
+export const getTruckById = async (truckId: number, onFail: (err: any) => void = console.log): Promise<Truck | null> => {
   const resp = await api.get(`/truck/${truckId}`)
   if (resp) {
     return parse(TruckMeta, resp.data)
   }
+  onFail("Failed to get truck")
   return null;
 }
 
-export const searchTruckByName = async (search: string, onFail: (err: any) => void): Promise<Truck[] | null> => {
+export const searchTruckByName = async (search: string, onFail: (err: any) => void = console.log): Promise<Truck[] | null> => {
   let result = await api.get(`/truck/search?search=${search}`)
     .catch(onFail);
   if (result) {
     return parse(t.array(TruckMeta), result.data);
   }
+  onFail("Couldn't search truck by name")
   return null;
 }
 
-export const deleteTruck = async (truckId: number, onFail: (err: any) => void) => {
+export const deleteTruck = async (truckId: number, onFail: (err: any) => void = console.log) => {
   await api.delete(`/truck/delete/${truckId}`, {})
     .catch(onFail);
+}
+
+export const getSubscribedUsernames = async (truckId: number, onFail?: (err: any) => void)
+  : Promise<string[] | null> => {
+  try {
+    const resp = await api.get(`/truck/${truckId}/subscribed-usernames`)
+    if (resp.data && Array.isArray(resp.data))
+      return resp.data;
+  } catch (e) {
+    if (onFail)
+      onFail(e)
+  }
+  if (onFail)
+    onFail("Invalid response")
+  return null;
 }

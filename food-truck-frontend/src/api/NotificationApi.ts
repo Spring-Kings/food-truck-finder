@@ -2,25 +2,30 @@ import api from "../util/api";
 import {parse} from "../util/type-checking";
 import {Notification, NotificationMeta} from "../domain/Notification";
 
-export const getNotifications = async (): Promise<Notification[] | null> => {
+export const getNotifications = async (onFail: (e) => void = console.log): Promise<Notification[] | null> => {
   let notifications: Notification[] = [];
-  const response = await api.get('/notifications');
-  if (response.data == null)
-    return null;
-  if (response.data) {
-    for (const n of response.data) {
-      const parsed = parse(NotificationMeta, n);
-      if (parsed !== null)
-        notifications.push(parsed)
+  try {
+    const response = await api.get('/notifications');
+    if (response.data !== null && Array.isArray(response.data)) {
+      for (const n of response.data) {
+        const parsed = parse(NotificationMeta, n);
+        if (parsed !== null)
+          notifications.push(parsed)
+      }
+      return notifications;
     }
+  } catch (e) {
+    onFail(e);
+    return null;
   }
-  return notifications;
+  onFail("Bad response for getNotifications")
+  return null;
 }
 
 export const sendNotification = async (
   truckId: number,
   message: string,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   let data = {
     truckId: truckId,
@@ -32,7 +37,7 @@ export const sendNotification = async (
 
 export const deleteNotification = async (
   notificationId: number,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await api.delete(`/notification/${notificationId}/delete`, {})
     .catch(onFail);
@@ -41,7 +46,7 @@ export const deleteNotification = async (
 export const setNotificationAsRead = async (
   notificationId: number,
   isRead: boolean,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await api.put(`/notification/read`, {
     notificationId: notificationId,

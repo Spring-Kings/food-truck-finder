@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { useRouter } from "next/router";
+import {useRouter} from "next/router";
 
 import {Button, CircularProgress, Container, Dialog, DialogContent, Grid, Typography,} from "@material-ui/core";
 
@@ -41,8 +41,6 @@ function OwnerDashboardComponent(props: OwnerDashboardProps) {
         const pts = await loadCurrentRoute(truck.id, DEFAULT_ERR_RESP);
         if (pts != null)
           setRoutePts(routePts.concat(pts));
-        else
-          setInError("Couldn't load route")
       } catch (err) {
         setInError(err);
       }
