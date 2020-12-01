@@ -156,10 +156,10 @@ public class RouteService {
         var r = route.get();
         r.getLocations().remove(loc);
         r.getLocations().add(newLoc);
+        newLoc.setRoute(r);
         if (routeConflicts(r, r.getTruck()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-
-        routeLocationRepository.save(loc);
+        routeLocationRepository.save(newLoc);
         return true;
     }
 
