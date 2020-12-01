@@ -1,7 +1,4 @@
-import {Box, Grid, Typography} from "@material-ui/core";
 import React from 'react';
-import NextLink from 'next/link'
-import TruckLocationMapComponent from "../components/map/truck_location_map/TruckLocationMapComponent";
 import {RecommendedSimpleTruck} from "../redux/user/UserReducer";
 import api from "../util/api";
 import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
@@ -60,7 +57,7 @@ class HomePageComponent extends React.Component<HomePageProps, HomePageState> {
     }
 
     getRouteLocations(trucks: RecommendedSimpleTruck[]) {
-        return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
+        return trucks.map((t) => backendToFrontend(t.loc, t.truck.id))
     }
 }
 
