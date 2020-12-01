@@ -3,7 +3,7 @@ import React from "react";
 import {LatLngLiteral} from "@google/maps";
 import {Container} from "@material-ui/core";
 import {GoogleMap, LoadScript, Marker, Polyline,} from "@react-google-maps/api/dist";
-import {RouteLocation} from "../route-map/RouteLocation";
+import {RouteLocation} from "../../../domain/RouteLocation";
 
 interface MapProps {
   locations: RouteLocation[];

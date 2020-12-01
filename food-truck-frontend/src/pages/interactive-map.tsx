@@ -1,17 +1,25 @@
-import React, { useState, useEffect } from 'react'
-import { DEFAULT_ERR_RESP } from '../api/DefaultResponses';
-import { getNearbyTruckLocations } from '../api/Truck';
-import { RouteLocation } from '../components/map/route-map/RouteLocation';
+import React, {useEffect, useState} from 'react'
+import {DEFAULT_ERR_RESP} from '../api/DefaultResponses';
+import {getNearbyTruckLocations} from '../api/TruckApi';
 import TruckLocationMapComponent from "../components/map/truck_location_map/TruckLocationMapComponent"
+import {RouteLocation} from "../domain/RouteLocation";
 
-function InteractiveMapPage(){
-  let [locations, setLocations]: [RouteLocation[], any] = useState([]);
+function InteractiveMapPage() {
+  let [locations, setLocations] = useState<RouteLocation[]>([]);
+  let [ready, setReady] = useState<boolean>(false);
   useEffect(() => {
-    (async () => setLocations(await getNearbyTruckLocations(DEFAULT_ERR_RESP)))();
-  }, []);
-  return (
-    <TruckLocationMapComponent locations={locations} />
-  );
+    getNearbyTruckLocations(DEFAULT_ERR_RESP)
+      .then(locs => {
+        if (locs) {
+          setLocations(locs);
+          setReady(true);
+        }
+      });
+    });
+    return(
+        ready && <TruckLocationMapComponent locations={locations} />
+            || <p>Please wait...</p>
+    )
 }
 
 export default InteractiveMapPage;

@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import {LoadNotificationAction, NotificationActionTypes, notificationsReduxName} from "./NotificationActions";
-import { Notification } from "../../api/Notification";
+import Notification from "../../domain/Notification";
 
 export interface NotificationData {
   notifications: Notification[];

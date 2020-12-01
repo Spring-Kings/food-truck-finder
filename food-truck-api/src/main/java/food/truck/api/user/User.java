@@ -32,6 +32,9 @@ public class User extends AbstractUser implements UserDetails {
     @Column(name = "is_owner", nullable = false)
     boolean isOwner;
 
+    @Column(name = "privacy_setting", nullable = false)
+    PrivacySetting privacySetting = PrivacySetting.PUBLIC;
+
     private static List<GrantedAuthority> ownerPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_OWNER"));
     private static List<GrantedAuthority> userPermissions = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
@@ -62,5 +65,12 @@ public class User extends AbstractUser implements UserDetails {
 
     public void visit(UserVisitor v) {
         v.accept(this);
+    }
+
+    @Override
+    public boolean canView(User u) {
+        if (u.privacySetting == PrivacySetting.PRIVATE)
+            return id.equals(u.id);
+        return true;
     }
 }

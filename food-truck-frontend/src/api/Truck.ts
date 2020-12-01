@@ -1,4 +1,4 @@
-import {backendToFrontend, RouteLocation} from "../components/map/route-map/RouteLocation";
+import {backendToFrontend, RouteLocation} from "../domain/RouteLocation";
 import api from "../util/api";
 
 export const getNearbyTruckLocations = async (onFail: (err: any) => void) => {

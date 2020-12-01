@@ -1,6 +1,8 @@
 package food.truck.api.reviews_and_subscriptions;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import food.truck.api.truck.Truck;
 import lombok.Data;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,13 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "truck_id", nullable = false)
+    @JsonIgnore
     Truck truck;
+
+    @JsonProperty("truckId")
+    long truckId() {
+        return truck.getId();
+    }
 
     @Column(name = "star_rating", nullable = false)
     Integer starRating;

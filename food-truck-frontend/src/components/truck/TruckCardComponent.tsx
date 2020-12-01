@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {makeEmptyTruckState, TruckState, userCanEditTruck} from "../TruckView";
-import {getTruckById} from "../../api/Truck";
+import {getTruckById} from "../../api/TruckApi";
 import {
   Button,
   Card,
@@ -8,7 +7,9 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  createStyles, Dialog, DialogContent,
+  createStyles,
+  Dialog,
+  DialogContent,
   Grid,
   Theme
 } from "@material-ui/core";
@@ -17,6 +18,7 @@ import {MoneyRating, StarRating} from "./rate_and_review/ratings";
 import {makeStyles} from "@material-ui/core/styles";
 import SendNotificationComponent from "../notifications/SendNotificationComponent";
 import {StyledDialogTitle} from "../util/StyledDialogTitle";
+import Truck, {emptyTruck} from "../../domain/Truck";
 
 export const useTruckDescriptionStyles = makeStyles((_theme: Theme) =>
   createStyles({
@@ -35,7 +37,7 @@ interface TruckCardProps {
 function TruckCardComponent(props: TruckCardProps) {
   const router = useRouter();
   const classes = useTruckDescriptionStyles();
-  const [truck, setTruck]: [TruckState, any] = useState(makeEmptyTruckState());
+  const [truck, setTruck]: [Truck, any] = useState(emptyTruck());
   const [sendingNotification, setSendingNotification]: [boolean, any] = useState(false);
 
   const redirect = (url: string, id: number): void => {

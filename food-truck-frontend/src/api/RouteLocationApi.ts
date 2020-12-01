@@ -1,8 +1,9 @@
 import api from "../util/api";
-import {backendToFrontend, frontendToBackend, RouteLocation,} from "../components/map/route-map/RouteLocation";
+import {backendToFrontend, frontendToBackend, RouteLocation, RouteLocationMeta,} from "../domain/RouteLocation";
 import DayOfWeek from "../components/map/route-map/DayOfWeek";
 import { Route } from "next/dist/next-server/server/router";
 import { AxiosResponse } from "axios";
+import {parse} from "../util/type-checking";
 
 export const loadRoutes = async (
   truckId: number,
@@ -19,52 +20,36 @@ export const loadRoutes = async (
   return routes;
 }
 
-export const loadTodaysRoute = async (
+export const loadCurrentRoute = async (
   truckId: number,
   onFail?: (res: any) => void
-) => {
+): Promise<RouteLocation[] | null> => {
   let routePts: RouteLocation[] = [];
   let nextStopId: number = 1;
 
-  await api
-    .request({
-      url: `/truck/${truckId}/active-route`,
-      method: "GET",
-      params: {
-        now: new Date()
-      }
-    })
-    .then((response) => {
-      if (response.data)
-        routePts = response.data.locations.map((pt: any) =>
-          backendToFrontend(pt, nextStopId++)
-        );
-    })
-    .catch(onFail);
-  return routePts;
+  const resp = await api.get(`/truck/${truckId}/active-route`);
+  if (resp.data?.locations)
+    return resp.data.locations
+      .map((loc: any) => parse(
+        RouteLocationMeta, backendToFrontend(loc, nextStopId++)
+      ))
+
+  return null;
 };
 
 export const loadRouteLocations = async (
   routeId: number,
   onFail?: (res: any) => void
 ) => {
-  let routePts: RouteLocation[] = [];
-  await api
-    .request({
-      url: `/truck/route/locations/${routeId}`,
-      method: "GET",
-    })
-    .then((response: any) => {
-      if (response.data != undefined) {
-        let nextStopId: number = 1;
-        routePts = response.data.map((pt: any) =>
-          backendToFrontend(pt, nextStopId++)
-        );
-      }
-    })
-    .catch(onFail);
+  const resp = await api.get(`/truck/route/locations/${routeId}`);
+  if (resp.data !== null) {
+    let nextStopId = 1;
+    return resp.data.map((pt: any) => parse(
+      RouteLocationMeta, backendToFrontend(pt, nextStopId++)
+    ))
+  }
 
-  return routePts;
+  return null;
 };
 
 export const updateRouteLocations = async (
