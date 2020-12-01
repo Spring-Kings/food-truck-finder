@@ -15,7 +15,7 @@ function InteractiveMapPage() {
           setReady(true);
         }
       });
-    });
+    }, []);
     return(
         ready? <TruckLocationMapComponent locations={locations} allowChangeLocation={true} />
             : <p>Please wait...</p>
