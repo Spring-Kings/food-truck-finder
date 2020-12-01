@@ -1,6 +1,5 @@
 package food.truck.api.routes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import food.truck.api.truck.Truck;
 import lombok.Data;

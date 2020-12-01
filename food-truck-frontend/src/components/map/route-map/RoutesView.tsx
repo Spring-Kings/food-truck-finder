@@ -23,7 +23,6 @@ function RoutesView(props: Props) {
   }, [props.truckId]);
 
   useEffect(() => {
-    console.group(routes);
     if (routes.length > 0) {
       setSelectedRoute(routes[0]);
     }
