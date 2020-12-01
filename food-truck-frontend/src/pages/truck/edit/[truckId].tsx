@@ -4,12 +4,13 @@ import {TruckProps, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
 import { useRouter } from "next/router";
-import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField,} from "@material-ui/core";
+import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField, Typography,} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
 import {getTruckById, deleteTruck, deleteTruckMenu} from "../../../api/Truck";
 import Truck from "../../../domain/Truck";
+import { MoneyRating } from "../../../components/truck/rate_and_review/ratings";
 
 type TruckComponentState = {
   truck: Truck | null
@@ -116,7 +117,8 @@ function EditTruck(props: TruckProps) {
                 <TextField label="Truck Name" name="name" defaultValue={state.truck.name}/>
                 <TextField label="Description" name="description"
                            defaultValue={state.truck.description}/>
-                <TextField label="Price Rating" name="priceRating"
+                <Typography variant="body1">Recommended Rating:</Typography>
+                <MoneyRating label="Price Rating" name="priceRating"
                            defaultValue={state.truck.priceRating}/>
                 <MultiField
                   title="Truck Tags"

@@ -64,6 +64,31 @@ class HomePageComponent extends React.Component<HomePageProps, HomePageState> {
         )
     }
 
+
+    async componentDidMount() {
+        try {
+        let resp: any = await api.request({
+            url: "/truck/recommended",
+            data: {
+            acceptableRadius: 20,
+            priceRating: 0,
+            truckIds: localStorage.getItem("prevSearch")
+                ? JSON.parse(`${localStorage.getItem("prevSearch")}`)
+                : [],
+            tags: [],
+            active: false,
+            numRequested: 10,
+            },
+            method: "POST",
+        });
+        if (resp.data !== undefined) {
+            this.setState({ recommendedTrucks: resp.data });
+        }
+        } catch (err) {
+        DEFAULT_ERR_RESP(err);
+        }
+    }
+
     getRouteLocations(trucks: RecommendedSimpleTruck[]) {
         return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
     }
