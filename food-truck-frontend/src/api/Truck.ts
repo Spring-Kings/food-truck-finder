@@ -1,4 +1,4 @@
-import {backendToFrontend, RouteLocation} from "../components/map/route-map/RouteLocation";
+import {backendToFrontend, RouteLocation} from "../domain/RouteLocation";
 import api from "../util/api";
 
 export const getNearbyTruckLocations = async (onFail: (err: any) => void) => {
@@ -61,5 +61,10 @@ export const searchTruckByName = async (search: string, onFail: (err: any) => vo
 
 export const deleteTruck = async (truckId: number, onFail: (err: any) => void) => {
   await api.delete(`/truck/delete/${truckId}`, {})
+    .catch(onFail);
+}
+
+export const deleteTruckMenu = async (truckId: number, onFail: (err: any) => void) => {
+  await api.delete(`/truck/${truckId}/delete-menu`, {})
     .catch(onFail);
 }

@@ -3,13 +3,12 @@ import {Button, Grid, Slider, Typography} from "@material-ui/core";
 import React, {Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
-import {backendToFrontend, RouteLocation} from "../map/route-map/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import {ReactEventAdapter} from "../Form";
-import {getNearbyTruckLocationsById} from "../../api/Truck";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
 import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
+import {backendToFrontend, RouteLocation} from "../../domain/RouteLocation";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
@@ -17,7 +16,7 @@ type RecommendedTruckState = {
   acceptableRadius: number;
   priceRating: number;
   tags: string[];
-  selectedTrucks?: RouteLocation[];
+  selectedTrucks?: RouteLocation[] | null;
 };
 
 const MARKS = [

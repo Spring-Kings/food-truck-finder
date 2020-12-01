@@ -1,7 +1,9 @@
-import Review, {backendToFrontend as review_backendToFrontend, TruckReviews} from "../domain/truck/Review";
-import Truck, {backendToFrontend as truck_backendToFrontend} from "../domain/truck/Truck";
+import Review, {backendToFrontend as review_backendToFrontend, ReviewMeta, TruckReviews} from "../domain/Review";
 import api from "../util/api";
 import {ClientResponseAction} from "./ResponseTypes";
+import {getUsername} from "./UserApi";
+import {parse} from "../util/type-checking";
+import {getTruckById} from "./TruckApi";
 
 /**
  * Get all reviews by a particular user
@@ -11,37 +13,33 @@ import {ClientResponseAction} from "./ResponseTypes";
 export const loadReviewsByUser = async (
   userId: number,
   onFail?: ClientResponseAction
-) => {
-  let reviews: Review[] = [];
+): Promise<Review[] | null> => {
 
   try {
     // Fetch username
-    let name: any = await api.request({
-      url: `/user/${userId}`,
+    let name = await getUsername(userId);
+    if (name == null) {
+      if (onFail)
+        onFail("User not found");
+      return null;
+    }
+
+    // Get the reviews by this user
+    let resp: any = await api.request({
+      url: `/reviews/user/${userId}`,
       method: "GET",
     });
 
-    // If we got a good response, then this user exists; create frontend representation of reviews
-    if (name.data !== null) {
-      // Get the reviews by this user
-      let resp: any = await api.request({
-        url: `/reviews/truck/${userId}`,
-        method: "GET",
-      });
-
-      // Map all backend reviews to frontend reviews
-      reviews = resp.data.map(async (r: any) => {
-        // Create frontend representation for 1 review, with either the username or a blank string
-        return review_backendToFrontend(r, name.data.username);
-      });
-    }
+    // Map all backend reviews to frontend reviews
+    return resp.data
+      .map((r: any) => parse(ReviewMeta, review_backendToFrontend(r, name as string)))
+      .filter((r: Review | null) => r != null)
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    reviews = [];
     if (onFail) onFail(e);
   }
 
-  return reviews;
+  return null;
 };
 
 /**
@@ -54,37 +52,30 @@ export const loadReviewFromTruckForUser = async (
   truckId: number,
   userId: number,
   onFail?: ClientResponseAction
-) => {
-  let review: Review | null = null;
+): Promise<Review | null> => {
   try {
     // Fetch username
-    let name: any = await api.request({
-      url: `/user/${userId}`,
+    let name = await getUsername(userId);
+    if (name === null)
+      throw 'User not found';
+
+    // Get the reviews by this user
+    let resp: any = await api.request({
+      url: `/reviews/truck/${truckId}/user`,
+      params: {
+        userId: userId
+      },
       method: "GET",
     });
 
-    // If we got a good response, then this user exists; create frontend representation of reviews
-    if (name.data !== null) {
-      // Get the reviews by this user
-      let resp: any = await api.request({
-        url: `/reviews/truck/${truckId}/user`,
-        params: {
-          userId: userId
-        },
-        method: "GET",
-      });
+    return parse(ReviewMeta, review_backendToFrontend(resp.data, name));
 
-      // Map review to a frontend review
-      if (resp.data !== null)
-        review = review_backendToFrontend(resp.data, name.data.username);
-    }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return null
-    review = null;
     if (onFail) onFail(e);
   }
 
-  return review;
+  return null;
 };
 
 /**
@@ -95,14 +86,7 @@ export const loadReviewFromTruckForUser = async (
 export const loadReviewsByTruck = async (
   truckId: number,
   onFail?: ClientResponseAction
-) => {
-  let reviews: TruckReviews = {
-    reviews: [],
-    avgCostRating: null,
-    avgStarRating: null,
-    truckName: ""
-  };
-
+): Promise<TruckReviews | null> => {
   try {
     // Get the reviews for this truck
     let resp: any = await api.request({
@@ -110,44 +94,38 @@ export const loadReviewsByTruck = async (
       method: "GET",
     });
 
-    // If we got a good response, then create frontend representation
-    if (resp.data !== null) {
-      // Map all backend reviews to frontend reviews
-      // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
-      reviews.reviews = await Promise.all(resp.data.map(async (r: any) => {
-        // Fetch username
-        let name: any = await api.request({
-          url: `/user/${r.userId}`,
-          method: "GET",
-        });
-        
-        // Create frontend representation for 1 review, with either the username or a blank string
-        return review_backendToFrontend(
-          r,
-          name.data !== null ? name.data.username : ""
-        );
-      }));
-    }
+    if (resp.data == null)
+      throw 'Truck not found';
 
-    // Fetch the truck's info. Yes, I could've gotten it from the reviews. That seemed like a coupling hazard, what happens
-    // if we change the way reviews get stored and they suddenly don't store trucks directly?
-    let truck: Truck | null = truck_backendToFrontend((await api.request({
-      url: `/truck/${truckId}`,
-      method: "GET"
-    })).data);
-    console.log(truck);
+    // Map all backend reviews to frontend reviews
+    // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
+    const promises: Promise<Review | null>[] = resp.data.map(async (r: any) => {
+      const name = await getUsername(r.userId)
+      if (!name)
+        throw 'User not found';
+      const rev: Review | null = parse(ReviewMeta, review_backendToFrontend(r, name))
+      return rev;
+    })
+
+    const reviews: Review[] = (await Promise.all(promises))
+      .filter(r => r != null) as Review[];
+
+    const truck = await getTruckById(truckId, () => {
+    })
     if (truck !== null) {
-      reviews.truckName = truck.name;
-      reviews.avgCostRating = truck.priceRating;
-      reviews.avgStarRating = truck.starRating;
+      return {
+        reviews,
+        truckName: truck.name,
+        avgCostRating: truck.priceRating,
+        avgStarRating: truck.starRating
+      }
     }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    reviews.reviews = [];
     if (onFail) onFail(e);
   }
 
-  return reviews;
+  return null;
 };
 
 /**
@@ -199,3 +177,16 @@ export const deleteReview = async (
     .catch(onFail);
   return result;
 };
+
+
+export const loadReviewById = async (reviewId: number): Promise<Review | null> => {
+  const response = await api.get(`/reviews/${reviewId}`);
+  if (response.data?.userId) {
+    const username = await getUsername(response.data.userId);
+    if (!username)
+      return null;
+    return parse(ReviewMeta, review_backendToFrontend(response.data, username));
+  }
+
+  return null;
+}

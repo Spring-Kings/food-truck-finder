@@ -1,5 +1,6 @@
 package food.truck.api.truck;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -41,6 +42,7 @@ public class TruckService {
     private RouteRepository routeRepository;
     @Autowired
     private AmazonS3 s3Client;
+    private static final String BUCKET_NAME = System.getenv("S3_BUCKET_NAME");
 
     public List<Truck> findTruck(String name) {
         return truckRepository.findByName(name);
@@ -166,14 +168,13 @@ public class TruckService {
         }
 
         var fileObjKeyName = "menu/" + truckId;
-        var bucketName = System.getenv("S3_BUCKET_NAME");
         try {
             var metadata = new ObjectMetadata();
             metadata.setContentType(contentType);
             metadata.setContentLength(file.getBytes().length);
-            var request = new PutObjectRequest(bucketName, fileObjKeyName, file.getInputStream(), metadata);
+            var request = new PutObjectRequest(BUCKET_NAME, fileObjKeyName, file.getInputStream(), metadata);
             s3Client.putObject(request);
-        } catch (IOException e) {
+        } catch (IOException | SdkClientException e) {
             log.info("Couldn't upload menu", e);
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
@@ -181,6 +182,24 @@ public class TruckService {
         t.setMenuContentType(contentType);
 
         truckRepository.save(t);
+        return HttpStatus.OK;
+    }
+
+    public HttpStatus tryDeleteMenu(long truckId) {
+        var t = findTruckById(truckId);
+        if (t.isEmpty())
+            return HttpStatus.NOT_FOUND;
+
+        var truck = t.get();
+        try {
+            s3Client.deleteObject(BUCKET_NAME, "menu/" + truckId);
+            truck.setMenuContentType(null);
+            truckRepository.save(truck);
+        } catch (SdkClientException e) {
+            log.info("Couldn't delete menu", e);
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
         return HttpStatus.OK;
     }
 }

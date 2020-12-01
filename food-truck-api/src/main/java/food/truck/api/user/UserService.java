@@ -31,12 +31,7 @@ public class UserService implements UserDetailsService {
         u.setPassword(passwordEncoder.encode(password));
         u.setEmail(email);
         u.setOwner(isOwner);
-        u = saveUser(u);
-        return u;
-    }
-
-    public User saveUser(User user) {
-        return userRepository.save(user);
+        return userRepository.save(u);
     }
 
     public Optional<User> findUserByUsername(String username) {
@@ -79,4 +74,7 @@ public class UserService implements UserDetailsService {
         return email.contains("@") && email.length() <= 100 || email.length() >= 3;
     }
 
+    public User saveUser(User u) {
+        return userRepository.save(u);
+    }
 }

@@ -3,7 +3,7 @@ import React from "react";
 import {LatLngLiteral} from "@google/maps";
 import {Container} from "@material-ui/core";
 import {GoogleMap, LoadScript, Marker, Polyline,} from "@react-google-maps/api/dist";
-import {RouteLocation} from "../route-map/RouteLocation";
+import {RouteLocation} from "../../../domain/RouteLocation";
 
 interface MapProps {
   locations: RouteLocation[];
@@ -63,7 +63,7 @@ export class TruckRouteMapComponent extends React.Component<MapProps, MapState> 
           >
             {this.props.locations.flatMap((pt) => (
               <Marker
-                key={pt.stopId}
+                key={`${pt.stopId}-route-map`}
                 draggable={this.props.onDrag !== undefined}
                 position={pt.coords}
                 onDragEnd={(e) => this.trigger(this.props.onDrag, pt, e)}

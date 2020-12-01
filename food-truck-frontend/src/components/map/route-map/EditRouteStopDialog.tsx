@@ -1,20 +1,10 @@
 import React from "react";
 
-import {
-  MuiPickersUtilsProvider,
-  TimePicker,
-} from "@material-ui/pickers";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Grid,
-  Button,
-  DialogActions,
-} from "@material-ui/core";
+import {MuiPickersUtilsProvider, TimePicker,} from "@material-ui/pickers";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid,} from "@material-ui/core";
 import DateFns from "@date-io/date-fns";
 
-import { RouteLocation } from "./RouteLocation";
+import {RouteLocation} from "../../../domain/RouteLocation";
 
 interface ERSDProps {
   routePt: RouteLocation | undefined;

@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Container, GridList, GridListTile, List, ListItem, Typography} from "@material-ui/core";
 import TruckCardComponent from "./TruckCardComponent";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
-import {RouteLocation} from "../map/route-map/RouteLocation";
+import {RouteLocation} from "../../domain/RouteLocation";
 import {RecommendedSimpleTruck, SimpleTruck} from "../../redux/user/UserReducer";
 
 interface Props {
