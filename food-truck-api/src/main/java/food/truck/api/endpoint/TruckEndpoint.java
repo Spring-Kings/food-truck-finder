@@ -18,10 +18,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -215,6 +213,19 @@ public class TruckEndpoint {
                 .filter(sub -> sub.getTruck().getId().equals(truckId))
                 .map(SubscriptionView::of)
                 .findFirst();
+    }
+
+    @GetMapping("/truck/{truckId}/subscribed-usernames")
+    public List<String> getSubscribedUsernames(@AuthenticationPrincipal AbstractUser u, @PathVariable long truckId) {
+        var truck = truckService.findTruckById(truckId);
+        if (truck.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var t = truck.get();
+        var subs = subscriptionService.findSubsByTruck(t);
+        return subs.stream()
+                .filter(sub -> u.canView(sub.getUser()))
+                .map(sub -> sub.getUser().getUsername())
+                .collect(Collectors.toList());
     }
 
     @Secured({"ROLE_USER"})

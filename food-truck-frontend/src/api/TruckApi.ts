@@ -57,3 +57,18 @@ export const deleteTruck = async (truckId: number, onFail: (err: any) => void) =
   await api.delete(`/truck/delete/${truckId}`, {})
     .catch(onFail);
 }
+
+export const getSubscribedUsernames = async (truckId: number, onFail?: (err: any) => void)
+  : Promise<string[] | null> => {
+  try {
+    const resp = await api.get(`/truck/${truckId}/subscribed-usernames`)
+    if (resp.data && Array.isArray(resp.data))
+      return resp.data;
+  } catch (e) {
+    if (onFail)
+      onFail(e)
+  }
+  if (onFail)
+    onFail("Invalid response")
+  return null;
+}
