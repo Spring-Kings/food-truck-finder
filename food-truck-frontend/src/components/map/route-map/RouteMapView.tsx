@@ -5,11 +5,12 @@ import { loadRouteLocations } from '../../../api/RouteLocation';
 import { RouteLocation } from './RouteLocation';
 import { RouteState } from './RoutesView';
 import { StyledDialogTitle } from '../../util/StyledDialogTitle';
-import { Grid, Typography } from '@material-ui/core';
+import { DialogContent, Grid, Typography } from '@material-ui/core';
+import { toTimeString } from '../../../util/date-conversions';
 
 function RouteMapView(props: RouteState) {
   const [route, setRoute]: [RouteState, any] = useState(props);
-  const [showTime, setShowTime]: [boolean, any] = useState(false);
+  const [selectedLocation, setSelectedLocation]: [RouteLocation | null, any] = useState(null);
 
   useEffect(() => {
     const onFail = (_res: any) => console.log(`Could not load routes for truck.`);
@@ -24,18 +25,24 @@ function RouteMapView(props: RouteState) {
 
   return (
     <>
-      <Dialog open={showTime}>
-        <StyledDialogTitle onClose={() => setShowTime(false)}>
+      {/* <Dialog open={selectedLocation !== null}>
+        <StyledDialogTitle onClose={() => setSelectedLocation(null)}>
           Active Time
         </StyledDialogTitle>
-      </Dialog>
+        <DialogContent>
+          <Typography>{`Arrival Time: ${toTimeString(selectedLocation !== null ? (selectedLocation as RouteLocation).arrivalTime : new Date())}`}</Typography>
+        </DialogContent>
+      </Dialog> */}
       <Grid container direction="row">
-        {route.days.map(day => <Grid item><Typography>{day}</Typography></Grid>)}
+        {route.days.map(day => <Grid item key={day}><Typography>{day}</Typography></Grid>)}
       </Grid>
       <TruckRouteMapComponent
-              locations={route.locations ? route.locations : []}
-              isRoute={true}
-              onMarkerClick={() => setShowTime(true)}
+              locations={route.locations !== undefined ? route.locations : []}
+              isRoute
+              onMarkerClick={(pt: RouteLocation, _) => {
+                console.group(pt);
+                setSelectedLocation(pt);
+              }}
               height="50vh"
             />
     </>
