@@ -101,8 +101,10 @@ function EditTruck(props: TruckProps) {
         <Grid item>
           <Button onClick={() => {
             if (state.truck !== null)
-              router.push(`/truck/${state.truck.id}`)
-          }>Back to Truck</Button>
+              router.push(`/truck/${state.truck.id}`);
+          }}>
+          Back to Truck
+          </Button>
         </Grid>
         <Grid item className={classes.root}>
           <Card>

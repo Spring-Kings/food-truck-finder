@@ -1,7 +1,7 @@
 import Route from './Route';
 import React, { useEffect, useState } from 'react';
-import { loadRoutes } from '../../../api/RouteLocation';
-import { RouteLocation } from './RouteLocation';
+import { loadRoutes } from '../../../api/RouteLocationApi';
+import { RouteLocation } from '../../../domain/RouteLocation';
 import RouteMapView from './RouteMapView';
 import { Box, Card, CardContent, CardHeader, Container, Grid, GridList, GridListTile, List, ListItem, ListSubheader, Typography } from '@material-ui/core';
 

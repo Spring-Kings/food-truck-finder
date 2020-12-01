@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TruckRouteMapComponent from '..';
-import { loadRouteLocations } from '../../../api/RouteLocation';
-import { RouteLocation } from './RouteLocation';
+import { loadRouteLocations } from '../../../api/RouteLocationApi';
+import { RouteLocation } from '../../../domain/RouteLocation';
 import { RouteState } from './RoutesView';
 import { StyledDialogTitle } from '../../util/StyledDialogTitle';
 import { Box, Dialog, DialogContent, Grid, Typography } from '@material-ui/core';
