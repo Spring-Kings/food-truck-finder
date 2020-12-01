@@ -15,6 +15,7 @@ import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFrom
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 import TruckRatingComponent from "./truck/TruckRatingComponent";
+import RoutesView from "./map/route-map/RoutesView";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
   const user = getUserInfo();
@@ -229,7 +230,8 @@ class TruckView extends Component<TruckProps, State> {
         <Grid container direction="row" justify="flex-start" align-items="flex-start">
           {truckInfoView}
           <Grid item xs>
-            <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+            <RoutesView truckId={this.state.id}/>
+            {/* <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/> */}
           </Grid>
         </Grid>
         {userCanEditTruck(this.state.userId) && ownerButtons}
