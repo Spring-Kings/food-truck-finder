@@ -148,12 +148,12 @@ class TruckView extends Component<TruckProps, State> {
         <CardHeader title={this.state.truck.name}/>
         <CardContent>
           <List>
-            {truckInfo.map((el, index) => (
+            {this.state.truck !== null && truckInfo.map((el, index) => (
               <ListItem key={`${this.state.truck.id}-${index}`}>
                 {el}
               </ListItem>
             ))}
-            {!userCanEditTruck(this.state.truck.userId) && loggedInUser() !== null &&
+            {this.state.truck !== null && !userCanEditTruck(this.state.truck.userId) && loggedInUser() !== null &&
             <>
               {reviewButton}
               {subscribeButton}
