@@ -12,15 +12,14 @@ import {getTruckById} from "./TruckApi";
  */
 export const loadReviewsByUser = async (
   userId: number,
-  onFail?: ClientResponseAction
+  onFail: ClientResponseAction = console.log
 ): Promise<Review[] | null> => {
 
   try {
     // Fetch username
     let name = await getUsername(userId);
     if (name == null) {
-      if (onFail)
-        onFail("User not found");
+      onFail("User not found");
       return null;
     }
 
@@ -36,9 +35,10 @@ export const loadReviewsByUser = async (
       .filter((r: Review | null) => r != null)
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    if (onFail) onFail(e);
+    onFail(e);
   }
 
+  onFail("Couldn't load reviews by user")
   return null;
 };
 
@@ -51,13 +51,15 @@ export const loadReviewsByUser = async (
 export const loadReviewFromTruckForUser = async (
   truckId: number,
   userId: number,
-  onFail?: ClientResponseAction
+  onFail: ClientResponseAction = console.log
 ): Promise<Review | null> => {
   try {
     // Fetch username
     let name = await getUsername(userId);
-    if (name === null)
-      throw 'User not found';
+    if (name === null) {
+      onFail('User not found');
+      return null;
+    }
 
     // Get the reviews by this user
     let resp: any = await api.request({
@@ -72,9 +74,10 @@ export const loadReviewFromTruckForUser = async (
 
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return null
-    if (onFail) onFail(e);
+    onFail(e);
   }
-
+  if (onFail)
+    onFail("Failed to load review for user")
   return null;
 };
 
@@ -85,7 +88,7 @@ export const loadReviewFromTruckForUser = async (
  */
 export const loadReviewsByTruck = async (
   truckId: number,
-  onFail?: ClientResponseAction
+  onFail: ClientResponseAction = console.log
 ): Promise<TruckReviews | null> => {
   try {
     // Get the reviews for this truck
@@ -94,15 +97,19 @@ export const loadReviewsByTruck = async (
       method: "GET",
     });
 
-    if (resp.data == null)
-      throw 'Truck not found';
+    if (resp.data == null) {
+      onFail('Truck not found');
+      return null;
+    }
 
     // Map all backend reviews to frontend reviews
     // Learned to use `Promise.all` from: https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
     const promises: Promise<Review | null>[] = resp.data.map(async (r: any) => {
       const name = await getUsername(r.userId)
-      if (!name)
-        throw 'User not found';
+      if (!name) {
+        onFail('User not found')
+        return null;
+      }
       const rev: Review | null = parse(ReviewMeta, review_backendToFrontend(r, name))
       return rev;
     })
@@ -122,9 +129,9 @@ export const loadReviewsByTruck = async (
     }
   } catch (e: any) {
     // Derp. Handle failure as the client requested and return an empty list
-    if (onFail) onFail(e);
+    onFail(e);
   }
-
+  onFail("Failed to load reviews for truck")
   return null;
 };
 
@@ -143,7 +150,7 @@ export const getSaveReviewUrl = (truckId: number) => `/reviews/truck/${truckId}`
 export const reviewTruck = async (
   review: Review,
   onSuccess?: ClientResponseAction,
-  onFail?: ClientResponseAction
+  onFail: ClientResponseAction = console.log
 ) => {
   await api
     .request({
@@ -163,7 +170,7 @@ export const reviewTruck = async (
  */
 export const deleteReview = async (
   truckId: number,
-  onFail?: ClientResponseAction
+  onFail: ClientResponseAction = console.log
 ) => {
   let result: boolean = false;
   await api
@@ -179,14 +186,19 @@ export const deleteReview = async (
 };
 
 
-export const loadReviewById = async (reviewId: number): Promise<Review | null> => {
-  const response = await api.get(`/reviews/${reviewId}`);
-  if (response.data?.userId) {
-    const username = await getUsername(response.data.userId);
-    if (!username)
-      return null;
-    return parse(ReviewMeta, review_backendToFrontend(response.data, username));
+export const loadReviewById = async (reviewId: number, onFail: (e) => void = console.log): Promise<Review | null> => {
+  try {
+    const response = await api.get(`/reviews/${reviewId}`);
+    if (response.data?.userId) {
+      const username = await getUsername(response.data.userId);
+      if (!username)
+        return null;
+      return parse(ReviewMeta, review_backendToFrontend(response.data, username));
+    }
+  } catch (e) {
+    onFail(e)
+    return null;
   }
-
+  onFail("Failed to load review by ID")
   return null;
 }
