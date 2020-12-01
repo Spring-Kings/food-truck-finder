@@ -9,7 +9,10 @@ import { DialogContent, Grid, Typography } from '@material-ui/core';
 import { toTimeString } from '../../../util/date-conversions';
 
 function RouteMapView(props: RouteState) {
-  const [route, setRoute]: [RouteState, any] = useState(props);
+  const [route, setRoute]: [RouteState, any] = useState({
+    ...props,
+    locations: []
+  });
   const [selectedLocation, setSelectedLocation]: [RouteLocation | null, any] = useState(null);
 
   useEffect(() => {

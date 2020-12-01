@@ -10,7 +10,7 @@ interface Props {
 };
 
 export type RouteState = Route & {
-  locations?: RouteLocation[];
+  locations: RouteLocation[];
 };
 
 function RoutesView(props: Props) {
@@ -23,6 +23,7 @@ function RoutesView(props: Props) {
   }, [props.truckId]);
 
   useEffect(() => {
+    console.group(routes);
     if (routes.length > 0) {
       setSelectedRoute(routes[0]);
     }
