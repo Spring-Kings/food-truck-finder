@@ -16,6 +16,7 @@ interface Props {
 }
 
 function TruckListAndMapComponent(props: Props) {
+  console.log(props.recommendedTrucks)
   return (
     <GridList cols={5}
               style={{
@@ -53,6 +54,7 @@ function TruckListAndMapComponent(props: Props) {
           <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
             <List disablePadding>
             {
+
               props.recommendedTrucks.map(truck => (
                 <ListItem key={truck.truck.id} style={{minWidth: '100%'}} disableGutters>
                   <TruckCardComponent id={truck.truck.id}

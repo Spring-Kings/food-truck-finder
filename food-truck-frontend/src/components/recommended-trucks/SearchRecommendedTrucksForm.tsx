@@ -7,9 +7,9 @@ import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import {ReactEventAdapter} from "../Form";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
-import { getLocationFromStorage } from "../../util/position";
+import {getLocationFromStorage} from "../../util/position";
 import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
-import {backendToFrontend, RouteLocation} from "../../domain/RouteLocation";
+import {RouteLocation} from "../../domain/RouteLocation";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
@@ -61,7 +61,7 @@ class RecommendedTrucksForm extends Component<
   }
 
   getRouteLocations(trucks: RecommendedSimpleTruck[]) {
-      return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
+    return trucks.map((t, ndx) => t.loc)
   }
 
   render() {
@@ -148,7 +148,7 @@ class RecommendedTrucksForm extends Component<
         method: "POST",
       });
       if (resp.data !== undefined) {
-        this.setState({ selectedTrucks: this.getRouteLocations(resp.data) })
+        this.setState({selectedTrucks: this.getRouteLocations(resp.data)}, () => console.log(this.state.selectedTrucks))
       }
 
     } catch (err) {
