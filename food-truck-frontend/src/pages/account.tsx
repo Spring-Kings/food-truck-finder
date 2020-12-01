@@ -37,7 +37,7 @@ class AccountPageComponent extends React.Component<PageProps, PageState> {
         else if (this.state.user == null) {
             return <p>Please wait...</p>
         } else {
-            let editForm = null;
+            let editForm: any = null;
             if (this.state.editMode) {
                 const resultP = (this.state.submitResultText !== null) ? <p>{this.state.submitResultText}</p> : null;
                 editForm = <div>
