@@ -250,4 +250,15 @@ public class TruckEndpoint {
         if (result != HttpStatus.OK)
             throw new ResponseStatusException(result);
     }
+
+    @Secured("ROLE_OWNER")
+    @DeleteMapping("/truck/{truckId}/delete-menu")
+    public void uploadMenu(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        if (!truckService.userOwnsTruck(u, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        var result = truckService.tryDeleteMenu(truckId);
+        if (result != HttpStatus.OK)
+            throw new ResponseStatusException(result);
+    }
 }

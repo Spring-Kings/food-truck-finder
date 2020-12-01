@@ -62,3 +62,8 @@ export const deleteTruck = async (truckId: number, onFail: (err: any) => void) =
   await api.delete(`/truck/delete/${truckId}`, {})
     .catch(onFail);
 }
+
+export const deleteTruckMenu = async (truckId: number, onFail: (err: any) => void) => {
+  await api.delete(`/truck/${truckId}/delete-menu`, {})
+    .catch(onFail);
+}

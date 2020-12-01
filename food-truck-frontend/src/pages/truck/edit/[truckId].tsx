@@ -16,7 +16,7 @@ import {
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
-import {getTruckById, deleteTruck} from "../../../api/Truck";
+import {getTruckById, deleteTruck, deleteTruckMenu} from "../../../api/Truck";
 
 interface EditTruckState {
     message: string;
@@ -70,14 +70,14 @@ function EditTruck(props: TruckProps) {
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
     router.push(`/truck/${state.id}`);
-  }
+  };
 
   const onFail = (formData: any, response: AxiosError) => {
     setState({
       ...state,
       message: `Failed to update truck details: ${JSON.stringify(response)}`
     });
-  }
+  };
 
   const deleteTruckCallback = () => {
     deleteTruck(state.id, err => {
@@ -87,7 +87,17 @@ function EditTruck(props: TruckProps) {
       })
     })
       .then(res => router.push('/'));
-  }
+  };
+
+  const deleteMenuCallback = () => {
+    deleteTruckMenu(state.id, err => {
+      setState({
+        ...state,
+        message: `Failed to delete menu: ${JSON.stringify(err)}`
+      })
+    })
+      .then(res => router.push(`/truck/${state.id}`));
+  };
 
   if (state.userId == -1)
     return <CircularProgress/>
@@ -95,6 +105,9 @@ function EditTruck(props: TruckProps) {
   return (
     <Grid container alignItems="stretch">
       <Grid container direction="row" alignItems="flex-start" className={classes.root}>
+        <Grid item>
+          <Button onClick={() => router.push(`/truck/${state.id}`)}>Back to Truck</Button>
+        </Grid>
         <Grid item className={classes.root}>
           <Card>
             <CardHeader title="Edit Truck Details"/>
@@ -119,7 +132,7 @@ function EditTruck(props: TruckProps) {
         </Grid>
         <Grid item direction="column" className={classes.root}>
           <Card>
-            <CardHeader title="Upload Menu"/>
+            <CardHeader title="Menu and Danger Zone"/>
             <CardContent>
               <Grid container>
                 <Grid item>
@@ -129,6 +142,11 @@ function EditTruck(props: TruckProps) {
                       <input className="hidden" type="file" id="fileInput" name="file" onChange={onMenuChange}/>
                     </Button>
                   </form>
+                </Grid>
+                <Grid item>
+                  <Button color="secondary" onClick={deleteMenuCallback}>
+                    Delete Menu
+                  </Button>
                 </Grid>
                 <Grid item>
                   <Button color="secondary"
