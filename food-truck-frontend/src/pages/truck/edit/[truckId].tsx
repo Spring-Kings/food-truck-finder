@@ -1,39 +1,32 @@
 import api from "../../../util/api";
 import Form from "../../../components/Form";
-import {makeEmptyTruckState, TruckProps, TruckState, userCanEditTruck} from "../../../components/TruckView";
+import {TruckProps, userCanEditTruck} from "../../../components/TruckView";
 import React, {useEffect, useState} from 'react'
 import {AxiosError, AxiosResponse} from "axios";
 import { useRouter } from "next/router";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CircularProgress,
-  Grid,
-  TextField,
-} from "@material-ui/core";
+import {Button, Card, CardContent, CardHeader, CircularProgress, Grid, TextField,} from "@material-ui/core";
 import MultiField from "../../../components/util/multi_field";
 import RouterSelectable from "../../../components/util/RouterSelectableComponent";
 import {useFlexGrowStyles} from "../../../components/theme/FoodTruckThemeProvider";
-import {getTruckById, deleteTruck} from "../../../api/Truck";
+import {deleteTruck, getTruckById} from "../../../api/TruckApi";
+import Truck from "../../../domain/Truck";
 
-interface EditTruckState {
-    message: string;
-}
-
-type TruckComponentState = TruckState & EditTruckState;
+type TruckComponentState = {
+  truck: Truck | null
+  message: string
+};
 
 function EditTruck(props: TruckProps) {
   const router = useRouter();
   const classes = useFlexGrowStyles();
   const [state, setState]: [TruckComponentState, any] = useState({
-    ...makeEmptyTruckState(),
-    id: props.truckId,
+    truck: null,
     message: "",
   });
 
   const onMenuChange = (event: React.FormEvent) => {
+    if (!state.truck)
+      return;
     const formData = new FormData();
     const imagefile = document.querySelector('#fileInput') as HTMLInputElement;
 
@@ -43,7 +36,7 @@ function EditTruck(props: TruckProps) {
     }
 
     formData.append("file", imagefile.files[0]);
-    api.post(`/truck/${state.id}/upload-menu`, formData, {
+    api.post(`/truck/${state.truck.id}/upload-menu`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -59,37 +52,33 @@ function EditTruck(props: TruckProps) {
       router.push("/");
     })
       .then(truck => {
-        console.table(truck);
         // If the response indicates they own the truck, show them. Otherwise, kick out.
         if (truck && userCanEditTruck(truck.userId))
-          setState(truck);
+          setState({truck});
         else
         router.push("/");
       });
   }, [props.truckId]);
 
   const onSubmit = (formData: any, response: AxiosResponse) => {
-    router.push(`/truck/${state.id}`);
+    if (state.truck)
+      router.push(`/truck/${state.truck.id}`);
   }
 
   const onFail = (formData: any, response: AxiosError) => {
-    setState({
-      ...state,
-      message: `Failed to update truck details: ${JSON.stringify(response)}`
-    });
+    setState({message: `Failed to update truck details: ${JSON.stringify(response)}`});
   }
 
   const deleteTruckCallback = () => {
-    deleteTruck(state.id, err => {
-      setState({
-        ...state,
-        message: `Failed to update truck details: ${JSON.stringify(err)}`
-      })
+    if (!state.truck)
+      return;
+    deleteTruck(state.truck.id, err => {
+      setState({message: `Failed to update truck details: ${JSON.stringify(err)}`})
     })
       .then(res => router.push('/'));
   }
 
-  if (state.userId == -1)
+  if (!state.truck)
     return <CircularProgress/>
 
   return (
@@ -101,17 +90,17 @@ function EditTruck(props: TruckProps) {
             <CardContent>
               <Form submitMethod="PUT" submitUrl={'/truck/update'} onSuccessfulSubmit={onSubmit}
                     onFailedSubmit={onFail}>
-                <TextField className={"hidden"} disabled label="Truck ID" name="truckId" defaultValue={state.id}/>
-                <TextField label="Truck Name" name="name" defaultValue={state.name}/>
+                <TextField className={"hidden"} disabled label="Truck ID" name="truckId" defaultValue={state.truck.id}/>
+                <TextField label="Truck Name" name="name" defaultValue={state.truck.name}/>
                 <TextField label="Description" name="description"
-                           defaultValue={state.description}/>
+                           defaultValue={state.truck.description}/>
                 <TextField label="Price Rating" name="priceRating"
-                           defaultValue={state.priceRating}/>
+                           defaultValue={state.truck.priceRating}/>
                 <MultiField
                   title="Truck Tags"
                   name="tags"
                   variant="h6"
-                  value={state.tags}
+                  value={state.truck.tags}
                 />
               </Form>
             </CardContent>

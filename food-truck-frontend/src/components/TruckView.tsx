@@ -1,64 +1,39 @@
 import React, {Component} from "react";
 import {Button, Container, Grid, Link, List, ListItem, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import NotFound from "./NotFound";
-import api from "../util/api";
 import Router from "next/router";
-import getUserInfo from "../util/token";
+import loggedInUser from "../util/token";
 import TruckRouteMapComponent from "./map";
-import {RouteLocation} from "./map/route-map/RouteLocation";
+import {RouteLocation} from "../domain/RouteLocation";
 
 import {DEFAULT_ERR_RESP} from "../api/DefaultResponses";
-import {loadTodaysRoute} from "../api/RouteLocation";
+import {loadCurrentRoute} from "../api/RouteLocationApi";
 import SendNotificationComponent from "./notifications/SendNotificationComponent";
-import {getSubscriptionForTruck, subscribeToTruck, Subscription, unsubscribeFromTruck} from "../api/Subscription";
+import {getSubscriptionForTruck, subscribeToTruck, unsubscribeFromTruck} from "../api/SubscriptionApi";
 import ImageDialog from "./util/ImageDialog";
 import {MoneyRating, StarRating} from "./truck/rate_and_review/ratings";
 import TruckRatingComponent from "./truck/TruckRatingComponent";
+import Truck from "../domain/Truck";
+import Subscription from "../domain/Subscription";
+import {getTruckById} from "../api/TruckApi";
 
 export const userCanEditTruck = (truckOwnerId: number): boolean => {
-  const user = getUserInfo();
+  const user = loggedInUser();
   if (user) {
     return truckOwnerId === user.userID;
   }
   return false;
 };
 
-export interface TruckState {
-  id: number;
-  userId: number;
-  name: string;
-  description: string | null;
-  priceRating: number | null;
-  tags: string[];
-  starRating: number | null;
-  menuContentType: string | null;
-}
-
-export const makeEmptyTruckState = (): TruckState => {
-  return {
-    id: 0,
-    userId: 0,
-    name: "",
-    description: "",
-    priceRating: null,
-    tags: [],
-    starRating: null,
-    menuContentType: null
-  };
-};
-
-interface TruckViewState {
-  notFound: boolean | null;
-}
-
 export interface TruckProps {
   truckId: number;
 }
 
-type State = TruckState & TruckViewState & {
-  routePts: RouteLocation[];
+type State = {
+  truck: Truck | null;
+  routePts: RouteLocation[] | null;
   subscription: Subscription | null;
+  err: string | null;
 };
 
 class TruckView extends Component<TruckProps, State> {
@@ -66,8 +41,8 @@ class TruckView extends Component<TruckProps, State> {
     super(props);
 
     this.state = {
-      ...makeEmptyTruckState(),
-      notFound: null,
+      truck: null,
+      err: null,
       routePts: [],
       subscription: null,
     };
@@ -75,41 +50,26 @@ class TruckView extends Component<TruckProps, State> {
 
   async componentDidMount() {
     try {
-      await api
-        .get(`/truck/${this.props.truckId}`, {})
-        .then((res) => this.setState(res ? res.data : null))
-        .catch((err) => {
-          if (err.response) {
-            console.log("Got error response code");
-          } else if (err.request) {
-            console.log("Did not receive Truck response");
-          } else {
-            console.log(err);
-          }
-          this.setState(null);
-        });
+      const truck = await getTruckById(this.props.truckId, DEFAULT_ERR_RESP);
+      if (truck === null) {
+        this.setState({err: "Couldn't get truck"});
+        return;
+      }
 
-      await getSubscriptionForTruck(this.props.truckId).then((sub) => {
-        this.setState({
-          ...this.state,
-          subscription: sub
-        })
-      });
+      const sub = await getSubscriptionForTruck(this.props.truckId);
+      const routePts = await loadCurrentRoute(this.props.truckId, DEFAULT_ERR_RESP);
 
-      // Load today's route
-      this.setState({
-        ...this.state,
-        routePts: await loadTodaysRoute(this.props.truckId, DEFAULT_ERR_RESP),
-      });
+      this.setState({subscription: sub, routePts, truck})
+
     } catch (err) {
       console.log(err);
     }
   }
 
   render() {
-    if (!this.state) {
-      return <NotFound/>;
-    } else if (this.state.id < 1) {
+    if (this.state.err) {
+      return <p>{this.state.err}</p>
+    } else if (!this.state.truck) {
       return (
         <Container>
           <CircularProgress/>
@@ -123,37 +83,38 @@ class TruckView extends Component<TruckProps, State> {
           <Typography variant="subtitle1">Description:</Typography>
         </Grid>
         <Grid item style={{maxWidth: '250px'}}>
-          {this.state.description}
+          {this.state.truck.description}
         </Grid>
       </Grid>
     );
 
-    const priceRating = this.state.priceRating ?
+    const priceRating = this.state.truck.priceRating ?
       <TruckRatingComponent name="Price Rating:"
-                            child={<MoneyRating readOnly precision={0.1} value={this.state.priceRating}/>}/>
-       : <></>;
-    const starRating = this.state.starRating ?
+                            child={<MoneyRating readOnly precision={0.1} value={this.state.truck.priceRating}/>}/>
+      : <></>;
+    const starRating = this.state.truck.starRating ?
       <TruckRatingComponent name="Star Rating:"
-                            child={<StarRating readOnly precision={0.1} value={this.state.starRating}/>}/>
-       : <></>;
+                            child={<StarRating readOnly precision={0.1} value={this.state.truck.starRating}/>}/>
+      : <></>;
 
     const tags = (
       <>
         <Typography variant="subtitle1">Tags:</Typography>
         <List>
-          {this.state.tags.map((tag, _ndx) => <ListItem key={`${this.state.id}-${tag}`}>{tag}</ListItem>)}
+          {this.state.truck.tags.map((tag: string, _ndx: number) => <ListItem
+            key={`${this.props.truckId}-${tag}`}>{tag}</ListItem>)}
         </List>
       </>
     );
 
     const reviewButton = (
-      <ListItem key={`${this.state.id}-reviewBtn`}>
+      <ListItem key={`${this.props.truckId}-reviewBtn`}>
         <Button color="primary" onClick={this.reviewTruck}>Leave Review</Button>
       </ListItem>
     );
 
     const subscribeButton = (
-      <ListItem key={`${this.state.id}-subscribeBtn`}>
+      <ListItem key={`${this.props.truckId}-subscribeBtn`}>
         <Button color="primary"
                 onClick={this.handleSubscription}>
           {this.state.subscription == null ? "Subscribe" : "Unsubscribe"}
@@ -161,12 +122,12 @@ class TruckView extends Component<TruckProps, State> {
       </ListItem>
     );
 
-    const menuUrl = `${process.env.S3_URL}/menu/${this.state.id}`;
+    const menuUrl = `${process.env.S3_URL}/menu/${this.props.truckId}`;
     let menuButton;
-    if (this.state.menuContentType === 'application/pdf')
+    if (this.state.truck.menuContentType === 'application/pdf')
       menuButton = <Button><Link href={menuUrl} color="initial">View Menu PDF</Link></Button>
     else
-      menuButton = <ImageDialog url={menuUrl} text={`${this.state.name} Menu`}/>
+      menuButton = <ImageDialog url={menuUrl} text={`${this.state.truck.name} Menu`}/>
 
     const viewReviewsButton = (
       <Button color="primary" onClick={this.readReviews}>Read Reviews</Button>
@@ -183,14 +144,14 @@ class TruckView extends Component<TruckProps, State> {
 
     const truckInfoView = (
       <Grid item>
-        <Typography variant="h4">{this.state.name}</Typography>
+        <Typography variant="h4">{this.state.truck.name}</Typography>
         <List>
           {truckInfo.map((el, index) => (
-            <ListItem key={`${this.state.id}-${index}`}>
+            <ListItem key={`${this.props.truckId}-${index}`}>
               {el}
             </ListItem>
           ))}
-          {!userCanEditTruck(this.state.userId) && getUserInfo() !== null &&
+          {!userCanEditTruck(this.state.truck.userId) && loggedInUser() !== null &&
           <>
             {reviewButton}
             {subscribeButton}
@@ -217,7 +178,7 @@ class TruckView extends Component<TruckProps, State> {
               <Typography variant="subtitle1">Send Notification To Subscribers:</Typography>
             </Grid>
             <Grid item>
-              <SendNotificationComponent truckId={this.state.id}/>
+              <SendNotificationComponent truckId={this.props.truckId}/>
             </Grid>
           </Grid>
         </Grid>
@@ -229,35 +190,41 @@ class TruckView extends Component<TruckProps, State> {
         <Grid container direction="row" justify="flex-start" align-items="flex-start">
           {truckInfoView}
           <Grid item xs>
-            <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+            {
+              this.state.routePts
+                ? <TruckRouteMapComponent locations={this.state.routePts} height="50vh"/>
+                : <p>Not currently on a route.</p>
+            }
+
           </Grid>
         </Grid>
-        {userCanEditTruck(this.state.userId) && ownerButtons}
+        {userCanEditTruck(this.state.truck.userId) && ownerButtons}
       </Grid>
     );
   }
 
   editTruck = () => {
-    Router.push(`/truck/edit/${this.state.id}`);
+    Router.push(`/truck/edit/${this.props.truckId}`);
   };
   
   reviewTruck = () => {
-    Router.push(`/truck/reviews/create/${this.state.id}`);
+    Router.push(`/truck/reviews/create/${this.props.truckId}`);
   };
 
   readReviews = () => {
-    Router.push(`/truck/reviews/${this.state.id}`);
+    Router.push(`/truck/reviews/${this.props.truckId}`);
   };
 
   handleSubscription = () => {
     if (this.state.subscription != null) {
-      unsubscribeFromTruck(this.state.id).then(() => {});
+      unsubscribeFromTruck(this.props.truckId).then(() => {
+      });
       this.setState({
         ...this.state,
         subscription: null,
       });
     } else {
-      subscribeToTruck(this.state.id).then((sub) => {
+      subscribeToTruck(this.props.truckId).then((sub) => {
         this.setState({
           ...this.state,
           subscription: sub

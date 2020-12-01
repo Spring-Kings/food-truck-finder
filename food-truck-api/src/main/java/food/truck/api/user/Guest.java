@@ -12,4 +12,9 @@ public class Guest extends AbstractUser {
     public void visit(UserVisitor v) {
         v.accept(this);
     }
+
+    @Override
+    public boolean canView(User u) {
+        return u.privacySetting == PrivacySetting.PUBLIC;
+    }
 }

@@ -56,7 +56,7 @@ class ReviewsList extends React.Component<ReviewProps, ReviewState>{
 
 
     componentDidMount(){
-        api.get(`/user/reviews?username=${this.props.username}`).then((response) => {
+        api.get(`/reviews/user?username=${this.props.username}`).then((response) => {
             this.setState({data: response.data})
         }).catch((error) => {
             console.log(error.toString())

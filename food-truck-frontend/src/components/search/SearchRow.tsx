@@ -1,15 +1,11 @@
 import React from 'react';
 import {Divider, ListItem} from "@material-ui/core";
 import TruckCardComponent from "../truck/TruckCardComponent";
+import Truck from "../../domain/Truck";
 
-export type SearchTruckData = {
-  id: number;
-  name: string;
-  description: string;
-}
 
 type TruckProp = {
-  truck: SearchTruckData,
+  truck: Truck,
   onRedirect?: () => void;
 }
 

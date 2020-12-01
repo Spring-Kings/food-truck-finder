@@ -4,14 +4,14 @@ import {LatLngLiteral} from "@google/maps";
 import {Button, Container} from "@material-ui/core";
 import Alert from '@material-ui/lab/Alert'
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import {locationsConflict, RouteLocation, RouteLocationState} from "./RouteLocation";
+import {locationsConflict, RouteLocation} from "../../../domain/RouteLocation";
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
   loadRouteLocations,
   updateRouteDays,
   updateRouteLocations,
-} from "../../../api/RouteLocation";
+} from "../../../api/RouteLocationApi";
 import {DEFAULT_ERR_KICK, DEFAULT_ERR_RESP, DEFAULT_OK_RESP as DEFAULT_NOOP,} from "../../../api/DefaultResponses";
 import RouteDaysBar from "./RouteDaysBar";
 import DayOfWeek from "./DayOfWeek";
@@ -192,7 +192,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       },
       arrivalTime: time,
       exitTime: time,
-      state: RouteLocationState.CREATED,
+      state: "CREATED"
     });
 
     this.setState({
@@ -249,7 +249,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     let trash: RouteLocation[] = this.state.trashedPts;
 
     // If the point is in the DB, save it for deletion
-    if (curr.state != RouteLocationState.CREATED) trash = trash.concat(curr);
+    if (curr.state != "CREATED") trash = trash.concat(curr);
 
     // Remove from the results array
     result = this.state.routePts

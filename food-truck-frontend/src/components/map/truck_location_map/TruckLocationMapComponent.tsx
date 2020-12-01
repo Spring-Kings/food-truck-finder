@@ -2,11 +2,12 @@ import {Dialog, DialogContent} from "@material-ui/core";
 import React, {useEffect, useState} from "react";
 import TruckRouteMapComponent from "..";
 import {DEFAULT_ERR_RESP} from "../../../api/DefaultResponses";
-import {getTruckById} from "../../../api/Truck";
-import {blankRouteLocation, RouteLocation} from "../route-map/RouteLocation";
+import {getTruckById} from "../../../api/TruckApi";
+import {RouteLocation} from "../../../domain/RouteLocation";
 import TruckCardComponent from "../../truck/TruckCardComponent";
 import {userCanEditTruck} from "../../TruckView";
 import {StyledDialogTitle} from "../../util/StyledDialogTitle";
+import Truck, {emptyTruck} from "../../../domain/Truck";
 
 export type TruckLocationMapProps = {
   locations: RouteLocation[];
@@ -14,7 +15,7 @@ export type TruckLocationMapProps = {
 }
 
 const TruckLocationMapComponent = (props: TruckLocationMapProps) => {
-  const [viewTruck, setViewTruck]: [RouteLocation | undefined, any] = useState(blankRouteLocation());
+  const [viewTruck, setViewTruck]: [Truck | undefined, any] = useState(emptyTruck());
   const [ownsTruck, setOwnsTruck]: [boolean, any] = useState(false);
 
   const selectTruck = async (pt: RouteLocation, _latLng: any) => setViewTruck((await getTruckById(pt.stopId, DEFAULT_ERR_RESP)));

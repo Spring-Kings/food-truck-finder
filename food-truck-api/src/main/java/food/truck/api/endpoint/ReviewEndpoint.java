@@ -4,6 +4,7 @@ import food.truck.api.reviews_and_subscriptions.Review;
 import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
+import food.truck.api.user.AbstractUser;
 import food.truck.api.user.User;
 import food.truck.api.user.UserService;
 import lombok.Value;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -32,37 +34,60 @@ public class ReviewEndpoint {
     @Autowired
     private TruckService truckService;
 
+    private void censorReview(AbstractUser viewer, Review r) {
+        var user = userService.findUserById(r.getUserId()).get();
+        if (!viewer.canView(user))
+            r.setUserId(-1L);
+    }
+
     @GetMapping("/reviews/{reviewId}")
-    public Review getReviewById(@PathVariable long reviewId) {
-        return reviewService.findReviewById(reviewId);
+    public Review getReviewById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long reviewId) {
+        var review = reviewService.findReviewById(reviewId);
+        if (review == null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        censorReview(viewer, review);
+        return review;
     }
 
     @GetMapping("/reviews/user")
-    public List<Review> getUserReviews(@RequestParam String username) {
+    public List<Review> getUserReviews(@AuthenticationPrincipal AbstractUser viewer, @RequestParam String username) {
         User user = userService.loadUserByUsername(username);
         if(user == null){
-            return new LinkedList<>();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        if (!viewer.canView(user))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
         return reviewService.findReviewsByUserId(user.getId());
     }
 
     @GetMapping("/reviews/user/{userId}")
-    public List<Review> getUserReviews(@PathVariable long userId) {
+    public List<Review> getUserReviews(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long userId) {
+        var user = userService.findUserById(userId);
+        if(user.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        if (!viewer.canView(user.get()))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         return reviewService.findReviewsByUserId(userId);
     }
 
     @GetMapping("/reviews/truck/{truckId}")
-    public List<Review> getTruckReviews(@PathVariable long truckId) {
-        return reviewService.findReviewByTruckId(truckId);
+    public List<Review> getTruckReviews(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long truckId) {
+        var reviews =  reviewService.findReviewByTruckId(truckId);
+        reviews.forEach(r -> censorReview(viewer, r));
+        return reviews;
     }
 
     @GetMapping("/reviews/truck/{truckId}/user")
-    public Review getTruckReviews(@PathVariable long truckId, @RequestParam Long userId) {
+    public Review getTruckReviews(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long truckId, @RequestParam Long userId) {
         var result = reviewService.findReviewForUser(userId, truckId);
-        if (result.isPresent())
-            return result.get();
-        else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested review does not exist");
+        if (result.isPresent()) {
+            var user = userService.findUserById(result.get().getUserId()).get();
+            if (viewer.canView(user))
+                return result.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Requested review does not exist");
     }
 
     @Value
@@ -93,6 +118,10 @@ public class ReviewEndpoint {
     @Secured({"ROLE_USER"})
     @DeleteMapping("/reviews/truck/{truckId}")
     public boolean deleteReview(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        var review = reviewService.findReviewForUser(u.getId(), truckId);
+        if (review.isEmpty() || !review.get().getUserId().equals(u.getId()))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+
         boolean result = reviewService.deleteReviewByUser(u, truckId);
         if (!result)
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find the specified review");

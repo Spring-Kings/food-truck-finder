@@ -17,7 +17,9 @@ public class UserView {
     @JsonProperty("owner")
     boolean isOwner; // Null is considered false
 
+    PrivacySetting privacySetting;
+
     public static UserView of(User u) {
-        return new UserView(u.getUsername(), u.getId(), u.getEmail(), u.isOwner());
+        return new UserView(u.getUsername(), u.getId(), u.getEmail(), u.isOwner(), u.getPrivacySetting());
     }
 }
