@@ -8,6 +8,7 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.search.IndexingService;
 import food.truck.api.search.TruckSearchService;
+import food.truck.api.truck.RecommendedTruck;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
@@ -82,7 +83,7 @@ public class TruckEndpoint {
     }
 
     @PostMapping(path = "/truck/recommended")
-    public List<Pair<Truck, Double>> getRecommendedTrucks(
+    public List<RecommendedTruck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
             @RequestBody @NonNull UserPreferences prefs
     ) {
@@ -92,7 +93,21 @@ public class TruckEndpoint {
         var truckList = strategy.getTrucksWithNormalizedScores();
         if (truckList.size() > prefs.getNumRequested())
             truckList = truckList.subList(0, prefs.getNumRequested());
-        return truckList;
+
+        var trucks = new ArrayList<RecommendedTruck>();
+
+        truckList.stream().forEach(t -> {
+            RecommendedTruck truck = new RecommendedTruck();
+            RouteLocation loc = truckService.getCurrentRouteLocation(t.getFirst().getId()).get();
+            if(loc != null) {
+                truck.setLoc(loc);
+                truck.setTruck(t.getFirst());
+                truck.setScore(t.getSecond());
+                trucks.add(truck);
+            }
+        });
+
+        return trucks;
     }
 
     @GetMapping(path = "/truck/{id}")

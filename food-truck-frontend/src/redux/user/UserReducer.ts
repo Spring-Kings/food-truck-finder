@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {LoadUserAction, LogoutUserAction, UserActionTypes, userReduxName} from './UserActions';
+import {RouteLocation} from "../../components/map/route-map/RouteLocation";
 
 // Simple representation of a Truck, just what's needed here
 export interface SimpleTruck {
@@ -8,8 +9,9 @@ export interface SimpleTruck {
 }
 
 export interface RecommendedSimpleTruck {
-    first: SimpleTruck;
-    second: number;
+    truck: SimpleTruck;
+    score: number;
+    loc: any;
 }
 
 // The data field for the state
