@@ -7,7 +7,7 @@ function InteractiveMapPage(){
     let [locations, setLocations] = useState([]);
     useEffect(() => async () => setLocations(await getNearbyTruckLocations(DEFAULT_ERR_RESP)));
     return(
-        <TruckLocationMapComponent locations={locations} />
+        <TruckLocationMapComponent locations={locations} allowChangeLocation={true} />
     )
 }
 

@@ -33,24 +33,6 @@ class HomePageComponent extends React.Component {
             </>
         )
     }
-
-    componentDidMount() {
-        if (!navigator.geolocation)
-            console.log("Geolocation not supported")
-        else
-            navigator.geolocation.getCurrentPosition(this.geoLocationSuccess, this.geoLocationError);
-    }
-
-    geoLocationSuccess(position: Position) {
-        localStorage.setItem("longitude", String(position.coords.longitude));
-        localStorage.setItem("latitude", String(position.coords.latitude));
-        console.log("Set position to " + position.coords.latitude + "," + position.coords.longitude);
-    }
-
-    geoLocationError() {
-        console.log("Geolocation failure");
-    }
-
 }
 
 function HomePage() {
