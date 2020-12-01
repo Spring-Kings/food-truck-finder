@@ -53,8 +53,8 @@ function TruckListAndMapComponent(props: Props) {
             <List disablePadding>
             {
               props.recommendedTrucks.map(truck => (
-                <ListItem key={truck.first.id} style={{minWidth: '100%'}} disableGutters>
-                  <TruckCardComponent id={truck.first.id}
+                <ListItem key={truck.truck.id} style={{minWidth: '100%'}} disableGutters>
+                  <TruckCardComponent id={truck.truck.id}
                     userOwnsTruck={false}/>
                 </ListItem>
               ))

@@ -36,6 +36,7 @@ export const getNearbyTruckLocationsById = async (ids: number[], onFail: (err: a
   return result;
 };
 
+
 export const getTruckById = async (truckId: number, onFail: (err: any) => void) => {
     try {
         // TODO add mediation between the frontend and backend representations

@@ -3,12 +3,12 @@ import {Button, Grid, Slider, Typography} from "@material-ui/core";
 import React, {Component} from "react";
 import {DEFAULT_ERR_RESP} from "../../api/DefaultResponses";
 import api from "../../util/api";
-import {RouteLocation} from "../../domain/RouteLocation";
 import MultiField from "../util/multi_field";
 import {MoneyRating} from "../truck/rate_and_review/ratings";
 import {ReactEventAdapter} from "../Form";
-import {getNearbyTruckLocationsById} from "../../api/TruckApi";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
+import {RecommendedSimpleTruck} from "../../redux/user/UserReducer";
+import {backendToFrontend, RouteLocation} from "../../domain/RouteLocation";
 
 type RecommendedTruckProps = {};
 type RecommendedTruckState = {
@@ -62,6 +62,10 @@ class RecommendedTrucksForm extends Component<
         },
       })
     );
+  }
+
+  getRouteLocations(trucks: RecommendedSimpleTruck[]) {
+      return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
   }
 
   render() {
@@ -148,7 +152,7 @@ class RecommendedTrucksForm extends Component<
         method: "POST",
       });
       if (resp.data !== undefined) {
-        this.setState({ selectedTrucks: await getNearbyTruckLocationsById(resp.data.map((t: any) => t.id), DEFAULT_ERR_RESP) })
+        this.setState({ selectedTrucks: this.getRouteLocations(resp.data) })
       }
 
     } catch (err) {
