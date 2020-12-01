@@ -13,3 +13,7 @@ export const toTimeString = (date: Date) => {
     minute: 'numeric'
   }).format(date)
 }
+
+export const secondsWithinDay = (date: Date) => {
+  return date.getUTCHours() * 3600 + date.getUTCMinutes() * 60 + date.getUTCSeconds();
+}

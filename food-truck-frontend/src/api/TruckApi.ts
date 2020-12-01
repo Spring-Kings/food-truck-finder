@@ -74,3 +74,8 @@ export const getSubscribedUsernames = async (truckId: number, onFail?: (err: any
     onFail("Invalid response")
   return null;
 }
+
+export const deleteTruckMenu = async (truckId: number, onFail: (err: any) => void) => {
+  await api.delete(`/truck/${truckId}/delete-menu`, {})
+    .catch(onFail);
+}
