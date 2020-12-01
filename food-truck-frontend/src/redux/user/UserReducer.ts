@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 import {LoadUserAction, LogoutUserAction, UserActionTypes, userReduxName} from './UserActions';
-import {RouteLocation} from "../../components/map/route-map/RouteLocation";
 
 // Simple representation of a Truck, just what's needed here
 export interface SimpleTruck {

@@ -65,12 +65,7 @@ class RecommendedTrucksForm extends Component<
   }
 
   getRouteLocations(trucks: RecommendedSimpleTruck[]) {
-      var routeLoc: any = [];
-      trucks.map((t, ndx) => {
-          let loc: any = backendToFrontend(t.loc,ndx);
-          routeLoc.push(loc);
-      })
-      return routeLoc
+      return trucks.map((t, ndx) => backendToFrontend(t.loc, ndx))
   }
 
   render() {
