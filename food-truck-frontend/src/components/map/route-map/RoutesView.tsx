@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { loadRoutes } from '../../../api/RouteLocation';
 import { RouteLocation } from './RouteLocation';
 import RouteMapView from './RouteMapView';
-import { Container, List, ListItem, Typography } from '@material-ui/core';
+import { Box, Card, CardContent, CardHeader, Container, Grid, GridList, GridListTile, List, ListItem, ListSubheader, Typography } from '@material-ui/core';
 
 interface Props {
   truckId: number;
@@ -28,27 +28,56 @@ function RoutesView(props: Props) {
       setSelectedRoute(routes[0]);
     }
   }, [routes]);
-  
+
   return (
-    <>
-      <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
-        <Typography>Active Routes</Typography>
-        <List disablePadding>
-            {
-              routes.map(route => (
-                <ListItem key={`${route.routeId}-view`}
-                  style={{ minWidth: '100%' }}
-                  button
-                  onClick={() => setSelectedRoute(route)}
-                  disableGutters>
-                  <Typography>{route.routeName}</Typography>
-                </ListItem>
-              ))
-            }
-        </List>
-      </Container>
-      {selectedRoute !== null && <RouteMapView {...selectedRoute}/>}
-    </>
+    <GridList cols={10}
+    style={{
+      height: "50vh",
+      width: "100%",
+    }}>
+      <GridListTile cols={3} style={{ height: '50vh' }}>
+        <Card>
+          <CardHeader title="Active Routes"/>
+          <CardContent>
+            <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
+              <List disablePadding>
+                {
+                  routes.filter(route => route.active).map(route => (
+                    <ListItem key={`${route.routeId}-view`}
+                              style={{ minWidth: '100%' }}
+                              button
+                              onClick={() => setSelectedRoute(route)}
+                              disableGutters>
+                      <Box pl={1}>
+                        <Typography>{route.routeName}</Typography>
+                      </Box>
+                    </ListItem>
+                  ))
+                }
+              </List>
+            </Container>
+          </CardContent>
+        </Card>
+        <Box py={1}></Box>
+        <Card>
+          <CardHeader title="Active Days"/>
+          <CardContent>
+            <Grid container direction="row">
+              {selectedRoute !== null && (selectedRoute as RouteState).days.map(day => (
+                <Box p={2}>
+                  <Grid item key={day}><Typography>{day}</Typography></Grid>
+                </Box>
+              ))}
+            </Grid>
+          </CardContent>
+        </Card>
+      </GridListTile>
+      {selectedRoute !== null && 
+      <GridListTile cols={7} style={{ height: '50vh' }}>
+        <RouteMapView {...selectedRoute}/>
+      </GridListTile>
+      }
+    </GridList>
   );
 }
 

@@ -1,11 +1,10 @@
-import { Dialog } from 'material-ui';
 import React, { useEffect, useState } from 'react';
 import TruckRouteMapComponent from '..';
 import { loadRouteLocations } from '../../../api/RouteLocation';
 import { RouteLocation } from './RouteLocation';
 import { RouteState } from './RoutesView';
 import { StyledDialogTitle } from '../../util/StyledDialogTitle';
-import { DialogContent, Grid, Typography } from '@material-ui/core';
+import { Box, Dialog, DialogContent, Grid, Typography } from '@material-ui/core';
 import { toTimeString } from '../../../util/date-conversions';
 
 function RouteMapView(props: RouteState) {
@@ -28,22 +27,21 @@ function RouteMapView(props: RouteState) {
 
   return (
     <>
-      {/* <Dialog open={selectedLocation !== null}>
+      <Dialog open={selectedLocation !== null} fullWidth>
         <StyledDialogTitle onClose={() => setSelectedLocation(null)}>
           Active Time
         </StyledDialogTitle>
         <DialogContent>
-          <Typography>{`Arrival Time: ${toTimeString(selectedLocation !== null ? (selectedLocation as RouteLocation).arrivalTime : new Date())}`}</Typography>
+          <Box p={1}>
+            <Typography>{`Arrival Time: ${toTimeString(selectedLocation !== null ? (selectedLocation as RouteLocation).arrivalTime : new Date())}`}</Typography>
+            <Typography>{`Exit Time: ${toTimeString(selectedLocation !== null ? (selectedLocation as RouteLocation).exitTime : new Date())}`}</Typography>
+          </Box>
         </DialogContent>
-      </Dialog> */}
-      <Grid container direction="row">
-        {route.days.map(day => <Grid item key={day}><Typography>{day}</Typography></Grid>)}
-      </Grid>
+      </Dialog>
       <TruckRouteMapComponent
-              locations={route.locations !== undefined ? route.locations : []}
+              locations={route.locations}
               isRoute
               onMarkerClick={(pt: RouteLocation, _) => {
-                console.group(pt);
                 setSelectedLocation(pt);
               }}
               height="50vh"
