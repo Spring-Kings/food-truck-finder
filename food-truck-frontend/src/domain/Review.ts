@@ -15,7 +15,7 @@ export const ReviewMeta = t.type({
 
 export type Review = t.TypeOf<typeof ReviewMeta>
 
-export const isExtended = (r: Review) => r.review == null;
+export const isExtended = (r: Review) => r.review === null;
 
 export type TruckReviews = {
   reviews: Review[];

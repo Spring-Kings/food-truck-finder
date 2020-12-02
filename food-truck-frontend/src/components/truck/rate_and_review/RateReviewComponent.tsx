@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import {Button, Container, FormControlLabel, Grid, Switch, TextField, Typography,} from "@material-ui/core";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import Review, {emptyReview, isExtended} from "../../../domain/Review";
+import Review, {emptyReview} from "../../../domain/Review";
 import {deleteReview, getSaveReviewUrl, loadReviewFromTruckForUser,} from "../../../api/RateReviewApi";
 import NotFound from "../../NotFound";
 import loggedInUser, {UserInfo} from "../../../util/token";
@@ -18,6 +18,7 @@ export interface RateState {
   review: Review;
   user: UserInfo | null | undefined;
   old_review_text: string | null;
+  extended: boolean;
 }
 
 /** Number of rows for the review field */
@@ -30,7 +31,8 @@ class RateReviewComponent extends Component<RateProps, RateState> {
     this.state = {
       review: emptyReview(-1, this.props.truckId),
       user: undefined,
-      old_review_text: ""
+      old_review_text: "",
+      extended: false
     };
     this.switchExtended = this.switchExtended.bind(this);
     this.deleteReview = this.deleteReview.bind(this);
@@ -90,8 +92,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
             label="Leave Extended Review"
             control={
               <Switch
-                value={isExtended(this.state.review)}
-                checked={isExtended(this.state.review)}
+                value={this.state.extended}
                 onChange={this.switchExtended}
               />
             }
@@ -110,7 +111,7 @@ class RateReviewComponent extends Component<RateProps, RateState> {
               name="costRating"
               defaultValue={this.state.review.costRating}
             />
-            {isExtended(this.state.review) &&
+            {this.state.extended &&
             <TextField
                 label="Review"
                 variant="outlined"
@@ -131,8 +132,11 @@ class RateReviewComponent extends Component<RateProps, RateState> {
   }
 
   private switchExtended(_: any, checked: boolean) {
+    console.log("Checked", checked)
+    console.log("this.state.extended", this.state.extended)
     let review_text: string | null = checked ? this.state.old_review_text : null;
     this.setState({
+      extended: checked,
       old_review_text: this.state.review.review,
       review: {
         ...this.state.review,
