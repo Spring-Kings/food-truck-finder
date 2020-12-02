@@ -23,10 +23,3 @@ export const SNAPSHOT_TEST = <T>(
     });
   });
 };
-
-export const ACCESS_TEST = <T>(
-  test_name: string,
-  component_callback: GenericFactory<ReactElement<T>>
-) => {
-  // TODO determine how to test
-}

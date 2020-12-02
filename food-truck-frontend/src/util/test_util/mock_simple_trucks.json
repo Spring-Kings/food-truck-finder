@@ -1,0 +1,24 @@
+[
+  {
+    "truck": {
+      "name": "Waluigi's Taco Stand",
+      "id": 0
+    },
+    "score": 100,
+    "loc": {
+      "lat": 5,
+      "lng": -11
+    }
+  },
+  {
+    "truck": {
+      "name": "WaaBurge",
+      "id": 2
+    },
+    "score": 93.2,
+    "loc": {
+      "lat": 22,
+      "lng": 45
+    }
+  }
+]

@@ -42,6 +42,7 @@ jobs:
       - name: Test Frontend
         run: |
           cd food-truck-frontend
+          yarn build
           yarn test --passWithNoTests
 
   deploy:

@@ -1,18 +1,12 @@
 import React from 'react';
-import {Button, Container, FormGroup, Grid, List, ListItem, TextField} from "@material-ui/core";
-import SearchTruckRow, {SearchTruckData} from "../../components/search/SearchRow";
-import {searchTruckByName} from "../../api/Truck";
-import TruckCardComponent from "../truck/TruckCardComponent";
-
-const truck = [{
-  id: -1,
-  name: "",
-  description: ""
-}]
+import {Button, Container, FormGroup, Grid, List, TextField} from "@material-ui/core";
+import SearchTruckRow from "../../components/search/SearchRow";
+import {searchTruckByName} from "../../api/TruckApi";
+import Truck from "../../domain/Truck";
 
 type SearchTruckState = SearchTruckProps & {
   search: string;
-  trucks: SearchTruckData[];
+  trucks: Truck[];
 }
 
 type SearchTruckProps = {
@@ -25,7 +19,7 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
 
     this.state = {
       search: "",
-      trucks: truck,
+      trucks: [],
       onRedirect: props.onRedirect,
     }
 
@@ -35,7 +29,10 @@ class SearchTruckComponent extends React.Component<SearchTruckProps, SearchTruck
   handleSubmit() {
     searchTruckByName(this.state.search, (_err) => {
       this.setState({trucks: []});
-    }).then(trucks => this.setState({trucks: trucks}));
+    }).then(trucks => {
+      if (trucks != null)
+        this.setState({trucks})
+    });
   }
 
   render() {

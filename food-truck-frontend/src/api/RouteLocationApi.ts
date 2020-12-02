@@ -1,60 +1,73 @@
 import api from "../util/api";
-import {backendToFrontend, frontendToBackend, RouteLocation,} from "../components/map/route-map/RouteLocation";
+import {backendToFrontend, frontendToBackend, RouteLocation, RouteLocationMeta,} from "../domain/RouteLocation";
 import DayOfWeek from "../components/map/route-map/DayOfWeek";
+import { Route } from "next/dist/next-server/server/router";
+import { AxiosResponse } from "axios";
+import {parse} from "../util/type-checking";
 
-export const loadTodaysRoute = async (
+export const loadRoutes = async (
   truckId: number,
   onFail?: (res: any) => void
 ) => {
+  let routes: Route[] = [];
+  await api.get(`/truck/${truckId}/routes`, {})
+    .then(
+      (res: AxiosResponse<Route[]>) => {
+        routes = res.data;
+      },
+      (err) => { if (onFail) onFail(err); }
+    );
+  return routes;
+}
+
+export const loadCurrentRoute = async (
+  truckId: number,
+  onFail: (res: any) => void = console.log
+): Promise<RouteLocation[] | null> => {
   let routePts: RouteLocation[] = [];
   let nextStopId: number = 1;
 
-  await api
-    .request({
-      url: `/truck/${truckId}/active-route`,
-      method: "GET",
-      params: {
-        now: new Date()
-      }
-    })
-    .then((response) => {
-      if (response.data)
-        routePts = response.data.locations.map((pt: any) =>
-          backendToFrontend(pt, nextStopId++)
-        );
-    })
-    .catch(onFail);
-  return routePts;
+  try {
+    const resp = await api.get(`/truck/${truckId}/active-route`);
+    if (resp.data?.locations)
+      return resp.data.locations
+        .map((loc: any) => parse(
+          RouteLocationMeta, backendToFrontend(loc, nextStopId++)
+        ))
+  } catch (e) {
+    onFail(e)
+    return null
+  }
+  onFail("Failed to load route")
+
+  return null;
 };
 
 export const loadRouteLocations = async (
   routeId: number,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
-  let routePts: RouteLocation[] = [];
-  await api
-    .request({
-      url: `/truck/route/locations/${routeId}`,
-      method: "GET",
-    })
-    .then((response: any) => {
-      if (response.data != undefined) {
-        let nextStopId: number = 1;
-        routePts = response.data.map((pt: any) =>
-          backendToFrontend(pt, nextStopId++)
-        );
-      }
-    })
-    .catch(onFail);
-
-  return routePts;
+  try {
+    const resp = await api.get(`/truck/route/locations/${routeId}`);
+    if (resp.data !== null) {
+      let nextStopId = 1;
+      return resp.data.map((pt: any) => parse(
+        RouteLocationMeta, backendToFrontend(pt, nextStopId++)
+      ))
+    }
+  } catch (e) {
+    onFail(e)
+    return null
+  }
+  onFail("Failed to load route locations")
+  return null;
 };
 
 export const updateRouteLocations = async (
   routeId: number,
   routePts: RouteLocation[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await api
     .request({
@@ -70,7 +83,7 @@ export const deleteRouteLocations = async (
   routeId: number,
   trashedPts: RouteLocation[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   // Ignore if no locations
   if (trashedPts.length == 0)
@@ -105,7 +118,7 @@ export const updateRouteDays = async (
   days: DayOfWeek[],
   trashedDays: DayOfWeek[],
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   await updateDayList(routeId, days, `/route/add-day`, onSuccess, onFail);
   await updateDayList(
@@ -122,7 +135,7 @@ const updateDayList = async (
   days: DayOfWeek[],
   url: string,
   onSuccess?: (res: any) => void,
-  onFail?: (res: any) => void
+  onFail: (res: any) => void = console.log
 ) => {
   for (const v of days) {
     await api

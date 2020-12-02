@@ -1,3 +1,6 @@
+/* Mock out Axios API */
+jest.mock("../api");
+
 import api from "../api";
 
 /** Convenience shorthand so no-one needs to remember all this */
@@ -50,8 +53,6 @@ const API_SUITE = <T>(
   describeHeader: string,
   apiCalls: ApiTestDescriptor<T>[]
 ) => {
-  /* Mock out Axios API */
-  jest.mock("../api");
   /* Create mock request function */
   const MOCK_REQUEST = jest.fn();
 
@@ -59,6 +60,9 @@ const API_SUITE = <T>(
     /* Hook into the API request */
     beforeAll(() => {
       api.request = MOCK_REQUEST;
+      api.get = MOCK_REQUEST;
+      api.put = MOCK_REQUEST;
+      api.delete = MOCK_REQUEST;
     });
 
     /* Clear the mock request, to ensure no cross-test contamination */

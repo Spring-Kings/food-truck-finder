@@ -1,15 +1,16 @@
 import React from "react";
-import {FRONTEND_ORACLE as mockTrucks} from "../../../../util/test_util/route/oracle";
+import {CURRENT_ROUTE_ORACLE as mockTrucks} from "../../../../util/test_util/route/oracle";
 
-import * as route from "../../../../api/RouteLocation";
 import RouteMap from "../RouteMap";
 import { shallow } from "enzyme";
 
 // Mock out retrieve trucks
-jest.mock("../../../../api/RouteLocation", () => ({
+jest.mock("../../../../api/RouteLocationApi", () => ({
   loadRouteLocations: jest.fn(),
   loadRouteIsActive: jest.fn()
 }));
+
+import * as route from "../../../../api/RouteLocationApi";
 
 // Cache for original navigator
 var originalNavigator: Navigator;
@@ -37,9 +38,8 @@ describe("Snapshot test route map component", () => {
     (route.loadRouteLocations as any as jest.Mock<any, any>).mockResolvedValueOnce(mockTrucks);
     (route.loadRouteIsActive as any as jest.Mock<any, any>).mockResolvedValueOnce(false);
 
-    // Test
-    const shallowRender = shallow(<RouteMap routeId={0}/>);
-    expect(shallowRender.html()).toMatchSnapshot();
+    // Run test
+    check();
   })
 
   test("Matches route active snapshot", () => {
@@ -47,9 +47,8 @@ describe("Snapshot test route map component", () => {
     (route.loadRouteLocations as any as jest.Mock<any, any>).mockResolvedValueOnce(mockTrucks);
     (route.loadRouteIsActive as any as jest.Mock<any, any>).mockResolvedValueOnce(true);
 
-    // Test
-    const shallowRender = shallow(<RouteMap routeId={0}/>);
-    expect(shallowRender.html()).toMatchSnapshot();
+    // Run test
+    check();
   })
 
   test("Matches empty locations snapshot", () => {
@@ -57,8 +56,12 @@ describe("Snapshot test route map component", () => {
     (route.loadRouteLocations as any as jest.Mock<any, any>).mockResolvedValueOnce([]);
     (route.loadRouteIsActive as any as jest.Mock<any, any>).mockResolvedValueOnce(false);
 
-    // Test
-    const shallowRender = shallow(<RouteMap routeId={0}/>);
-    expect(shallowRender.html()).toMatchSnapshot();
+    // Run test
+    check();
   })
 });
+
+const check = () => {
+  const shallowRender = shallow(<RouteMap routeId={0}/>);
+  expect(shallowRender.html()).toMatchSnapshot();
+}

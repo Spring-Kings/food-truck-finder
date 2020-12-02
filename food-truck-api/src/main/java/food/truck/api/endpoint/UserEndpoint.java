@@ -5,10 +5,7 @@ import food.truck.api.reviews_and_subscriptions.ReviewService;
 import food.truck.api.reviews_and_subscriptions.Subscription;
 import food.truck.api.reviews_and_subscriptions.SubscriptionService;
 import food.truck.api.truck.Truck;
-import food.truck.api.user.AbstractUser;
-import food.truck.api.user.User;
-import food.truck.api.user.UserService;
-import food.truck.api.user.UserView;
+import food.truck.api.user.*;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
@@ -43,11 +40,24 @@ public class UserEndpoint {
         return true;
     }
 
+    @GetMapping("/get-username")
+    public String getUsername(@AuthenticationPrincipal AbstractUser viewer, @RequestParam long id) {
+        var user = userService.findUserById(id);
+        if (user.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var u = user.get();
+        if (!viewer.canView(u))
+            return "Anonymous";
+        else
+            return u.getUsername();
+    }
+
     @GetMapping("/user/{id}")
     public UserView findUserById(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
-        return userService.findUserById(id)
-                .map(UserView::of)
-                .orElse(null);
+        var target = userService.findUserById(id);
+        if (target.isEmpty() || !viewer.canView(target.get()))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return UserView.of(target.get());
     }
 
     @Value
@@ -57,6 +67,8 @@ public class UserEndpoint {
         String newPassword;
         @Nullable
         String newEmail;
+        PrivacySetting newPrivacySetting;
+        boolean newOwnerStatus;
     }
 
     @PutMapping("/user")
@@ -76,23 +88,27 @@ public class UserEndpoint {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
             u.setEmail(data.newEmail);
         }
+        u.setPrivacySetting(data.newPrivacySetting);
+        u.setOwner(data.newOwnerStatus);
 
         userService.saveUser(u);
+
         return true;
     }
 
     @GetMapping("/search-usernames")
-    public List<UserView> searchUsernames(@RequestParam String username) {
-        return userService.searchUsernames(username).stream()
-                .map(UserView::of)
-                .collect(Collectors.toList());
+    public UserView searchUsernames(@AuthenticationPrincipal AbstractUser viewer, @RequestParam String username) {
+        var user = userService.searchUsernames(username).stream().findFirst();
+        if (user.isEmpty() || !viewer.canView(user.get()))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return UserView.of(user.get());
     }
 
 
     @GetMapping("/user/{id}/subscriptions")
-    public List<Truck> getUserSubscriptions(@PathVariable long id) {
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long id) {
         var user = userService.findUserById(id);
-        if (user.isEmpty())
+        if (user.isEmpty() || !viewer.canView(user.get()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return subscriptionService.findSubsByUser(user.get()).stream()
                 .map(Subscription::getTruck)
@@ -100,9 +116,9 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/subscriptions")
-    public List<Truck> getUserSubscriptions(@RequestParam String username) {
+    public List<Truck> getUserSubscriptions(@AuthenticationPrincipal AbstractUser viewer, @RequestParam String username) {
         User user = userService.loadUserByUsername(username);
-        if (user == null)
+        if (user == null || !viewer.canView(user))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return subscriptionService.findSubsByUser(user).stream()
                 .map(Subscription::getTruck)
@@ -110,20 +126,11 @@ public class UserEndpoint {
     }
 
     @GetMapping("/user/{userId}/reviews")
-    public List<Review> getUserReviews(@PathVariable long userId) {
+    public List<Review> getUserReviews(@AuthenticationPrincipal AbstractUser viewer, @PathVariable long userId) {
         var u = userService.findUserById(userId);
-        if (u.isEmpty())
+        if (u.isEmpty() || !viewer.canView(u.get()))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         return reviewService.findReviewsByUserId(userId);
-    }
-
-    @GetMapping("/user/reviews")
-    public List<Review> getUserReviews(@RequestParam String username) {
-        User user = userService.loadUserByUsername(username);
-        if(user == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return reviewService.findReviewsByUserId(user.getId());
     }
 
 }

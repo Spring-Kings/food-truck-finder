@@ -1,6 +1,6 @@
 import api from "../util/api";
 
-export const validateAuthentication = async (onFail?: () => void) => {
+export const validateAuthentication = async (onFail: () => void = console.log) => {
   await api.get(`/authenticated`, {})
     .then(
       (res) => {
@@ -8,10 +8,8 @@ export const validateAuthentication = async (onFail?: () => void) => {
           onFail();
         }
       },
-    (_err) => {
-      if (onFail) {
+      (_err) => {
         onFail();
-      }
-    },
+      },
   );
 }

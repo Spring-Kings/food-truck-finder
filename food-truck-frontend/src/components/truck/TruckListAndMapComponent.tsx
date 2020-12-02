@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, Container, GridList, GridListTile, List, ListItem, Typography} from "@material-ui/core";
 import TruckCardComponent from "./TruckCardComponent";
 import TruckLocationMapComponent from "../map/truck_location_map/TruckLocationMapComponent";
-import {RouteLocation} from "../map/route-map/RouteLocation";
+import {RouteLocation} from "../../domain/RouteLocation";
 import {RecommendedSimpleTruck, SimpleTruck} from "../../redux/user/UserReducer";
 
 interface Props {
@@ -12,13 +12,15 @@ interface Props {
   owner?: boolean;
   listLabel: string;
   mapLabel: string;
+  allowChangeLocation?: boolean;
 }
 
 function TruckListAndMapComponent(props: Props) {
+  console.log(props.recommendedTrucks)
   return (
     <GridList cols={5}
               style={{
-                height: "100vh",
+                height: "auto",
                 width: "100%",
               }}>
       <GridListTile cols={2} style={{ height: '50vh' }}>
@@ -37,11 +39,11 @@ function TruckListAndMapComponent(props: Props) {
           </List>
         </Container>
       </GridListTile>
-      <GridListTile cols={3} style={{ height: '50vh' }}>
+      <GridListTile cols={3} style={{ height: 'auto' }}>
         <Box py={0.5} px={3}>
           <Typography variant="h6">{props.mapLabel}</Typography>
         </Box>
-        <TruckLocationMapComponent locations={props.routePts} height="50vh"/>
+        <TruckLocationMapComponent allowChangeLocation={props.allowChangeLocation} locations={props.routePts} height="50vh"/>
       </GridListTile>
 
       { props.recommendedTrucks !== undefined ?
@@ -52,9 +54,10 @@ function TruckListAndMapComponent(props: Props) {
           <Container style={{maxHeight: '50vh', overflow: 'auto'}}>
             <List disablePadding>
             {
+
               props.recommendedTrucks.map(truck => (
-                <ListItem key={truck.first.id} style={{minWidth: '100%'}} disableGutters>
-                  <TruckCardComponent id={truck.first.id}
+                <ListItem key={truck.truck.id} style={{minWidth: '100%'}} disableGutters>
+                  <TruckCardComponent id={truck.truck.id}
                     userOwnsTruck={false}/>
                 </ListItem>
               ))

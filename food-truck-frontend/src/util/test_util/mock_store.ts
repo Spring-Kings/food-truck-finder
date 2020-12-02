@@ -1,6 +1,6 @@
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import { makeEmptyTruckState } from "../../components/TruckView";
+import { emptyTruck } from "../../domain/Truck";
 import { StoreState } from "../redux";
 import user_data from "./user_data.json";
 
@@ -26,7 +26,7 @@ const mockStateFactory: () => StoreState = () => ({
         {
           id: 0,
           message: "waa",
-          truck: makeEmptyTruckState(),
+          truck: emptyTruck(),
           time: new Date(0),
           read: false,
           type: "type",

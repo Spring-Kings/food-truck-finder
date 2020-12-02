@@ -1,5 +1,6 @@
 package food.truck.api.endpoint;
 
+import food.truck.api.user.PrivacySetting;
 import food.truck.api.user.UserView;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,7 @@ public class UserEndpointTest extends EndpointTest {
     @Test
     public void updateUser() throws Exception {
         var req = put("/user")
-                .content(asJson(new UserEndpoint.EditUserParams("password", "newPass", "coolEmail@aaa")))
+                .content(asJson(new UserEndpoint.EditUserParams("password", "newPass", "coolEmail@aaa", PrivacySetting.USERS_ONLY, true)))
                 .contentType("application/json")
                 .with(user(data.standardUser));
         mockMvc.perform(req)
@@ -34,6 +35,8 @@ public class UserEndpointTest extends EndpointTest {
         var user = userService.findUserById(data.standardUser.getId()).get();
         assertEquals(user.getEmail(), "coolEmail@aaa");
         assertTrue(userService.passwordMatches(user, "newPass"));
+        assertEquals(user.getPrivacySetting(), PrivacySetting.USERS_ONLY);
+        assertTrue(user.isOwner());
     }
 
     @Test

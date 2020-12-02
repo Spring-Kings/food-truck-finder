@@ -11,7 +11,7 @@ function toUserInfo(obj: any): UserInfo | null {
     return null;
 }
 
-function getUserInfo(): UserInfo | null {
+function loggedInUser(): UserInfo | null {
     const token = localStorage.getItem('authToken');
     if (token === null) {
         return null;
@@ -26,4 +26,4 @@ function getUserInfo(): UserInfo | null {
     return toUserInfo(parsed);
 }
 
-export default getUserInfo;
+export default loggedInUser;

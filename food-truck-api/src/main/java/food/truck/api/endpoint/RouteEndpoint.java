@@ -150,13 +150,10 @@ public class RouteEndpoint {
         return routeService.createRoute(truckService.findTruckById(truckId).get(), data.routeName, Character.toUpperCase(data.active) == 'Y');
     }
 
-
-    // TODO: Should all users be able to see route locations?
     @GetMapping("/truck/route/locations/{routeId}")
-    public List<RouteLocation> getRouteLocations(@AuthenticationPrincipal User user, @PathVariable long routeId) {
+    public List<RouteLocation> getRouteLocations(@PathVariable long routeId) {
         return routeService.findRouteLocationByRouteId(routeId);
     }
-
 
     @Value
     private static class AddOrUpdateRouteLocationParams {
@@ -186,8 +183,9 @@ public class RouteEndpoint {
 
             LocalTime arrival = d.arrivalTime.atOffset(ZoneOffset.UTC).toLocalTime();
             LocalTime exit = d.exitTime.atOffset(ZoneOffset.UTC).toLocalTime();
-            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit))
+            if (!routeService.addOrUpdateLocation(routeId, d.routeLocationId, d.lat, d.lng, arrival, exit)) {
                 good = false;
+            }
         }
         return good;
     }

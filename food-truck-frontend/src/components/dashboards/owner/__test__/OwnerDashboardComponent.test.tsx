@@ -3,9 +3,8 @@ import React from "react";
 import OwnerDashboardComponent from "../OwnerDashboardComponent";
 import user_data from "../../../../util/test_util/user_data.json";
 import {
-  RouteLocation,
-  RouteLocationState,
-} from "../../../map/route-map/RouteLocation";
+  RouteLocation
+} from "../../../../domain/RouteLocation";
 import { SNAPSHOT_TEST } from "../../../../util/test_util/basic_tests";
 
 const mockLOC: RouteLocation = {
@@ -14,11 +13,11 @@ const mockLOC: RouteLocation = {
   exitTime: new Date(),
   stopId: 0,
   coords: { lat: 0, lng: 0 },
-  state: RouteLocationState.PERSISTED,
+  state: "PERSISTED" as "PERSISTED",
 };
 
-jest.mock("../../../../api/RouteLocation", () => ({
-  loadTodaysRoute: jest.fn().mockImplementation(() => [mockLOC]),
+jest.mock("../../../../api/RouteLocationApi", () => ({
+  loadCurrentRoute: jest.fn().mockImplementation(() => [mockLOC]),
 }));
 
 SNAPSHOT_TEST(

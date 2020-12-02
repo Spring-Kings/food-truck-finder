@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {createMuiTheme, jssPreset, makeStyles, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
+import {createMuiTheme, jssPreset, makeStyles, MuiThemeProvider, StylesProvider, ThemeProvider} from '@material-ui/core/styles';
 import {create} from 'jss';
 import rtl from 'jss-rtl';
 import CoolLayout, {Args} from "../layout/CoolLayout"
@@ -191,12 +191,14 @@ export const FoodTruckThemeProvider = (props: Args & ThemeProps) => {
 
   return (
     <StylesProvider jss={jss}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <CoolLayout>
-          {props.children}
-        </CoolLayout>
-      </ThemeProvider>
+      <MuiThemeProvider theme={theme}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <CoolLayout>
+            {props.children}
+          </CoolLayout>
+        </ThemeProvider>
+      </MuiThemeProvider>
     </StylesProvider>
   );
 };

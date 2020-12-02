@@ -4,7 +4,7 @@ import {LatLngLiteral} from "@google/maps";
 import {Button, Container} from "@material-ui/core";
 import Alert from '@material-ui/lab/Alert'
 import EditRouteStopDialogComponent from "./EditRouteStopDialog";
-import {locationsConflict, RouteLocation, RouteLocationState} from "./RouteLocation";
+import {locationsConflict, RouteLocation} from "../../../domain/RouteLocation";
 import TruckRouteMapComponent from "..";
 import {
   deleteRouteLocations,
@@ -12,7 +12,7 @@ import {
   loadRouteLocations,
   updateRouteDays,
   updateRouteLocations,
-} from "../../../api/RouteLocation";
+} from "../../../api/RouteLocationApi";
 import {DEFAULT_ERR_KICK, DEFAULT_ERR_RESP, DEFAULT_OK_RESP as DEFAULT_NOOP,} from "../../../api/DefaultResponses";
 import RouteDaysBar from "./RouteDaysBar";
 import DayOfWeek from "./DayOfWeek";
@@ -145,12 +145,15 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   }
 
   private checkForConflicts = (): string | null => {
+    console.log("Checking for conflicts")
     const locs = this.state.routePts;
     for (let i = 0; i < locs.length; ++i) {
       for (let j = i + 1; j < locs.length; ++j) {
         const loc1 = locs[i];
         const loc2 = locs[j];
-        if (locationsConflict(loc1, loc2)) {
+        const doesConflict = locationsConflict(loc1, loc2)
+        console.log("Conflicts? ", doesConflict)
+        if (doesConflict) {
           return `Stop #${loc1.stopId} (${toTimeString(loc1.arrivalTime)} - ${toTimeString(loc1.exitTime)})` +
             ` conflicts with stop #${loc2.stopId} (${toTimeString(loc2.arrivalTime)} - ${toTimeString(loc2.exitTime)})`
         }
@@ -186,7 +189,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
   private addPoint(e: any) {
     const id: number = this.state.nextStopId;
     const time = new Date();
-    time.setUTCSeconds(0, 0);
+    time.setSeconds(0, 0);
     const pts = this.state.routePts.concat({
       stopId: id,
       routeLocationId: -1,
@@ -196,7 +199,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
       },
       arrivalTime: time,
       exitTime: time,
-      state: RouteLocationState.CREATED,
+      state: "CREATED"
     });
 
     this.setState({
@@ -253,7 +256,7 @@ class RouteMapComponent extends React.Component<RouteMapProps, RouteMapState> {
     let trash: RouteLocation[] = this.state.trashedPts;
 
     // If the point is in the DB, save it for deletion
-    if (curr.state != RouteLocationState.CREATED) trash = trash.concat(curr);
+    if (curr.state != "CREATED") trash = trash.concat(curr);
 
     // Remove from the results array
     result = this.state.routePts

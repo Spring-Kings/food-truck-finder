@@ -2,6 +2,7 @@ import React, {Component, ReactElement} from 'react'
 import {AxiosError, AxiosResponse} from 'axios'
 import api from '../util/api'
 import {Button, Grid} from '@material-ui/core';
+import {recursiveMap} from "../util/react-utils";
 
 export type Props = {
     submitUrl: string,
@@ -35,48 +36,67 @@ class Form extends Component<Props, State> {
     super(props);
 
     this.state = {formData: {}};
-    React.Children.forEach(this.props.children, c => {
-      // Ensure a null didn't slip through (can happen in dynamic forms)
-      if (c === null)
+    recursiveMap(this.props.children, node => {
+      if (!React.isValidElement(node))
         return;
+      const e = node as ReactElement;
 
-      // Parse child
-      const child = c as ReactElement;
-      if (child.props.name != null) {
-        if (child.props.value != null) {
-          this.state.formData[child.props.name] = child.props.value;
-        } else if (child.props.defaultValue != null) {
-          this.state.formData[child.props.name] = child.props.defaultValue;
-        } else {
-          this.state.formData[child.props.name] = "";
-        }
+      if (e.props.name) {
+        this.state.formData[e.props.name] =
+            e.props.value ??
+            e.props.defaultValue ??
+            e.props.checked ??
+            "";
       }
     });
+
+    //console.log("Initial state: ");
+    //console.log(this.state);
 
     this.onSubmit = this.onSubmit.bind(this);
     this.onValueChanged = this.onValueChanged.bind(this);
   }
 
-  mapChild = (child: React.ReactNode) => {
-    const c = child as ReactElement;
-    if (c === null || c.props.name === undefined)
+  wrapInGrid = (child: React.ReactNode) => {
+    if (!React.isValidElement(child))
       return child;
-    return (
-      <Grid item>
-        {React.cloneElement(c, {
-          onChange: this.onValueChanged,
-          value: this.state.formData[c.props.name],
-          defaultValue: undefined
-        })}
-      </Grid>
-    );
+    const c = child as ReactElement;
+
+    return <Grid item key={c.key + "_wrapper"}>{c}</Grid>
+  }
+
+  mapChild = (child: React.ReactNode) => {
+    if (!React.isValidElement(child))
+      return child;
+
+    const c = child as ReactElement;
+    if (c.props.name) {
+      //console.log("Mapping " + c.props.name + " => " + this.state.formData[c.props.name]);
+      const someProps = (c.props.checked) ? {
+        checked: this.state.formData[c.props.name]
+      }
+      : {
+        value: this.state.formData[c.props.name]
+      }
+
+      return React.cloneElement(c, {
+        onChange: this.onValueChanged,
+        ...someProps,
+        defaultValue: undefined,
+      });
+    }
+
+    else
+      return c;
   }
 
   render() {
     return (
       <form onSubmit={this.onSubmit} {...this.props.formProps}>
         <Grid container spacing={2}>
-          {React.Children.map(this.props.children, this.mapChild)}
+          {recursiveMap(this.props.children, this.mapChild)
+              .map(this.wrapInGrid)
+          }
           <Grid item>
             <Button type="submit">Submit</Button>
           </Grid>
@@ -123,25 +143,34 @@ class Form extends Component<Props, State> {
     const name = target.name;
 
     this.setState(prev => ({
-      formData: {
-        ...prev.formData,
-        [name]: value
-      }
-    }));
+        formData: {
+          ...prev.formData,
+          [name]: value
+        }
+      }),
+//() => console.log(this.state)
+    );
+
   }
 
   static getDerivedStateFromProps(props: Props, state: State) {
     let newFormData: any = {};
     if (props.children)
-      React.Children.forEach(props.children, (c: any) => {
-        // Ensure a null didn't slip through (can happen in dynamic forms)
-        if (c === null)
+      recursiveMap(props.children, node => {
+        if (!React.isValidElement(node))
           return;
+        const e = node as ReactElement;
 
-        // Parse child
-        let name: string = (c as ReactElement).props.name as string;
-        newFormData[name] = state.formData[name];
+        if (e.props.name) {
+          newFormData[e.props.name] =
+              state.formData[e.props.name] ??
+              e.props.value ??
+              e.props.defaultValue ??
+              e.props.checked ??
+              "";
+        }
       });
+
     state.formData = newFormData;
     return state;
   }

@@ -8,6 +8,7 @@ import food.truck.api.routes.Route;
 import food.truck.api.routes.RouteLocation;
 import food.truck.api.search.IndexingService;
 import food.truck.api.search.TruckSearchService;
+import food.truck.api.truck.RecommendedTruck;
 import food.truck.api.truck.Truck;
 import food.truck.api.truck.TruckService;
 import food.truck.api.user.AbstractUser;
@@ -18,10 +19,7 @@ import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -82,7 +81,7 @@ public class TruckEndpoint {
     }
 
     @PostMapping(path = "/truck/recommended")
-    public List<Pair<Truck, Double>> getRecommendedTrucks(
+    public List<RecommendedTruck> getRecommendedTrucks(
             @AuthenticationPrincipal AbstractUser u,
             @RequestBody @NonNull UserPreferences prefs
     ) {
@@ -92,7 +91,21 @@ public class TruckEndpoint {
         var truckList = strategy.getTrucksWithNormalizedScores();
         if (truckList.size() > prefs.getNumRequested())
             truckList = truckList.subList(0, prefs.getNumRequested());
-        return truckList;
+
+        var trucks = new ArrayList<RecommendedTruck>();
+
+        truckList.stream().forEach(t -> {
+            RecommendedTruck truck = new RecommendedTruck();
+            RouteLocation loc = truckService.getCurrentRouteLocation(t.getFirst().getId()).get();
+            if(loc != null) {
+                truck.setLoc(loc);
+                truck.setTruck(t.getFirst());
+                truck.setScore(t.getSecond());
+                trucks.add(truck);
+            }
+        });
+
+        return trucks;
     }
 
     @GetMapping(path = "/truck/{id}")
@@ -211,14 +224,23 @@ public class TruckEndpoint {
     @GetMapping("/truck/{truckId}/subscription")
     public Optional<SubscriptionView> subscribedToTruck(@AuthenticationPrincipal User u, @PathVariable long truckId) {
         var subs = subscriptionService.findSubsByUser(u);
-        var iter = subs.stream()
-            .filter(sub -> sub.getTruck().getId().equals(truckId))
-            .map(SubscriptionView::of)
-            .iterator();
-        if (iter.hasNext()) {
-            return Optional.of(iter.next());
-        }
-        return Optional.empty();
+        return subs.stream()
+                .filter(sub -> sub.getTruck().getId().equals(truckId))
+                .map(SubscriptionView::of)
+                .findFirst();
+    }
+
+    @GetMapping("/truck/{truckId}/subscribed-usernames")
+    public List<String> getSubscribedUsernames(@AuthenticationPrincipal AbstractUser u, @PathVariable long truckId) {
+        var truck = truckService.findTruckById(truckId);
+        if (truck.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        var t = truck.get();
+        var subs = subscriptionService.findSubsByTruck(t);
+        return subs.stream()
+                .filter(sub -> u.canView(sub.getUser()))
+                .map(sub -> sub.getUser().getUsername())
+                .collect(Collectors.toList());
     }
 
     @Secured({"ROLE_USER"})
@@ -230,14 +252,10 @@ public class TruckEndpoint {
         }
         var truck = t.get();
         var subs = subscriptionService.findSubsByUser(u);
-        var filteredSubs = subs
-                .stream()
+        subs.stream()
                 .filter(sub -> sub.getTruck().getId().equals(truck.getId()))
-                .iterator();
-        if (filteredSubs.hasNext()) {
-            var sub = filteredSubs.next();
-            subscriptionService.deleteSubscription(sub);
-        }
+                .findFirst()
+                .ifPresent(subscriptionService::deleteSubscription);
     }
 
     @Secured("ROLE_OWNER")
@@ -247,6 +265,17 @@ public class TruckEndpoint {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 
         var result = truckService.tryUploadMenu(truckId, file);
+        if (result != HttpStatus.OK)
+            throw new ResponseStatusException(result);
+    }
+
+    @Secured("ROLE_OWNER")
+    @DeleteMapping("/truck/{truckId}/delete-menu")
+    public void uploadMenu(@AuthenticationPrincipal User u, @PathVariable long truckId) {
+        if (!truckService.userOwnsTruck(u, truckId))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+
+        var result = truckService.tryDeleteMenu(truckId);
         if (result != HttpStatus.OK)
             throw new ResponseStatusException(result);
     }
