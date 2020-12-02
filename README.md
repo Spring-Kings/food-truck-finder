@@ -18,7 +18,7 @@
     * Configure Lombok
         * Install Lombok Plugin for IntelliJ (IntelliJ IDEA > Preferences > Plugins ... Search for "Lombok" by Michail Plushnikov)
         * Enable Annotation Processing in IntelliJ Compliation (IntelliJ IDEA > Preferences > Build, Execution, Deployment > Compiler > Annotation Processors > Check "Enable annotation processing")
-* Deploy MySQL, Localstack, Flask: `docker-compose -f ./docker/local.docker-compose.yml up -d`
+* Deploy MySQL, Localstack, Tag Similarity Service: `docker-compose -f ./docker/local.docker-compose.yml up -d`
     * If you need to stop the containers (`docker-compose -f ./docker/local.docker-compose.yml stop` or ctrl+C), you can 
     restart the containers with: `docker-compose -f ./docker/local.docker-compose.yml start`   
 * From IntelliJ, create the default `food-truck-finder` database on the server: File > New > Data Source > Mysql  
@@ -56,9 +56,15 @@
 2. Run Homebrew to install Node: `brew install node`
 3. Run Homebrew to install Yarn: `brew install yarn`
 4. Navigate to the food-truck-frontend directory
-5. Install frontend dependencies: `yarn install` 
-6. Run the frontend dev server: `yarn dev` 
-7. Navigate to http://localhost:3000 - you should see the food truck application
+5. Install frontend dependencies: `yarn install`
+6. Modify the .env file to contain the following (note you should have your own Google Maps API development key.
+```
+FOOD_TRUCK_API_URL="http://localhost:8080"
+GOOGLE_MAPS_API_KEY=YOUR_KEY_HERE
+S3_URL="http://localhost:4572/ftbucket"
+```
+7. Run the frontend dev server: `yarn dev` 
+8. Navigate to http://localhost:3000 - you should see the food truck application
 
 **Local Development Instructions (Windows):**
 
