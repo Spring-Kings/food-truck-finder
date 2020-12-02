@@ -20,6 +20,7 @@ function NotificationListComponent(props: NotificationListProps) {
     if (notifications !== null) {
       let notifs: Notification[] = notifications?.filter((notification: Notification) => notification.id != id);
       setNotifications(notifs);
+      props.loadNotificationsFromBackend();
     }
   };
 
