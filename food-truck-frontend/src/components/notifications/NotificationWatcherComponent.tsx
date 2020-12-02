@@ -12,9 +12,10 @@ function NotificationWatcherComponent(props: NotificationListProps) {
   const [initialized, setInitialized]: [boolean, any] = useState(false);
   const [notify, setNotify]: [boolean, any] = useState(false);
   const [notified, setNotified]: [boolean, any] = useState(false);
+  const [checkAlert, setCheckAlert]: [boolean, any] = useState(false);
   const reloadNotifications = async () => {
     await props.loadNotificationsFromBackend();
-    notifyUnread();
+    setCheckAlert(true);
   };
   const notifyUnread = () => {
     const foundItem = props.data.notifications.find((notification) => !notification.read);
@@ -29,17 +30,21 @@ function NotificationWatcherComponent(props: NotificationListProps) {
 
   useEffect(() => {
       if (!initialized) {
-        reloadNotifications().then(setInitialized(true));
+        reloadNotifications();
+        setInitialized(true);
       }
     },
     [] // No state dependencies --> only run once
   );
   useEffect(() => {
-    if (initialized) {
-      const timer = setInterval(reloadNotifications, 15000);
-      return () => clearInterval(timer);
-    }
-  })
+    const timer = setInterval(reloadNotifications, 15000);
+    return () => clearInterval(timer);
+  }, [initialized]);
+
+  useEffect(() => {
+    if (initialized && checkAlert)
+      notifyUnread();
+  }, [props.data.notifications, checkAlert, initialized]);
 
   return (
     <>
