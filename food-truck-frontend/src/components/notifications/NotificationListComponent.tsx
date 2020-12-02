@@ -10,23 +10,11 @@ export type NotificationListProps = {
 };
 
 function NotificationListComponent(props: NotificationListProps) {
-  const [notifications, setNotifications]: [Notification[], any] = useState([]);
-  const [initialized, setInitialized]: [boolean, any] = useState(false);
-  const reloadNotifications = () => {
-    props.loadNotificationsFromBackend().then();
-    setNotifications(props.data.notifications);
-  };
+  const [notifications, setNotifications]: [Notification[], any] = useState(props.data.notifications);
+
   useEffect(() => {
-    if (!initialized) {
-      // Load
-      reloadNotifications();
-      setInitialized(true);
-    } else {
-      const timer = setInterval(reloadNotifications, 5000);
-      return () => clearInterval(timer);
-    }
-    return () => {};
-  });
+    setNotifications(props.data.notifications);
+  }, [props.data.notifications]);
 
   const deleteNotification = (id: number) => {
     if (notifications !== null) {
